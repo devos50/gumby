@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+
 import logging
 import sys
 import os
@@ -31,7 +32,9 @@ class StandaloneTriblerRunner(object):
         self.scenario_runner._read_scenario(scenario_file_path)
 
         self.scenario_runner.register(self.start_session)
-        self.scenario_runner.register(self.stop)
+        self.scenario_runner.register(self.stop_session)
+        self.scenario_runner.parse_file()
+        self.scenario_runner.run()
 
     def start_session(self):
         self._logger.info("Starting Tribler session")
@@ -39,8 +42,8 @@ class StandaloneTriblerRunner(object):
         options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
         self.service.start_tribler(options)
 
-    def stop(self):
-        self._logger.info("Stopping Tribler session")
+    def stop_session(self):
+        self._logger.error("Stopping Tribler session")
         self.service.session.shutdown()
         reactor.stop()
 
