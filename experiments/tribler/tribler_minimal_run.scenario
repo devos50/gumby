@@ -1,0 +1,4 @@
+# This experiment just starts and stops Tribler.
+#
+@0:2 start_session
+@0:15 stop
