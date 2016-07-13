@@ -45,33 +45,37 @@ from gumby.instrumentation import init_instrumentation
 
 
 sys.path.append(os.path.abspath('./tribler'))
-sys.path.append(os.path.abspath('./tribler/twisted/twisted/plugins'))
+sys.path.append(os.path.abspath('./tribler/twisted/plugins'))
 
 from tribler_plugin import TriblerServiceMaker
 
-class IdleTribleRunner():
+
+class IdleTriblerRunner(object):
+    """
+    This class simply starts an idle run of Tribler.
+    """
     def __init__(self):
         init_instrumentation()
         self.service = None
 
-
     def start(self):
         self.service = TriblerServiceMaker()
+        options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
+        self.service.start_tribler(options)
 
         if "TRIBLER_EXECUTION_TIME" in os.environ:
             run_time = int(os.environ["TRIBLER_EXECUTION_TIME"])
         else:
-            run_time = 60*10 # Run for 10 minutes by default
+            run_time = 60 * 10  # Run for 10 minutes by default
 
         reactor.callLater(run_time, self.stop)
 
     def stop(self):
-        # TODO(Laurens): Current the plugin does not offer a function to shutdown it nicely
-        # so once this is added, make sure it is not violently killed.
-        self.service.shutdown_process()
+        self.service.session.shutdown()
+        reactor.stop()
 
 if __name__ == "__main__":
-    runner = IdleTribleRunner()
+    runner = IdleTriblerRunner()
     reactor.callWhenRunning(runner.start)
     reactor.run()
 
