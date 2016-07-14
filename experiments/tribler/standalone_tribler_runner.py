@@ -14,6 +14,11 @@ sys.path.append(os.path.abspath('./tribler/twisted/plugins'))
 
 from tribler_plugin import TriblerServiceMaker
 
+from Tribler.community.allchannel.community import AllChannelCommunity
+from Tribler.community.search.community import SearchCommunity
+from Tribler.community.tunnel.hidden_community import HiddenTunnelCommunity
+from Tribler.dispersy.discovery.community import DiscoveryCommunity
+
 
 class StandaloneTriblerRunner(object):
     """
@@ -25,8 +30,16 @@ class StandaloneTriblerRunner(object):
         self.scenario_file = None
         self._logger = logging.getLogger(self.__class__.__name__)
         self.community_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "community_stats.csv"), 'w')
+        self.community_stats_file.write("Time,Search Communtiy,AllChannel Community,Tunnel Community,Discovery Community\n")
+
         self.tribler_session = None
         self.stats_lc = LoopingCall(self.write_stats)
+
+        # Communities
+        self.search_community = None
+        self.discovery_community = None
+        self.allchannel_community = None
+        self.tunnel_community = None
 
     def start_experiment(self):
         """
@@ -43,11 +56,22 @@ class StandaloneTriblerRunner(object):
         self.scenario_runner.parse_file()
         self.scenario_runner.run()
 
+    def get_num_candidates(self, community):
+        """
+        Get the number of candidates in a specific community
+        """
+        if not community:
+            return 0
+        return len(community.candidates)
+
     def write_stats(self):
         """
-
+        Write the gatherered statistics
         """
-        pass
+        self.scenario_file.write("%d,%d,%d,%d\n" % (self.get_num_candidates(self.search_community),
+                                                    self.get_num_candidates(self.allchannel_community),
+                                                    self.get_num_candidates(self.tunnel_community),
+                                                    self.get_num_candidates(self.discovery_community)))
 
     def start_session(self):
         """
@@ -61,7 +85,16 @@ class StandaloneTriblerRunner(object):
 
         # Fetch the communities in the tribler session
         for community in self.tribler_session.get_dispersy_instance().get_communities():
-            print community
+            if isinstance(community, AllChannelCommunity):
+                self.allchannel_community = community
+            elif isinstance(community, SearchCommunity):
+                self.search_community = community
+            elif isinstance(community, HiddenTunnelCommunity):
+                self.tunnel_community = community
+            elif isinstance(community, DiscoveryCommunity):
+                self.discovery_community = community
+
+        self.stats_lc.start(1)
 
     def stop_session(self):
         """
