@@ -1,0 +1,4 @@
+# This experiment starts Tribler and performs some basic operations (starting a download, performing a remote search etc.
+#
+@0:2 start_session
+@0:15 stop_session
