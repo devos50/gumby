@@ -60,7 +60,7 @@ class StandaloneTriblerRunner(object):
         self.tribler_session = self.service.session
 
         # Fetch the communities in the tribler session
-        for community in self.tribler_session.get_dispersy_instance().communities:
+        for community in self.tribler_session.get_dispersy_instance().get_communities():
             print community
 
     def stop_session(self):
