@@ -3,6 +3,7 @@
 import logging
 import sys
 import os
+import time
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
 
@@ -17,6 +18,7 @@ from tribler_plugin import TriblerServiceMaker
 from Tribler.community.allchannel.community import AllChannelCommunity
 from Tribler.community.search.community import SearchCommunity
 from Tribler.community.tunnel.hidden_community import HiddenTunnelCommunity
+from Tribler.Core.simpledefs import NTFY_CHANNEL, NTFY_DISCOVERED, NTFY_TORRENT
 from Tribler.dispersy.discovery.community import DiscoveryCommunity
 
 
@@ -31,9 +33,15 @@ class StandaloneTriblerRunner(object):
         self._logger = logging.getLogger(self.__class__.__name__)
         self.community_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "community_stats.csv"), 'w')
         self.community_stats_file.write("Time,Search Communtiy,AllChannel Community,Tunnel Community,Discovery Community\n")
+        self.discovered_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "discovered_stats.csv"), 'w')
+        self.community_stats_file.write("Time,Channels,Torrents\n")
 
         self.tribler_session = None
+        self.tribler_start_time = 0.0
         self.stats_lc = LoopingCall(self.write_stats)
+
+        self.discovered_torrents = 0
+        self.discovered_channels = 0
 
         # Communities
         self.search_community = None
@@ -68,10 +76,13 @@ class StandaloneTriblerRunner(object):
         """
         Write the gatherered statistics
         """
-        self.scenario_file.write("%d,%d,%d,%d\n" % (self.get_num_candidates(self.search_community),
-                                                    self.get_num_candidates(self.allchannel_community),
-                                                    self.get_num_candidates(self.tunnel_community),
-                                                    self.get_num_candidates(self.discovery_community)))
+        self.community_stats_file.write("%.2f,%d,%d,%d,%d\n" % (time.time() - self.tribler_start_time,
+                                                                self.get_num_candidates(self.search_community),
+                                                                self.get_num_candidates(self.allchannel_community),
+                                                                self.get_num_candidates(self.tunnel_community),
+                                                                self.get_num_candidates(self.discovery_community)))
+        self.discovered_stats_file.write("%.2f,%d,%d\n" % (time.time() - self.tribler_start_time,
+                                                           self.discovered_channels, self.discovered_torrents))
 
     def start_session(self):
         """
@@ -81,7 +92,11 @@ class StandaloneTriblerRunner(object):
         self.service = TriblerServiceMaker()
         options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
         self.service.start_tribler(options)
+        self.tribler_start_time = time.time()
         self.tribler_session = self.service.session
+
+        self.tribler_session.add_observer(self.on_channel_discovered, NTFY_CHANNEL, [NTFY_DISCOVERED])
+        self.tribler_session.add_observer(self.on_torrent_discovered, NTFY_TORRENT, [NTFY_DISCOVERED])
 
         # Fetch the communities in the tribler session
         for community in self.tribler_session.get_dispersy_instance().get_communities():
@@ -95,6 +110,12 @@ class StandaloneTriblerRunner(object):
                 self.discovery_community = community
 
         self.stats_lc.start(1)
+
+    def on_channel_discovered(self, subject, changetype, objectID, *args):
+        self.discovered_channels += 1
+
+    def on_torrent_discovered(self, subject, changetype, objectID, *args):
+        self.discovered_torrents += 1
 
     def stop_session(self):
         """
