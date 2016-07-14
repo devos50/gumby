@@ -34,7 +34,7 @@ class StandaloneTriblerRunner(object):
         self.community_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "community_stats.csv"), 'w')
         self.community_stats_file.write("Time,Search Communtiy,AllChannel Community,Tunnel Community,Discovery Community\n")
         self.discovered_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "discovered_stats.csv"), 'w')
-        self.community_stats_file.write("Time,Channels,Torrents\n")
+        self.discovered_stats_file.write("Time,Channels,Torrents\n")
 
         self.tribler_session = None
         self.tribler_start_time = 0.0
