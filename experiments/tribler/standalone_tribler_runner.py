@@ -123,9 +123,10 @@ class StandaloneTriblerRunner(object):
     def write_search_stats(self):
         search_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "search_stats.txt"), 'a')
         for query, search_info in self.search_stats.iteritems():
-            search_stats_file.write("---- query %s:\n" % query)
+            search_stats_file.write("---- run %d query %s:\n" % (self.run_index, query))
             for key, value in search_info.iteritems():
                 search_stats_file.write("%s %s\n" % (key, value))
+        search_stats_file.close()
 
     def start_session(self):
         """
@@ -210,7 +211,7 @@ class StandaloneTriblerRunner(object):
     def perform_torrent_search(self, query):
         self._logger.error("Starting remote torrent search with query %s" % query)
         self.search_stats[query] = {'num_hits': 0, 'time_first_response': -1, 'time_last_response': -1,
-                                    'start_time': time.time()}
+                                    'start_time': self.tribler_start_time - time.time()}
         keywords = split_into_keywords(unicode(query))
         self.tribler_session.search_remote_torrents(keywords)
 
