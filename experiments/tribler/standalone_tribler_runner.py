@@ -178,7 +178,7 @@ class StandaloneTriblerRunner(object):
         query = ' '.join(search_results['keywords'])
         start_time_search = self.search_stats[query]['start_time']
         self.search_stats[query]['num_hits'] += len(search_results['results'])
-        if self.search_stats[query]['time_first_response'] == -1:
+        if self.search_stats[query]['time_first_response'] == -1 and len(search_results['results']) >= 1:
             self.search_stats[query]['time_first_response'] = cur_time - start_time_search
         self.search_stats[query]['time_last_response'] = cur_time - start_time_search
 
