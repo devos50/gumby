@@ -136,7 +136,7 @@ class StandaloneTriblerRunner(object):
         self._logger.error("Starting Tribler session")
         begin_time = time.time()
         self.service = TriblerServiceMaker()
-        options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
+        options = {"restapi": 5289 + self.run_index, "statedir": None, "dispersy": -1, "libtorrent": -1}
         self.service.start_tribler(options)
         self.tribler_start_time = time.time()
         self.general_stats['tribler_startup'] = self.tribler_start_time - begin_time
