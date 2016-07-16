@@ -121,7 +121,7 @@ class StandaloneTriblerRunner(object):
         general_stats_file.close()
 
     def write_search_stats(self):
-        search_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "search_stats.txt"), 'w')
+        search_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "search_stats.txt"), 'a')
         for query, search_info in self.search_stats.iteritems():
             search_stats_file.write("---- query %s:\n" % query)
             for key, value in search_info.iteritems():
