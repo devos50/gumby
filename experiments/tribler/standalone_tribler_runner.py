@@ -38,7 +38,6 @@ class StandaloneTriblerRunner(object):
         self.service = None
         self.scenario_file = None
         self.general_stats = {}
-        self.search_stats = {}
         self.run_index = 0
         self.pending_searches = []
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -54,9 +53,6 @@ class StandaloneTriblerRunner(object):
         self.tribler_session = None
         self.tribler_start_time = 0.0
         self.stats_lc = LoopingCall(self.write_stats)
-
-        self.discovered_torrents = 0
-        self.discovered_channels = 0
 
         # Communities
         self.search_community = None
@@ -111,6 +107,7 @@ class StandaloneTriblerRunner(object):
         items_to_remove = set()
         for query, min_peers in self.pending_searches:
             if self.get_num_candidates(self.search_community) >= min_peers:
+                items_to_remove.add((query, min_peers))
                 self.perform_torrent_search(query)
 
         for item in items_to_remove:
@@ -143,6 +140,10 @@ class StandaloneTriblerRunner(object):
         self.tribler_start_time = time.time()
         self.general_stats['tribler_startup'] = self.tribler_start_time - begin_time
         self.tribler_session = self.service.session
+
+        self.search_stats = {}
+        self.discovered_torrents = 0
+        self.discovered_channels = 0
 
         self.tribler_session.set_download_states_callback(self.downloads_callback)
         self.tribler_session.add_observer(self.on_channel_discovered, NTFY_CHANNEL, [NTFY_DISCOVERED])
