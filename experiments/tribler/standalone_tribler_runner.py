@@ -211,7 +211,7 @@ class StandaloneTriblerRunner(object):
     def perform_torrent_search(self, query):
         self._logger.error("Starting remote torrent search with query %s" % query)
         self.search_stats[query] = {'num_hits': 0, 'time_first_response': -1, 'time_last_response': -1,
-                                    'start_time': self.tribler_start_time - time.time()}
+                                    'start_time': time.time()}
         keywords = split_into_keywords(unicode(query))
         self.tribler_session.search_remote_torrents(keywords)
 
