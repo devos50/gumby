@@ -215,6 +215,7 @@ class StandaloneTriblerRunner(object):
         self.tribler_session.search_remote_torrents(keywords)
 
     def search_torrent(self, query, min_peers=0):
+        query = query.replace("_", " ")
         min_peers = int(min_peers)
         if min_peers == 0:
             self.perform_torrent_search(query)
