@@ -1,9 +1,6 @@
 # This experiment starts Tribler and performs some basic operations (starting a download, performing a remote search etc.
 #
 @0:2 start_session
-@0:5 search_torrent brother 10
+@0:10 subscribe 11FC61602C9533AE51B6A05E47B6BFBB75DCB5FD
 @0:60 stop_session
-@0:62 start_session
-@0:67 search_torrent tribler 10
-@0:120 stop_session
-@0:125 stop
+@0:65 stop

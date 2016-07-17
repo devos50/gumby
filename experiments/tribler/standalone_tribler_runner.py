@@ -128,6 +128,14 @@ class StandaloneTriblerRunner(object):
                 search_stats_file.write("%s %s\n" % (key, value))
         search_stats_file.close()
 
+    def write_sub_torrent_discover_stats(self):
+        sub_torrent_discover_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "sub_torrent_discover_stats.csv"), 'a')
+        sub_torrent_discover_stats_file.write("CID,Time\n")
+        for cid, info in self.sub_torrent_discover_stats.iteritems():
+            time_until_first_discovery = info['start_time'] - info['discover_time']
+            sub_torrent_discover_stats_file.write("%s,%s" % (cid, time_until_first_discovery))
+        sub_torrent_discover_stats_file.close()
+
     def start_session(self):
         """
         Start the Tribler session.
@@ -143,6 +151,7 @@ class StandaloneTriblerRunner(object):
         self.tribler_session = self.service.session
 
         self.search_stats = {}
+        self.sub_torrent_discover_stats = {}
         self.discovered_torrents = 0
         self.discovered_channels = 0
 
@@ -193,6 +202,10 @@ class StandaloneTriblerRunner(object):
             self.general_stats['first_torrent_discovered'] = time.time() - self.tribler_start_time
         self.discovered_torrents += 1
 
+        cid = args[0]['dispersy_cid']
+        if cid in self.sub_torrent_discover_stats and self.sub_torrent_discover_stats[cid]['discover_time'] == -1:
+            self.sub_torrent_discover_stats[cid]['discover_time'] = time.time()
+
     def stop_session(self):
         """
         Stop the Tribler session and write all statistics away
@@ -204,6 +217,7 @@ class StandaloneTriblerRunner(object):
 
         self.write_general_stats()
         self.write_search_stats()
+        self.write_sub_torrent_discover_stats()
 
     def clean_state_dir(self):
         shutil.rmtree(self.tribler_session.get_state_dir())
@@ -263,6 +277,7 @@ class StandaloneTriblerRunner(object):
         deferred.addCallback(handle_response)
 
     def subscribe_to_channel(self, cid):
+        self.sub_torrent_discover_stats[cid.encode('hex')] = {'start_time': time.time(), 'discover_time': -1}
         self._logger.error("Subscribing to channel with cid %s" % cid.encode('hex'))
         for community in self.tribler_session.get_dispersy_instance().get_communities():
             if isinstance(community, AllChannelCommunity):
