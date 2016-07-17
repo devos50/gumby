@@ -132,7 +132,7 @@ class StandaloneTriblerRunner(object):
         sub_torrent_discover_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "sub_torrent_discover_stats.csv"), 'a')
         sub_torrent_discover_stats_file.write("CID,Time\n")
         for cid, info in self.sub_torrent_discover_stats.iteritems():
-            time_until_first_discovery = info['start_time'] - info['discover_time']
+            time_until_first_discovery = info['discover_time'] - info['start_time']
             sub_torrent_discover_stats_file.write("%s,%s" % (cid, time_until_first_discovery))
         sub_torrent_discover_stats_file.close()
 
