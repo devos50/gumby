@@ -254,7 +254,7 @@ class StandaloneTriblerRunner(object):
                 self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), time.time() - start_time))
 
         self.metainfo_requests[infohash] = {'start_time': time.time()}
-        self.tribler_session.download_torrentfile(self, infohash=infohash.decode('hex'), usercallback=None, prio=0)
+        self.tribler_session.download_torrentfile(infohash=infohash.decode('hex'), usercallback=None, prio=0)
 
     def start_download(self, uri, hops):
         self.tribler_session.start_download_from_uri(uri, hops)
@@ -282,6 +282,7 @@ class StandaloneTriblerRunner(object):
         self.discovered_stats_file.close()
         self.download_stats_file.close()
         self.local_search_stats_file.close()
+        self.metainfo_stats_file.close()
 
         reactor.stop()
 
