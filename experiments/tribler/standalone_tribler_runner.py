@@ -49,6 +49,8 @@ class StandaloneTriblerRunner(object):
         self.download_stats_file.write("Infohash,State,Progress,Download speed,Upload speed\n")
         self.local_search_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "local_search_stats.txt"), 'w')
         self.local_search_stats_file.write("Time,Hits,Query\n")
+        self.metainfo_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "metainfo_stats.csv"), 'w')
+        self.metainfo_stats_file.write("Infohash,Time\n")
 
         self.tribler_session = None
         self.tribler_start_time = 0.0
@@ -75,8 +77,8 @@ class StandaloneTriblerRunner(object):
         self.scenario_runner.register(self.clean_state_dir)
         self.scenario_runner.register(self.search_torrent)
         self.scenario_runner.register(self.local_search_torrent)
+        self.scenario_runner.register(self.get_metainfo)
         self.scenario_runner.register(self.start_download)
-        self.scenario_runner.register(self.perform_video_request)
         self.scenario_runner.register(self.subscribe)
         self.scenario_runner.register(self.stop)
 
@@ -151,6 +153,7 @@ class StandaloneTriblerRunner(object):
 
         self.search_stats = {}
         self.sub_torrent_discover_stats = {}
+        self.metainfo_requests = {}
         self.discovered_torrents = 0
         self.discovered_channels = 0
 
@@ -244,36 +247,17 @@ class StandaloneTriblerRunner(object):
         end_time = time.time()
         self.local_search_stats_file.write("%s,%d,%s\n" % (end_time - start_time, len(results), query))
 
+    def get_metainfo(self, infohash):
+        def metainfo_cb(infohash, metainfo):
+            if infohash.encode('hex') in self.metainfo_requests:
+                start_time = self.metainfo_requests[infohash.encode('hex')]['start_time']
+                self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), time.time() - start_time))
+
+        self.metainfo_requests[infohash] = {'start_time': time.time()}
+        self.tribler_session.download_torrentfile(self, infohash=infohash.decode('hex'), usercallback=None, prio=0)
+
     def start_download(self, uri, hops):
         self.tribler_session.start_download_from_uri(uri, hops)
-
-    def received_video_response(self, response):
-        self._logger.error(response)
-
-    def perform_video_request(self, infohash, file_index):
-        video_server_port = self.tribler_session.get_videoplayer_port()
-
-        def handle_response(response):
-            class SimpleReceiver(Protocol):
-                def __init__(s, deferred):
-                    s.buf = ''
-                    s.deferred = deferred
-
-                def dataReceived(s, data):
-                    self._logger.error("partial data:")
-                    self._logger.error(data)
-                    s.buf += data
-
-                def connectionLost(s, reason):
-                    s.deferred.callback(s.buf)
-
-            resp_deferred = Deferred()
-            resp_deferred.addCallback(self.received_video_response)
-            response.deliverBody(SimpleReceiver(resp_deferred))
-
-        agent = Agent(reactor)
-        deferred = agent.request('GET', 'http://localhost:%d/%s/%s' % (video_server_port, infohash, file_index), Headers({'User-Agent': ['Tribler'], 'Range': ['bytes=0-10000']}), None)
-        deferred.addCallback(handle_response)
 
     def subscribe_to_channel(self, cid):
         self.sub_torrent_discover_stats[cid.encode('hex')] = {'start_time': time.time(), 'discover_time': -1}

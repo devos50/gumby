@@ -1,0 +1,6 @@
+# This experiment fetches many torrents from the DHT.
+#
+@0:2 start_session
+@0:10 get_metainfo 4E6B6A765A6D5A6C367741494E55434F523574632B4F393848776F3D
+@0:90 stop_session
+@0:95 stop
