@@ -24,7 +24,7 @@ from Tribler.community.allchannel.community import AllChannelCommunity
 from Tribler.community.search.community import SearchCommunity
 from Tribler.community.tunnel.hidden_community import HiddenTunnelCommunity
 from Tribler.Core.Session import Session
-from Tribler.Core.simpledefs import dlstatus_strings, NTFY_CHANNEL, NTFY_DISCOVERED, NTFY_TORRENT, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD, NTFY_TORRENTS, NTFY_CHANNELCAST
+from Tribler.Core.simpledefs import dlstatus_strings, NTFY_CHANNEL, NTFY_DISCOVERED, NTFY_TORRENT, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD, NTFY_TORRENTS, NTFY_CHANNELCAST, NTFY_METAINFO, NTFY_TIMEOUT, NTFY_INSERT
 from Tribler.Core.Utilities.search_utils import split_into_keywords
 from Tribler.dispersy.discovery.community import DiscoveryCommunity
 
@@ -161,6 +161,8 @@ class StandaloneTriblerRunner(object):
         self.tribler_session.add_observer(self.on_channel_discovered, NTFY_CHANNEL, [NTFY_DISCOVERED])
         self.tribler_session.add_observer(self.on_torrent_discovered, NTFY_TORRENT, [NTFY_DISCOVERED])
         self.tribler_session.add_observer(self.on_torrent_search_results, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS)
+        self.tribler_session.add_observer(self.on_metainfo, NTFY_METAINFO, NTFY_INSERT)
+        self.tribler_session.add_observer(self.on_metainfo_timeout, NTFY_METAINFO, NTFY_TIMEOUT)
 
         # Fetch the communities in the Tribler session
         for community in self.tribler_session.get_dispersy_instance().get_communities():
@@ -193,6 +195,17 @@ class StandaloneTriblerRunner(object):
         if self.search_stats[query]['time_first_response'] == -1 and len(search_results['results']) >= 1:
             self.search_stats[query]['time_first_response'] = cur_time - start_time_search
         self.search_stats[query]['time_last_response'] = cur_time - start_time_search
+
+    def on_metainfo(self, subject, changetype, objectID, data):
+        infohash = data['infohash']
+        if infohash.encode('hex') in self.metainfo_requests:
+            start_time = self.metainfo_requests[infohash.encode('hex')]['start_time']
+            self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), time.time() - start_time))
+
+    def on_metainfo_timeout(self, subject, changetype, objectID, data):
+        infohash = data['infohash']
+        if infohash.encode('hex') in self.metainfo_requests:
+            self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), -1))
 
     def on_channel_discovered(self, subject, changetype, objectID, *args):
         if self.discovered_channels == 0:
@@ -247,12 +260,7 @@ class StandaloneTriblerRunner(object):
         end_time = time.time()
         self.local_search_stats_file.write("%s,%d,%s\n" % (end_time - start_time, len(results), query))
 
-    def get_metainfo(self, infohash):
-        def metainfo_cb(infohash, metainfo):
-            if infohash.encode('hex') in self.metainfo_requests:
-                start_time = self.metainfo_requests[infohash.encode('hex')]['start_time']
-                self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), time.time() - start_time))
-
+    def get_metainfo(self, infohash)
         self.metainfo_requests[infohash] = {'start_time': time.time()}
         self.tribler_session.download_torrentfile(infohash=infohash.decode('hex'), usercallback=None, prio=0)
 
