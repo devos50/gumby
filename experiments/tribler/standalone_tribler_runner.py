@@ -198,14 +198,14 @@ class StandaloneTriblerRunner(object):
 
     def on_metainfo(self, subject, changetype, objectID, data):
         infohash = data['infohash']
-        if infohash.encode('hex') in self.metainfo_requests:
-            start_time = self.metainfo_requests[infohash.encode('hex')]['start_time']
-            self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), time.time() - start_time))
+        if infohash in self.metainfo_requests:
+            start_time = self.metainfo_requests[infohash]['start_time']
+            self.metainfo_stats_file.write("%s,%s\n" % (infohash, time.time() - start_time))
 
     def on_metainfo_timeout(self, subject, changetype, objectID, data):
         infohash = data['infohash']
-        if infohash.encode('hex') in self.metainfo_requests:
-            self.metainfo_stats_file.write("%s,%s\n" % (infohash.encode('hex'), -1))
+        if infohash in self.metainfo_requests:
+            self.metainfo_stats_file.write("%s,%s\n" % (infohash, -1))
 
     def on_channel_discovered(self, subject, changetype, objectID, *args):
         if self.discovered_channels == 0:
