@@ -261,6 +261,7 @@ class StandaloneTriblerRunner(object):
         self.local_search_stats_file.write("%s,%d,%s\n" % (end_time - start_time, len(results), query))
 
     def get_metainfo(self, infohash):
+        infohash = infohash.lower()
         self.metainfo_requests[infohash] = {'start_time': time.time()}
         self.tribler_session.download_torrentfile(infohash=infohash.decode('hex'), usercallback=None, prio=0)
 
