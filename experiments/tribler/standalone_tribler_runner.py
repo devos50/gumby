@@ -48,7 +48,7 @@ class StandaloneTriblerRunner(object):
         self.download_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "download_stats.csv"), 'w')
         self.download_stats_file.write("Infohash,State,Progress,Download speed,Upload speed\n")
         self.local_search_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "local_search_stats.txt"), 'w')
-        self.local_search_stats_file.write("Time,Hits,Query\n")
+        self.local_search_stats_file.write("Time,Hits,Query,DB Time\n")
         self.metainfo_stats_file = open(os.path.join(os.environ['OUTPUT_DIR'], "metainfo_stats.csv"), 'w')
         self.metainfo_stats_file.write("Infohash,Time\n")
 
@@ -258,7 +258,7 @@ class StandaloneTriblerRunner(object):
         start_time = time.time()
         results = torrent_db.searchNames(keywords, keys=['infohash', 'T.name'], doSort=False)
         end_time = time.time()
-        self.local_search_stats_file.write("%s,%d,%s\n" % (end_time - start_time, len(results), query))
+        self.local_search_stats_file.write("%s,%d,%s,%s\n" % (end_time - start_time, len(results), query, torrent_db.local_search_times[query]))
 
     def get_metainfo(self, infohash):
         infohash = infohash.lower()
