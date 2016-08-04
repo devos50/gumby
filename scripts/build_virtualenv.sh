@@ -40,10 +40,10 @@
 #
 
 # Increase this every time the file gets modified.
-SCRIPT_VERSION=22
+SCRIPT_VERSION=24
 
 # Code:
-set -e
+set -ex
 
 export CONCURRENCY_LEVEL=$(grep process /proc/cpuinfo | wc -l)
 
@@ -71,6 +71,8 @@ if [ ! -z "$VIRTUALENV_DIR" ]; then
 else
     VENV=$HOME/venv
 fi
+
+ls -la $VENV/lib/python2.*/site-packages
 
 export LD_LIBRARY_PATH=$VENV/inst/lib:$VENV/lib:$LD_LIBRARY_PATH
 
@@ -274,7 +276,7 @@ if [ ! -e $VENV/lib/python*/site-packages/M2Crypto*.egg  -o ! -e $M2CRYPTO_MARKE
     if [ ! -e M2Crypto-$M2CRYPTO_VERSION*gz ]; then
         wget --no-check-certificate http://pypi.python.org/packages/source/M/M2Crypto/M2Crypto-$M2CRYPTO_VERSION.tar.gz
     fi
-    if [ ! -d M2Crypto-$M2CRYPTO_VERSION*/ ]; then
+    if [ ! -d M2Crypto-$M2CRYPTO_VERSION*/ -o ! -e $M2CRYPTO_MARKER ]; then
         rm -fR M2Crypto-*/
         tar xvapf M2Crypto-$M2CRYPTO_VERSION*gz
     fi
@@ -286,6 +288,7 @@ if [ ! -e $VENV/lib/python*/site-packages/M2Crypto*.egg  -o ! -e $M2CRYPTO_MARKE
 
     # Add openssl's .a's at THE END of the compile command. Using LDFLAGS won't work as it would end up in the middle.
     EXTRA_LINK_ARGS="-fPIC $M2CDEPS/lib/libssl.a $M2CDEPS/lib/libcrypto.a"
+    echo $EXTRA_LINK_ARGS
     sed -i 's~\( extra_compile_args=\[.*,$\)~\1 extra_link_args='"'$EXTRA_LINK_ARGS'.split()"',~' setup.py
 
     # python setup.py clean # This doesn't clean everything
@@ -369,6 +372,11 @@ if [ ! -e $VENV/lib/python*/site-packages/libtorrent.so  -o ! -e $LIBTORRENT_MAR
     pushd $VENV/lib
     ln -fs libboost_python.so libboost_python-py27.so.$LIBTORRENT_VERSION
     # mkdir -p $VENV/lib/python2.7/site-packages/
+    rm $VENV/lib/python2.7/site-packages/libtorrent.so
+    rm -rf $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/gcc-4.8.5
+    ls -l $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin
+    echo "---"
+    ls -l $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/*/*
     cp $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/*/*/libtorrent-python-*/*/libtorrent.so $VENV/lib/python2.7/site-packages/
     popd
     popd
@@ -533,6 +541,7 @@ pynacl # New EC crypto stuff for tunnelcommunity
 pysqlite
 pyzmq
 service_identity
+cherrypy
 six
 twisted # Used by the config server/clients
 unicodecsv # used for report generation scripts from Cor-Paul

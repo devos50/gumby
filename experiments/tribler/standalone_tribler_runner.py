@@ -15,8 +15,11 @@ from twisted.web.http_headers import Headers
 from gumby.instrumentation import init_instrumentation
 from gumby.scenario import ScenarioRunner
 
-sys.path.append(os.path.abspath('./tribler'))
-sys.path.append(os.path.abspath('./tribler/twisted/plugins'))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', "tribler")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', "tribler", "twisted", "plugins")))
+
+#sys.path.append(os.path.abspath('./tribler'))
+#sys.path.append(os.path.abspath('./tribler/twisted/plugins'))
 
 from tribler_plugin import TriblerServiceMaker
 
@@ -24,7 +27,7 @@ from Tribler.community.allchannel.community import AllChannelCommunity
 from Tribler.community.search.community import SearchCommunity
 from Tribler.community.tunnel.hidden_community import HiddenTunnelCommunity
 from Tribler.Core.Session import Session
-from Tribler.Core.simpledefs import dlstatus_strings, NTFY_CHANNEL, NTFY_DISCOVERED, NTFY_TORRENT, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD, NTFY_TORRENTS, NTFY_CHANNELCAST, NTFY_METAINFO, NTFY_TIMEOUT, NTFY_INSERT
+from Tribler.Core.simpledefs import dlstatus_strings, NTFY_CHANNEL, NTFY_DISCOVERED, NTFY_TORRENT, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD, NTFY_TORRENTS, NTFY_CHANNELCAST, NTFY_INSERT
 from Tribler.Core.Utilities.search_utils import split_into_keywords
 from Tribler.dispersy.discovery.community import DiscoveryCommunity
 
@@ -161,8 +164,8 @@ class StandaloneTriblerRunner(object):
         self.tribler_session.add_observer(self.on_channel_discovered, NTFY_CHANNEL, [NTFY_DISCOVERED])
         self.tribler_session.add_observer(self.on_torrent_discovered, NTFY_TORRENT, [NTFY_DISCOVERED])
         self.tribler_session.add_observer(self.on_torrent_search_results, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS)
-        self.tribler_session.add_observer(self.on_metainfo, NTFY_METAINFO, NTFY_INSERT)
-        self.tribler_session.add_observer(self.on_metainfo_timeout, NTFY_METAINFO, NTFY_TIMEOUT)
+        #self.tribler_session.add_observer(self.on_metainfo, NTFY_METAINFO, NTFY_INSERT)
+        #self.tribler_session.add_observer(self.on_metainfo_timeout, NTFY_METAINFO, NTFY_TIMEOUT)
 
         # Fetch the communities in the Tribler session
         for community in self.tribler_session.get_dispersy_instance().get_communities():
