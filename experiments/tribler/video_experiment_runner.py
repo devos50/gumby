@@ -36,6 +36,7 @@ class VideoExperimentRunner(object):
         self.tribler_start_time = 0.0
         self.search_community = None
         self.search_peers_lc = LoopingCall(self.check_peers_search)
+        self.received_torrent_info = False
 
         self.search_keywords = []
         self.potential_results = []
@@ -111,10 +112,15 @@ class VideoExperimentRunner(object):
         self.tribler_session.search_remote_torrents([unicode(search_keyword)])
         reactor.callLater(30, self.pick_torrent_to_download)
 
-    def received_torrent_def(self, _, infohash):
+    def received_torrent_def(self, infohash):
+        self.received_torrent_info = True
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
         print tdef
         self.stop_session()
+
+    def check_for_torrent(self):
+        if not self.received_torrent_info:
+            self.stop_session()
 
     def pick_torrent_to_download(self):
         if len(self.potential_results) == 0:
@@ -123,8 +129,9 @@ class VideoExperimentRunner(object):
             return
 
         random_result = random.choice(self.potential_results)
+        reactor.callLater(60, self.check_for_torrent)
 
-        # Download from other peers
+        # TODO Download from other peers
         print random_result
 
         # Download from DHT
