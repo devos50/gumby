@@ -100,7 +100,7 @@ class VideoExperimentRunner(object):
     def perform_remote_search(self):
         search_keyword = random.choice(self.search_keywords)
         self._logger.error("Searching for %s" % search_keyword)
-        self.tribler_session.search_remote_torrents([search_keyword])
+        self.tribler_session.search_remote_torrents([unicode(search_keyword)])
         reactor.callLater(30, self.stop_session)
 
     def check_peers_search(self):
