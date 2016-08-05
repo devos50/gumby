@@ -158,16 +158,18 @@ class VideoExperimentRunner(object):
         self.write_event("picking_torrents_to_download")
         if len(self.potential_results) == 0:
             self._logger.error("No video results, aborting...")
+            self.write_event("stopping_no_video_results")
             self.stop_session()
             return
 
-        random_results = random.sample(self.potential_results, 3)
+        random_results = random.sample(self.potential_results, 5)
         reactor.callLater(60, self.check_for_torrent)
 
         # TODO Download from other peers
 
         # Download from DHT
         for random_result in random_results:
+            self.write_event("scheduling_dht_lookup_%s" % random_result[0].encode('hex'))
             self.tribler_session.download_torrentfile(random_result[0], self.received_torrent_def)
 
     def downloads_callback(self, download_states_list):
