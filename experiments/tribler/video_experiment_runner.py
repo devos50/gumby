@@ -163,7 +163,7 @@ class VideoExperimentRunner(object):
             self.stop_session()
             return
 
-        random_results = random.sample(self.potential_results, 5)
+        random_results = random.sample(self.potential_results, min(len(self.potential_results), 5))
         reactor.callLater(60, self.check_for_torrent)
 
         # TODO Download from other peers
