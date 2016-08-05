@@ -102,10 +102,11 @@ class VideoExperimentRunner(object):
         search_keyword = random.choice(self.search_keywords)
         self._logger.error("Searching for %s" % search_keyword)
         self.tribler_session.search_remote_torrents([search_keyword])
-        self.stop_session()
+        reactor.callLater(30, self.stop_session)
 
     def check_peers_search(self):
         if self.get_num_candidates(self.search_community) >= MIN_PEERS_SEARCH:
+            self.search_peers_lc.stop()
             self.general_stats['start_search'] = time.time() - self.experiment_start_time
             self._logger.error("Starting search")
             self.perform_remote_search()
