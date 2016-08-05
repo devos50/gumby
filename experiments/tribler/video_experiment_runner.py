@@ -110,9 +110,13 @@ class VideoExperimentRunner(object):
         search_keyword = random.choice(self.search_keywords)
         self._logger.error("Searching for %s" % search_keyword)
         self.tribler_session.search_remote_torrents([unicode(search_keyword)])
-        reactor.callLater(30, self.pick_torrent_to_download)
+        reactor.callLater(30, self.pick_torrents_to_fetch)
 
     def received_torrent_def(self, infohash):
+        if self.received_torrent_info:
+            # We already got another result
+            return
+
         self.received_torrent_info = True
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
         self._logger.error("Received tdef of infohash %s" % infohash.encode('hex'))
@@ -121,26 +125,24 @@ class VideoExperimentRunner(object):
         self.tribler_session.set_download_states_callback(self.downloads_callback)
         reactor.callLater(120, self.stop_session)
 
-        self.stop_session()
-
     def check_for_torrent(self):
         if not self.received_torrent_info:
             self.stop_session()
 
-    def pick_torrent_to_download(self):
+    def pick_torrents_to_fetch(self):
         if len(self.potential_results) == 0:
             self._logger.error("No video results, aborting...")
             self.stop_session()
             return
 
-        random_result = random.choice(self.potential_results)
+        random_results = random.sample(self.potential_results, 3)
         reactor.callLater(60, self.check_for_torrent)
 
         # TODO Download from other peers
-        print random_result
 
         # Download from DHT
-        self.tribler_session.download_torrentfile(random_result[0], self.received_torrent_def)
+        for random_result in random_results:
+            self.tribler_session.download_torrentfile(random_result[0], self.received_torrent_def)
 
     def downloads_callback(self, download_states_list):
         for download_state in download_states_list:
