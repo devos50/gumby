@@ -115,7 +115,12 @@ class VideoExperimentRunner(object):
     def received_torrent_def(self, infohash):
         self.received_torrent_info = True
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
-        print tdef
+        self._logger.error("Received tdef of infohash %s" % infohash.encode('hex'))
+
+        self.tribler_session.start_download_from_tdef(tdef)
+        self.tribler_session.set_download_states_callback(self.downloads_callback)
+        reactor.callLater(120, self.stop_session)
+
         self.stop_session()
 
     def check_for_torrent(self):
@@ -136,11 +141,6 @@ class VideoExperimentRunner(object):
 
         # Download from DHT
         self.tribler_session.download_torrentfile(random_result[0], self.received_torrent_def)
-
-        #magnetlink = "magnet:?xt=urn:btih:" + hexlify(random_result[0])
-        #self.tribler_session.start_download_from_uri(magnetlink)
-        #self.tribler_session.set_download_states_callback(self.downloads_callback)
-        #reactor.callLater(120, self.stop_session)
 
     def downloads_callback(self, download_states_list):
         for download_state in download_states_list:
