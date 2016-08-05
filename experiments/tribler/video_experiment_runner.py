@@ -80,15 +80,14 @@ class VideoExperimentRunner(object):
         self.search_peers_lc.start(0.5)
 
     def on_torrent_search_results(self, subject, changetype, objectID, search_results):
+        self._logger.error(search_results)
         cur_time = time.time()
         self.general_stats['num_search_hits'] += len(search_results['results'])
         if self.general_stats['search_first_response'] == -1 and len(search_results['results']) >= 1:
             self.general_stats['search_first_response'] = cur_time - self.experiment_start_time
-        self.search_stats['search_last_response'] = cur_time - self.experiment_start_time
+        self.general_stats['search_last_response'] = cur_time - self.experiment_start_time
 
         # TODO check whether we can pick this torrent for downloading
-        for result in search_results['results']:
-            self._logger.error(result[4][0])
 
     def get_num_candidates(self, community):
         """
