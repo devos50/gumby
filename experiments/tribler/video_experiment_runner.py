@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from binascii import hexlify
 import logging
 import os
 import random
@@ -36,6 +37,7 @@ class VideoExperimentRunner(object):
         self.search_peers_lc = LoopingCall(self.check_peers_search)
 
         self.search_keywords = []
+        self.potential_results = []
 
         # Read keyword file
         with open('gumby/experiments/tribler/popular_keywords.txt', 'r') as keyword_file:
@@ -80,16 +82,16 @@ class VideoExperimentRunner(object):
         self.search_peers_lc.start(0.5)
 
     def on_torrent_search_results(self, subject, changetype, objectID, search_results):
-        self._logger.error(search_results)
         cur_time = time.time()
         self.general_stats['num_search_hits'] += len(search_results['results'])
         if self.general_stats['search_first_response'] == -1 and len(search_results['results']) >= 1:
             self.general_stats['search_first_response'] = cur_time - self.experiment_start_time
         self.general_stats['search_last_response'] = cur_time - self.experiment_start_time
 
-        # TODO check whether we can pick this torrent for downloading
         for result in search_results['results']:
-            print result[4][0]
+            category = result[4][0]
+            if category == 'Video' or category == 'xxx':
+                self.potential_results.append(result)
 
     def get_num_candidates(self, community):
         """
@@ -103,6 +105,16 @@ class VideoExperimentRunner(object):
         search_keyword = random.choice(self.search_keywords)
         self._logger.error("Searching for %s" % search_keyword)
         self.tribler_session.search_remote_torrents([unicode(search_keyword)])
+        reactor.callLater(30, self.pick_torrent_to_download)
+
+    def pick_torrent_to_download(self):
+        if len(self.potential_results) == 0:
+            self._logger.error("No video results, aborting...")
+            self.stop_session()
+
+        random_result = random.choice(self.potential_results)
+        magnetlink = "magnet:?xt=urn:btih:" + hexlify(random_result[0])
+        self.tribler_session.start_download_from_uri(magnetlink)
         reactor.callLater(30, self.stop_session)
 
     def check_peers_search(self):
