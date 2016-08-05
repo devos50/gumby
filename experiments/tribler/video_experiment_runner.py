@@ -128,6 +128,7 @@ class VideoExperimentRunner(object):
 
         # Get largest video file
         video_files = tdef.get_files_as_unicode(exts=videoextdefaults)
+        print video_files
         largest_file_name = sorted(video_files, key=lambda x: tdef.get_length(selectedfiles=[x]))[-1]
         self.largest_video_index = tdef.get_files_as_unicode().index(largest_file_name)
         print "Largest video file index: %d" % self.largest_video_index
