@@ -19,6 +19,7 @@ from Tribler.Core.DownloadConfig import DownloadStartupConfig
 from Tribler.Core.Session import Session
 from Tribler.Core.TorrentDef import TorrentDef
 from Tribler.Core.simpledefs import dlstatus_strings, DLSTATUS_DOWNLOADING, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD
+from Tribler.Core.Video.utils import videoextdefaults
 
 
 MIN_PEERS_SEARCH = 30
@@ -39,6 +40,8 @@ class VideoExperimentRunner(object):
         self.search_community = None
         self.search_peers_lc = LoopingCall(self.check_peers_search)
         self.received_torrent_info = False
+        self.active_download = None
+        self.largest_video_index = -1
 
         self.search_keywords = []
         self.potential_results = []
@@ -123,9 +126,16 @@ class VideoExperimentRunner(object):
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
         self._logger.error("Received tdef of infohash %s" % infohash.encode('hex'))
 
+        # Get largest video file
+        video_files = tdef.get_files_as_unicode(exts=videoextdefaults)
+        largest_file_name = sorted(video_files, key=lambda x: tdef.get_length(selectedfiles=[x]))[-1]
+        self.largest_video_index = tdef.get_files_as_unicode().index(largest_file_name)
+        print "Largest video file index: %d" % self.largest_video_index
+
+        # Start the download
         dscfg = DownloadStartupConfig()
         dscfg.set_hops(1)
-        self.tribler_session.start_download_from_tdef(tdef, dscfg)
+        self.active_download = self.tribler_session.start_download_from_tdef(tdef, dscfg)
         self.tribler_session.set_download_states_callback(self.downloads_callback)
         reactor.callLater(120, self.stop_session)
 
