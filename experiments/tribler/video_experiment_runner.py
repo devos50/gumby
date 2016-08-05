@@ -19,7 +19,7 @@ from Tribler.Core.Session import Session
 from Tribler.Core.simpledefs import dlstatus_strings, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD
 
 
-MIN_PEERS_SEARCH = 20
+MIN_PEERS_SEARCH = 30
 
 
 class VideoExperimentRunner(object):
@@ -111,6 +111,7 @@ class VideoExperimentRunner(object):
         if len(self.potential_results) == 0:
             self._logger.error("No video results, aborting...")
             self.stop_session()
+            return
 
         random_result = random.choice(self.potential_results)
         magnetlink = "magnet:?xt=urn:btih:" + hexlify(random_result[0])
