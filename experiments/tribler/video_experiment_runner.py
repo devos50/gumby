@@ -16,7 +16,7 @@ from tribler_plugin import TriblerServiceMaker
 
 from Tribler.community.search.community import SearchCommunity
 from Tribler.Core.Session import Session
-from Tribler.Core.simpledefs import SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS
+from Tribler.Core.simpledefs import dlstatus_strings, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD
 
 
 MIN_PEERS_SEARCH = 20
@@ -115,7 +115,16 @@ class VideoExperimentRunner(object):
         random_result = random.choice(self.potential_results)
         magnetlink = "magnet:?xt=urn:btih:" + hexlify(random_result[0])
         self.tribler_session.start_download_from_uri(magnetlink)
+        self.tribler_session.set_download_states_callback(self.downloads_callback)
         reactor.callLater(30, self.stop_session)
+
+    def downloads_callback(self, download_states_list):
+        for download_state in download_states_list:
+            print "%s,%s,%s,%s,%s\n" % (download_state.download.get_def().get_infohash().encode('hex'),
+                                        dlstatus_strings[download_state.get_status()],
+                                        download_state.get_progress() * 100,
+                                        download_state.get_current_speed(DOWNLOAD),
+                                        download_state.get_current_speed(UPLOAD))
 
     def check_peers_search(self):
         if self.get_num_candidates(self.search_community) >= MIN_PEERS_SEARCH:
