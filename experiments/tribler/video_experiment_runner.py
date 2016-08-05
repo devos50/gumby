@@ -15,6 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from tribler_plugin import TriblerServiceMaker
 
 from Tribler.community.search.community import SearchCommunity
+from Tribler.Core.DownloadConfig import DownloadStartupConfig
 from Tribler.Core.Session import Session
 from Tribler.Core.TorrentDef import TorrentDef
 from Tribler.Core.simpledefs import dlstatus_strings, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD
@@ -121,7 +122,9 @@ class VideoExperimentRunner(object):
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
         self._logger.error("Received tdef of infohash %s" % infohash.encode('hex'))
 
-        self.tribler_session.start_download_from_tdef(tdef)
+        dscfg = DownloadStartupConfig()
+        dscfg.set_hops(1)
+        self.tribler_session.start_download_from_tdef(tdef, dscfg)
         self.tribler_session.set_download_states_callback(self.downloads_callback)
         reactor.callLater(120, self.stop_session)
 
