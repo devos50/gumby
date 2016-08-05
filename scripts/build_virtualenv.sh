@@ -72,9 +72,17 @@ else
     VENV=$HOME/venv
 fi
 
-ls -la $VENV/lib/python2.*/site-packages
-
 export LD_LIBRARY_PATH=$VENV/inst/lib:$VENV/lib:$LD_LIBRARY_PATH
+
+ls -la $VENV/lib/python2.*/site-packages
+export PATH=$VENV/lib:$PATH
+ldd $VENV/lib/python*/site-packages/libtorrent.so
+ls -la $VENV/src/libtorrent-rasterbar-1.1.0/bindings/python/bin/*/*/libtorrent-python-*/*/
+ls -la $VENV/lib/
+#rm -f $VENV/src/.completed*__24
+#rm -f $VENV/inst/.completed.24
+#rm -f $VENV/.completed.24
+#rm -rf $VENV/src/libtorrent*
 
 # Build the systemtap enabled python runtime and systemtap itself
 # if dtrace is available, if not, just build python 2.7
@@ -372,11 +380,8 @@ if [ ! -e $VENV/lib/python*/site-packages/libtorrent.so  -o ! -e $LIBTORRENT_MAR
     pushd $VENV/lib
     ln -fs libboost_python.so libboost_python-py27.so.$LIBTORRENT_VERSION
     # mkdir -p $VENV/lib/python2.7/site-packages/
-    rm $VENV/lib/python2.7/site-packages/libtorrent.so
-    rm -rf $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/gcc-4.8.5
-    ls -l $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin
-    echo "---"
-    ls -l $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/*/*
+    #rm $VENV/lib/python2.7/site-packages/libtorrent.so
+    ls -la $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/*/*
     cp $VENV/src/libtorrent-rasterbar-$LIBTORRENT_VERSION/bindings/python/bin/*/*/libtorrent-python-*/*/libtorrent.so $VENV/lib/python2.7/site-packages/
     popd
     popd
@@ -528,6 +533,7 @@ configobj
 cryptography
 cython
 gmpy==1.16
+feedparser
 ipython
 nose
 nosexcover
@@ -536,6 +542,7 @@ pillow
 psutil
 pyasn1 # for twisted
 pycparser
+leveldb
 pycrypto # Twisted needs it
 pynacl # New EC crypto stuff for tunnelcommunity
 pysqlite
