@@ -26,7 +26,7 @@ class VideoExperimentRunner(object):
     def __init__(self):
         init_instrumentation()
         self.service = None
-        self.general_stats = {'num_search_hits': 0}
+        self.general_stats = {'num_search_hits': 0, 'search_first_response': -1}
         self.experiment_start_time = 0
         self._logger = logging.getLogger(self.__class__.__name__)
 
@@ -88,6 +88,8 @@ class VideoExperimentRunner(object):
         self.general_stats['search_last_response'] = cur_time - self.experiment_start_time
 
         # TODO check whether we can pick this torrent for downloading
+        for result in search_results['results']:
+            print result[4][0]
 
     def get_num_candidates(self, community):
         """
