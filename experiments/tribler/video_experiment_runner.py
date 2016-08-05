@@ -38,7 +38,7 @@ class VideoExperimentRunner(object):
         self.search_keywords = []
 
         # Read keyword file
-        with open('popular_keywords.txt', 'r') as keyword_file:
+        with open('gumby/experiments/tribler/popular_keywords.txt', 'r') as keyword_file:
             content = keyword_file.read()
             self.search_keywords = [keyword for keyword in content.split('\n') if len(keyword) > 0]
 
