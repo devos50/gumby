@@ -34,6 +34,7 @@ class VideoExperimentRunner(object):
         self.experiment_start_time = 0
         self._logger = logging.getLogger(self.__class__.__name__)
         self.last_download_state = -1
+        self.download_received_bytes = False
 
         self.tribler_session = None
         self.tribler_start_time = 0.0
@@ -42,7 +43,7 @@ class VideoExperimentRunner(object):
         self.received_torrent_info = False
         self.active_download = None
         self.largest_video_index = -1
-        self.events_file = open('events.txt', 'w', 0)
+        self.events_file = open(os.path.join('output', 'events_%s.txt' % hexlify(os.urandom(8))), 'w', 0)
 
         self.search_keywords = []
         self.potential_results = []
@@ -73,7 +74,7 @@ class VideoExperimentRunner(object):
         self.events_file.close()
 
     def write_event(self, name):
-        self.events_file.write("%d %s\n" % (time.time() - self.experiment_start_time, name))
+        self.events_file.write("%s %s\n" % (time.time() - self.experiment_start_time, name))
 
     def start_session(self):
         """
@@ -126,14 +127,14 @@ class VideoExperimentRunner(object):
         reactor.callLater(30, self.pick_torrents_to_fetch)
 
     def received_torrent_def(self, infohash):
-        self.write_event("received_torrent_def")
+        self.write_event("received_torrent_def_%s" % infohash)
         if self.received_torrent_info:
             # We already got another result
             return
 
         self.received_torrent_info = True
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
-        self._logger.error("Received tdef of infohash %s" % infohash.encode('hex'))
+        self._logger.error("Received tdef of infohash %s" % infohash)
 
         # Get largest video file
         video_files = tdef.get_files_as_unicode(exts=videoextdefaults)
@@ -147,7 +148,7 @@ class VideoExperimentRunner(object):
         dscfg.set_hops(1)
         self.active_download = self.tribler_session.start_download_from_tdef(tdef, dscfg)
         self.tribler_session.set_download_states_callback(self.downloads_callback)
-        self.write_event("download_started")
+        self.write_event("download_started_%s" % infohash)
         reactor.callLater(120, self.stop_session)
 
     def check_for_torrent(self):
@@ -176,7 +177,12 @@ class VideoExperimentRunner(object):
         for download_state in download_states_list:
             if self.last_download_state != DLSTATUS_DOWNLOADING and download_state.get_status() == DLSTATUS_DOWNLOADING:
                 # Workaround for anon download that does not start for the first time
+                self.write_event("circuits_ready")
                 download_state.download.force_recheck()
+
+            if not self.download_received_bytes and download_state.get_current_speed(DOWNLOAD) > 0:
+                self.write_event("download_received_first_bytes")
+                self.download_received_bytes = True
 
             print "%s,%s,%s,%s,%s\n" % (download_state.download.get_def().get_infohash().encode('hex'),
                                         dlstatus_strings[download_state.get_status()],
@@ -185,7 +191,7 @@ class VideoExperimentRunner(object):
                                         download_state.get_current_speed(UPLOAD))
             self.last_download_state = download_state.get_status()
 
-        return 1.0, []
+        return 0.5, []
 
     def check_peers_search(self):
         if self.get_num_candidates(self.search_community) >= MIN_PEERS_SEARCH:
