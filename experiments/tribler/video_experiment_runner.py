@@ -100,7 +100,7 @@ class VideoExperimentRunner(object):
 
         for result in search_results['results']:
             category = result[4][0]
-            if category == 'Video' or category == 'xxx':
+            if category == 'Video':
                 self.potential_results.append(result)
 
     def get_num_candidates(self, community):
