@@ -42,6 +42,7 @@ class VideoExperimentRunner(object):
         self.received_torrent_info = False
         self.active_download = None
         self.largest_video_index = -1
+        self.events_file = open('events.txt', 'r', 0)
 
         self.search_keywords = []
         self.potential_results = []
@@ -69,6 +70,10 @@ class VideoExperimentRunner(object):
         Session.del_instance()
 
         reactor.stop()
+        self.events_file.close()
+
+    def write_event(self, name):
+        self.events_file.write("%d %s\n" % (time.time() - self.experiment_start_time, name))
 
     def start_session(self):
         """
@@ -80,6 +85,7 @@ class VideoExperimentRunner(object):
         options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
         self.service.start_tribler(options)
         self.general_stats['tribler_startup'] = time.time() - self.experiment_start_time
+        self.write_event("tribler_startup")
         self.tribler_session = self.service.session
         print "State dir: %s" % self.tribler_session.get_state_dir()
 
@@ -92,6 +98,7 @@ class VideoExperimentRunner(object):
         self.search_peers_lc.start(0.5)
 
     def on_torrent_search_results(self, subject, changetype, objectID, search_results):
+        self.write_event("incoming_results")
         cur_time = time.time()
         self.general_stats['num_search_hits'] += len(search_results['results'])
         if self.general_stats['search_first_response'] == -1 and len(search_results['results']) >= 1:
@@ -113,11 +120,13 @@ class VideoExperimentRunner(object):
 
     def perform_remote_search(self):
         search_keyword = random.choice(self.search_keywords)
+        self.write_event("start_remote_search")
         self._logger.error("Searching for %s" % search_keyword)
         self.tribler_session.search_remote_torrents([unicode(search_keyword)])
         reactor.callLater(30, self.pick_torrents_to_fetch)
 
     def received_torrent_def(self, infohash):
+        self.write_event("received_torrent_def")
         if self.received_torrent_info:
             # We already got another result
             return
@@ -138,6 +147,7 @@ class VideoExperimentRunner(object):
         dscfg.set_hops(1)
         self.active_download = self.tribler_session.start_download_from_tdef(tdef, dscfg)
         self.tribler_session.set_download_states_callback(self.downloads_callback)
+        self.write_event("download_started")
         reactor.callLater(120, self.stop_session)
 
     def check_for_torrent(self):
@@ -145,6 +155,7 @@ class VideoExperimentRunner(object):
             self.stop_session()
 
     def pick_torrents_to_fetch(self):
+        self.write_event("picking_torrents_to_download")
         if len(self.potential_results) == 0:
             self._logger.error("No video results, aborting...")
             self.stop_session()
