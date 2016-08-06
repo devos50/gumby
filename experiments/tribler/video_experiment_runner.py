@@ -7,6 +7,8 @@ import time
 import sys
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
+from twisted.web.client import Agent, readBody
+from twisted.web.http_headers import Headers
 from gumby.instrumentation import init_instrumentation
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', "tribler")))
@@ -153,6 +155,12 @@ class VideoExperimentRunner(object):
 
     def check_for_torrent(self):
         if not self.received_torrent_info:
+            self.write_event("no_torrent_info_received")
+            self.stop_session()
+
+    def check_if_bytes_downloaded(self):
+        if not self.download_received_bytes:
+            self.write_event("no_bytes_downloaded")
             self.stop_session()
 
     def pick_torrents_to_fetch(self):
@@ -164,6 +172,7 @@ class VideoExperimentRunner(object):
             return
 
         random_results = random.sample(self.potential_results, min(len(self.potential_results), 5))
+        print random_results
         reactor.callLater(60, self.check_for_torrent)
 
         # TODO Download from other peers
@@ -173,12 +182,26 @@ class VideoExperimentRunner(object):
             self.write_event("scheduling_dht_lookup_%s" % random_result[0].encode('hex'))
             self.tribler_session.download_torrentfile(random_result[0], self.received_torrent_def)
 
+    def perform_video_request(self):
+        video_server_port = self.tribler_session.get_videoserver_port()
+        Agent(reactor).request(
+            'GET', 'http://127.0.0.1:%s/%s/%s' % (video_server_port, self.active_download.tdef.get_infohash().encode('hex'), video_server_port), Headers({'User-Agent': ['Tribler']}), None).addCallback(self.on_video_request).addCallback(self.on_video_response)
+
+    def on_video_request(self, response):
+        return readBody(response)
+
+    def on_video_response(self, response):
+        self.write_event("got_video_response")
+        self.stop_session()
+
     def downloads_callback(self, download_states_list):
         for download_state in download_states_list:
             if self.last_download_state != DLSTATUS_DOWNLOADING and download_state.get_status() == DLSTATUS_DOWNLOADING:
                 # Workaround for anon download that does not start for the first time
                 self.write_event("circuits_ready")
+                reactor.callLater(60, self.check_if_bytes_downloaded)
                 download_state.download.force_recheck()
+                self.perform_video_request()
 
             if not self.download_received_bytes and download_state.get_current_speed(DOWNLOAD) > 0:
                 self.write_event("download_received_first_bytes")
