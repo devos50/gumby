@@ -64,7 +64,6 @@ class VideoExperimentRunner(object):
         """
         self._logger.error("Starting experiment")
         reactor.callLater(random.random() * 20, self.start_session)
-        reactor.callLater(30, self.stop_session)
 
     def stop_session(self):
         """
