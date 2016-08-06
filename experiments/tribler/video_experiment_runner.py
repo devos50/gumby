@@ -45,7 +45,7 @@ class VideoExperimentRunner(object):
         self.received_torrent_info = False
         self.active_download = None
         self.largest_video_index = -1
-        self.events_file = open(os.path.join('output', 'events_%s.txt' % hexlify(os.urandom(8))), 'w', 0)
+        self.events_file = open('events_%s.txt' % hexlify(os.urandom(8)), 'w', 0)
 
         self.search_keywords = []
         self.potential_results = []
