@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 import logging
 from os import environ
 from random import random
