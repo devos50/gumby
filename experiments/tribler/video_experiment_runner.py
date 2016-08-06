@@ -21,6 +21,7 @@ from Tribler.Core.DownloadConfig import DownloadStartupConfig
 from Tribler.Core.Session import Session
 from Tribler.Core.TorrentDef import TorrentDef
 from Tribler.Core.simpledefs import dlstatus_strings, DLSTATUS_DOWNLOADING, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS, DOWNLOAD, UPLOAD
+from Tribler.Core.Utilities.network_utils import autodetect_socket_style, get_random_port
 from Tribler.Core.Video.utils import videoextdefaults
 
 
@@ -86,7 +87,7 @@ class VideoExperimentRunner(object):
         self._logger.error("Starting Tribler session")
         self.experiment_start_time = time.time()
         self.service = TriblerServiceMaker()
-        options = {"restapi": 8085, "statedir": None, "dispersy": -1, "libtorrent": -1}
+        options = {"restapi": get_random_port(), "statedir": None, "dispersy": -1, "libtorrent": -1}
         self.service.start_tribler(options)
         self.general_stats['tribler_startup'] = time.time() - self.experiment_start_time
         self.write_event("tribler_startup")
