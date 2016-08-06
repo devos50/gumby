@@ -63,8 +63,8 @@ class VideoExperimentRunner(object):
         Start the experiment by parsing and running the scenario file.
         """
         self._logger.error("Starting experiment")
-        reactor.callLater(1, self.start_session)
-        reactor.callLater(10, self.stop_session)
+        reactor.callLater(random.random() * 20, self.start_session)
+        reactor.callLater(30, self.stop_session)
 
     def stop_session(self):
         """
