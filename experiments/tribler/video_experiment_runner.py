@@ -149,6 +149,7 @@ class VideoExperimentRunner(object):
         dscfg = DownloadStartupConfig()
         dscfg.set_hops(1)
         self.active_download = self.tribler_session.start_download_from_tdef(tdef, dscfg)
+        print "Destination: %s" % self.active_download.get_dest_dir()
         self.tribler_session.set_download_states_callback(self.downloads_callback)
         self.write_event("download_started_%s" % infohash)
         reactor.callLater(120, self.stop_session)
@@ -185,7 +186,7 @@ class VideoExperimentRunner(object):
     def perform_video_request(self):
         video_server_port = self.tribler_session.get_videoserver_port()
         Agent(reactor).request(
-            'GET', 'http://127.0.0.1:%s/%s/%s' % (video_server_port, self.active_download.tdef.get_infohash().encode('hex'), video_server_port), Headers({'User-Agent': ['Tribler']}), None).addCallback(self.on_video_request).addCallback(self.on_video_response)
+            'GET', 'http://127.0.0.1:%s/%s/%s' % (video_server_port, self.active_download.tdef.get_infohash().encode('hex'), self.largest_video_index), Headers({'User-Agent': ['Tribler']}), None).addCallback(self.on_video_request).addCallback(self.on_video_response)
 
     def on_video_request(self, response):
         return readBody(response)
