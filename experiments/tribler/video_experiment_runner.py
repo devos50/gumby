@@ -86,6 +86,8 @@ class VideoExperimentRunner(object):
         for arg in args:
             str_to_write += " %s" % arg
 
+        str_to_write += "\n"
+
         self.events_file.write(str_to_write)
 
     def start_session(self):
