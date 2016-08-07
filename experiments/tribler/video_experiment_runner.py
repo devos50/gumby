@@ -38,6 +38,7 @@ class VideoExperimentRunner(object):
         self._logger = logging.getLogger(self.__class__.__name__)
         self.last_download_state = -1
         self.download_received_bytes = False
+        self.bytes_downloaded = 0
 
         self.tribler_session = None
         self.tribler_start_time = 0.0
@@ -80,8 +81,15 @@ class VideoExperimentRunner(object):
         reactor.stop()
         self.events_file.close()
 
-    def write_event(self, name):
-        self.events_file.write("%s %s\n" % (time.time() - self.experiment_start_time, name))
+    def write_event(self, name, args=[]):
+        str_to_write = "%s %s\n" % (time.time() - self.experiment_start_time, name)
+        for arg in args:
+            str_to_write += "%s " % arg
+
+        if len(args) > 0:
+            self.events_file.write(str_to_write[:-1])
+        else:
+            self.events_file.write(str_to_write)
 
     def start_session(self):
         """
@@ -128,7 +136,7 @@ class VideoExperimentRunner(object):
 
     def perform_remote_search(self):
         search_keyword = random.choice(self.search_keywords)
-        self.write_event("start_remote_search")
+        self.write_event("start_remote_search", [search_keyword])
         self._logger.error("Searching for %s" % search_keyword)
         self.tribler_session.search_remote_torrents([unicode(search_keyword)])
         reactor.callLater(30, self.pick_torrents_to_fetch)
@@ -156,17 +164,16 @@ class VideoExperimentRunner(object):
         self.active_download = self.tribler_session.start_download_from_tdef(tdef, dscfg)
         print "Destination: %s" % self.active_download.get_dest_dir()
         self.tribler_session.set_download_states_callback(self.downloads_callback)
-        self.write_event("download_started_%s" % infohash)
-        reactor.callLater(120, self.stop_session)
+        self.write_event("download_started", [infohash])
+        reactor.callLater(180, self.log_progress_and_stop)
+
+    def log_progress_and_stop(self):
+        self.write_event("bytes_downloaded", ["%d" % self.bytes_downloaded])
+        self.stop_session()
 
     def check_for_torrent(self):
         if not self.received_torrent_info:
             self.write_event("no_torrent_info_received")
-            self.stop_session()
-
-    def check_if_bytes_downloaded(self):
-        if not self.download_received_bytes:
-            self.write_event("no_bytes_downloaded")
             self.stop_session()
 
     def pick_torrents_to_fetch(self):
@@ -205,13 +212,14 @@ class VideoExperimentRunner(object):
             if self.last_download_state != DLSTATUS_DOWNLOADING and download_state.get_status() == DLSTATUS_DOWNLOADING:
                 # Workaround for anon download that does not start for the first time
                 self.write_event("circuits_ready")
-                reactor.callLater(60, self.check_if_bytes_downloaded)
                 download_state.download.force_recheck()
                 self.perform_video_request()
 
             if not self.download_received_bytes and download_state.get_current_speed(DOWNLOAD) > 0:
                 self.write_event("download_received_first_bytes")
                 self.download_received_bytes = True
+
+            self.bytes_downloaded = download_state.get_total_transferred(DOWNLOAD)
 
             print "%s,%s,%s,%s,%s\n" % (download_state.download.get_def().get_infohash().encode('hex'),
                                         dlstatus_strings[download_state.get_status()],
