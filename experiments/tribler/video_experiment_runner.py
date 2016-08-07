@@ -39,6 +39,7 @@ class VideoExperimentRunner(object):
         self.last_download_state = -1
         self.download_received_bytes = False
         self.bytes_downloaded = 0
+        self.performed_remote_search = False
 
         self.tribler_session = None
         self.tribler_start_time = 0.0
@@ -112,6 +113,7 @@ class VideoExperimentRunner(object):
         self.tribler_session.add_observer(self.on_torrent_search_results, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS)
         #reactor.callLater(30, self.perform_remote_search)
         self.search_peers_lc.start(1)
+        reactor.callLater(120, self.check_has_performed_search)
 
     def on_torrent_search_results(self, subject, changetype, objectID, search_results):
         self.write_event("incoming_results")
@@ -136,6 +138,7 @@ class VideoExperimentRunner(object):
         return len(community.candidates)
 
     def perform_remote_search(self):
+        self.performed_remote_search = True
         search_keyword = random.choice(self.search_keywords)
         self.write_event("start_remote_search", [search_keyword])
         self._logger.error("Searching for %s" % search_keyword)
@@ -164,6 +167,11 @@ class VideoExperimentRunner(object):
     def log_progress_and_stop(self):
         self.write_event("bytes_downloaded", ["%d" % self.bytes_downloaded])
         self.stop_session()
+
+    def check_has_performed_search(self):
+        if not self.performed_remote_search:
+            self.write_event("not_enough_search_peers")
+            self.stop_session()
 
     def check_for_torrent(self):
         if not self.received_torrent_info:

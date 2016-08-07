@@ -12,6 +12,7 @@ class EventFileParser(object):
         # 1 = download started, received no bytes,
         # 2 = no torrent info received,
         # 3 = no results received during remote search,
+        # 4 = not enough peers for remote search within time
         self.status = -1
 
         self.tribler_startup_time = -1
@@ -56,6 +57,8 @@ class EventFileParser(object):
                 self.circuits_ready = parts[0]
             elif parts[1] == "download_received_first_bytes":
                 self.first_byte_downloaded = parts[0]
+            elif parts[1] == "not_enough_search_peers":
+                self.status = 4
 
     def write_results(self):
         with open(os.path.join(os.environ['OUTPUT_DIR'], 'reduced_video_stats.log'), 'a') as output_file:
