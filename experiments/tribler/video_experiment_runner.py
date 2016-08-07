@@ -82,14 +82,11 @@ class VideoExperimentRunner(object):
         self.events_file.close()
 
     def write_event(self, name, args=[]):
-        str_to_write = "%s %s\n" % (time.time() - self.experiment_start_time, name)
+        str_to_write = "%s %s" % (time.time() - self.experiment_start_time, name)
         for arg in args:
-            str_to_write += "%s " % arg
+            str_to_write += " %s" % arg
 
-        if len(args) > 0:
-            self.events_file.write(str_to_write[:-1])
-        else:
-            self.events_file.write(str_to_write)
+        self.events_file.write(str_to_write)
 
     def start_session(self):
         """
