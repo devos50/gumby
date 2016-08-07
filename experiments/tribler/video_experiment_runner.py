@@ -25,7 +25,7 @@ from Tribler.Core.Utilities.network_utils import autodetect_socket_style, get_ra
 from Tribler.Core.Video.utils import videoextdefaults
 
 
-MIN_PEERS_SEARCH = 30
+MIN_PEERS_SEARCH = 20
 
 
 class VideoExperimentRunner(object):
@@ -122,7 +122,7 @@ class VideoExperimentRunner(object):
 
         for result in search_results['results']:
             category = result[4][0]
-            if category == 'Video':
+            if category != 'xxx':
                 self.potential_results.append(result)
 
     def get_num_candidates(self, community):
@@ -141,7 +141,7 @@ class VideoExperimentRunner(object):
         reactor.callLater(30, self.pick_torrents_to_fetch)
 
     def received_torrent_def(self, infohash):
-        self.write_event("received_torrent_def_%s" % infohash)
+        self.write_event("received_torrent_def", [infohash])
         if self.received_torrent_info:
             # We already got another result
             return
@@ -149,13 +149,6 @@ class VideoExperimentRunner(object):
         self.received_torrent_info = True
         tdef = TorrentDef.load_from_memory(self.tribler_session.lm.torrent_store.get(infohash))
         self._logger.error("Received tdef of infohash %s" % infohash)
-
-        # Get largest video file
-        video_files = tdef.get_files_as_unicode(exts=videoextdefaults)
-        print video_files
-        largest_file_name = sorted(video_files, key=lambda x: tdef.get_length(selectedfiles=[x]))[-1]
-        self.largest_video_index = tdef.get_files_as_unicode().index(largest_file_name)
-        print "Largest video file index: %d" % self.largest_video_index
 
         # Start the download
         dscfg = DownloadStartupConfig()
@@ -178,8 +171,8 @@ class VideoExperimentRunner(object):
     def pick_torrents_to_fetch(self):
         self.write_event("picking_torrents_to_download")
         if len(self.potential_results) == 0:
-            self._logger.error("No video results, aborting...")
-            self.write_event("stopping_no_video_results")
+            self._logger.error("No results, aborting...")
+            self.write_event("stopping_no_results")
             self.stop_session()
             return
 
@@ -212,7 +205,7 @@ class VideoExperimentRunner(object):
                 # Workaround for anon download that does not start for the first time
                 self.write_event("circuits_ready")
                 download_state.download.force_recheck()
-                self.perform_video_request()
+                #self.perform_video_request()
 
             if not self.download_received_bytes and download_state.get_current_speed(DOWNLOAD) > 0:
                 self.write_event("download_received_first_bytes")

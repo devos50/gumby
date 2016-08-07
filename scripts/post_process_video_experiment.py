@@ -11,7 +11,7 @@ class EventFileParser(object):
         # 0 = download started + received bytes,
         # 1 = download started, received no bytes,
         # 2 = no torrent info received,
-        # 3 = no video files received during remote search,
+        # 3 = no results received during remote search,
         self.status = -1
 
         self.tribler_startup_time = -1
@@ -50,7 +50,7 @@ class EventFileParser(object):
                 self.total_bytes_downloaded = parts[2]
             elif parts[1] == "no_torrent_info_received":
                 self.status = 2
-            elif parts[1] == "stopping_no_video_results":
+            elif parts[1] == "stopping_no_results":
                 self.status = 3
             elif parts[1] == "circuits_ready":
                 self.circuits_ready = parts[0]
