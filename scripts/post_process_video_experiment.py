@@ -28,6 +28,8 @@ class EventFileParser(object):
             content = event_file.read()
 
         for line in content.split("\n"):
+            if len(line) == 0:
+                continue
             parts = line.split(" ")
 
             if parts[1] == "tribler_startup":
