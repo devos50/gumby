@@ -121,9 +121,7 @@ class VideoExperimentRunner(object):
         self.general_stats['search_last_response'] = cur_time - self.experiment_start_time
 
         for result in search_results['results']:
-            category = result[4][0]
-            if category != 'xxx':
-                self.potential_results.append(result)
+            self.potential_results.append(result)
 
     def get_num_candidates(self, community):
         """
