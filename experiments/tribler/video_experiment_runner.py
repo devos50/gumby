@@ -170,7 +170,7 @@ class VideoExperimentRunner(object):
 
     def check_has_performed_search(self):
         if not self.performed_remote_search:
-            self.write_event("not_enough_search_peers")
+            self.write_event("not_enough_search_peers", ["%d" % self.get_num_candidates(self.search_community)])
             self.stop_session()
 
     def check_for_torrent(self):
