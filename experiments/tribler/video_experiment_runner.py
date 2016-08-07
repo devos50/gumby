@@ -120,7 +120,10 @@ class VideoExperimentRunner(object):
             self.general_stats['search_first_response'] = cur_time - self.experiment_start_time
         self.general_stats['search_last_response'] = cur_time - self.experiment_start_time
 
+        print search_results
+
         for result in search_results['results']:
+            print "----- appending"
             self.potential_results.append(result)
 
     def get_num_candidates(self, community):
