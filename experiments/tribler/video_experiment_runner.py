@@ -111,7 +111,7 @@ class VideoExperimentRunner(object):
 
         self.tribler_session.add_observer(self.on_torrent_search_results, SIGNAL_SEARCH_COMMUNITY, SIGNAL_ON_SEARCH_RESULTS)
         #reactor.callLater(30, self.perform_remote_search)
-        self.search_peers_lc.start()
+        self.search_peers_lc.start(1)
 
     def on_torrent_search_results(self, subject, changetype, objectID, search_results):
         self.write_event("incoming_results")
