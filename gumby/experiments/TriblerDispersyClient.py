@@ -51,13 +51,10 @@ class TriblerDispersyExperimentScriptClient(DispersyExperimentScriptClient):
 
         def _do_start():
             logging.error("Upgrader")
-            upgrader = self.session.prestart()
-            while not upgrader.is_done:
-                sleep(0.1)
-
+            self.session.prestart()
             return self.session.start().addCallback(on_tribler_started)
 
-        deferToThread(_do_start).addCallback(self.__setup_dispersy_member)
+        _do_start().addCallback(self.__setup_dispersy_member)
 
     def __setup_dispersy_member(self, _):
         self.original_on_incoming_packets = self._dispersy.on_incoming_packets
@@ -92,7 +89,8 @@ class TriblerDispersyExperimentScriptClient(DispersyExperimentScriptClient):
         config.set_dht_torrent_collecting(False)
         config.set_enable_torrent_search(False)
         config.set_enable_channel_search(False)
-        config.set_videoplayer(False)
+        config.set_videoserver_enabled(False)
+        config.set_tunnel_community_enabled(False)
         config.set_listen_port(20000 + self.scenario_runner._peernumber)
 
         if self.dispersy_port is None:
