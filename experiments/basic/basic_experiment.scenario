@@ -1,0 +1,5 @@
+&module gumby.modules.tribler_module.TriblerModule
+
+@0:2 start_session
+@0:10 stop_session
+@0:20 stop
