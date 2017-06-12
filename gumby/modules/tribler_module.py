@@ -41,7 +41,9 @@ class TriblerModule(BaseDispersyModule):
 
     @experiment_callback
     def stop_session(self):
-        self.session.shutdown()
+        self._logger.error("Before shutting down...")
+        deferred = self.session.shutdown()
+        self._logger.error("Deferred: %s", deferred)
 
     @experiment_callback
     def set_transfer_size(self, size):
