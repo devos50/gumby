@@ -1,0 +1,53 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.waves.waves_module.WavesModule
+
+@0:5 start_waves {1}
+@0:10 start_waves {2-40}
+@0:30 issue_asset DUM1 {1}
+@0:30 issue_asset DUM2 {1}
+@0:40 transfer_asset_to_all_peers WAVES {1}
+@0:40 transfer_asset_to_all_peers DUM1 {1}
+@0:40 transfer_asset_to_all_peers DUM2 {1}
+@0:205.1 bid 10 DUM1 10 DUM2 {1}
+@0:205.2 bid 10 DUM1 10 DUM2 {2}
+@0:205.3 bid 10 DUM1 10 DUM2 {3}
+@0:205.4 bid 10 DUM1 10 DUM2 {4}
+@0:205.5 bid 10 DUM1 10 DUM2 {5}
+@0:205.6 bid 10 DUM1 10 DUM2 {6}
+@0:205.7 bid 10 DUM1 10 DUM2 {7}
+@0:205.8 bid 10 DUM1 10 DUM2 {8}
+@0:205.9 bid 10 DUM1 10 DUM2 {9}
+@0:206.0 bid 10 DUM1 10 DUM2 {10}
+@0:206.1 bid 10 DUM1 10 DUM2 {11}
+@0:206.2 bid 10 DUM1 10 DUM2 {12}
+@0:206.3 bid 10 DUM1 10 DUM2 {13}
+@0:206.4 bid 10 DUM1 10 DUM2 {14}
+@0:206.5 bid 10 DUM1 10 DUM2 {15}
+@0:206.6 bid 10 DUM1 10 DUM2 {16}
+@0:206.7 bid 10 DUM1 10 DUM2 {17}
+@0:206.8 bid 10 DUM1 10 DUM2 {18}
+@0:206.9 bid 10 DUM1 10 DUM2 {19}
+@0:207.0 bid 10 DUM1 10 DUM2 {20}
+@0:207.1 ask 10 DUM1 10 DUM2 {21}
+@0:207.2 ask 10 DUM1 10 DUM2 {22}
+@0:207.3 ask 10 DUM1 10 DUM2 {23}
+@0:207.4 ask 10 DUM1 10 DUM2 {24}
+@0:207.5 ask 10 DUM1 10 DUM2 {25}
+@0:207.6 ask 10 DUM1 10 DUM2 {26}
+@0:207.7 ask 10 DUM1 10 DUM2 {27}
+@0:207.8 ask 10 DUM1 10 DUM2 {28}
+@0:207.9 ask 10 DUM1 10 DUM2 {29}
+@0:208.0 ask 10 DUM1 10 DUM2 {30}
+@0:208.1 ask 10 DUM1 10 DUM2 {31}
+@0:208.2 ask 10 DUM1 10 DUM2 {32}
+@0:208.3 ask 10 DUM1 10 DUM2 {33}
+@0:208.4 ask 10 DUM1 10 DUM2 {34}
+@0:208.5 ask 10 DUM1 10 DUM2 {35}
+@0:208.6 ask 10 DUM1 10 DUM2 {36}
+@0:208.7 ask 10 DUM1 10 DUM2 {37}
+@0:208.8 ask 10 DUM1 10 DUM2 {38}
+@0:208.9 ask 10 DUM1 10 DUM2 {39}
+@0:208.0 ask 10 DUM1 10 DUM2 {40}
+@0:300 write_stats
+@0:300 dump_blockchain {1}
+@0:310 stop
