@@ -1,0 +1,4 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.pagerank.pagerank_module.PagerankModule
+
+@0:5 compute
