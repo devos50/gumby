@@ -5,7 +5,7 @@ from gumby.modules.community_launcher import *
 
 from Tribler.Core.Session import Session
 from Tribler.Core.APIImplementation.LaunchManyCore import TriblerLaunchMany
-from Tribler.dispersy.util import blocking_call_on_reactor_thread
+from dispersy.util import blocking_call_on_reactor_thread
 
 
 class CommunityLoader(object):
@@ -113,6 +113,7 @@ class DefaultCommunityLoader(CommunityLoader):
         self.set_launcher(PreviewChannelCommunityLauncher())
         self.set_launcher(TrustChainCommunityLauncher())
         self.set_launcher(HiddenTunnelCommunityLauncher())
+        self.set_launcher(MoneyCommunityLauncher())
 
 
 class GumbyLaunchMany(TriblerLaunchMany):

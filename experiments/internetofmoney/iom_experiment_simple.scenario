@@ -1,0 +1,19 @@
+&module gumby.modules.dispersy_module.DispersyModule
+&module experiments.internetofmoney.iom_module.IOMModule
+
+@0:0 isolate_community MoneyCommunity
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:1 start_log_connections_loop
+@0:2 init_db
+@0:2 start_bank_server {1}
+@0:5 initialize_manager DUMA {1-2}
+@0:5 initialize_manager DUMB {2-3}
+@0:5 initialize_manager DUMC {3-4}
+@0:10 set_malicious 1 {2}
+@0:50 perform_fast_payment NL68DUMA0111111111 NL41DUMC0111111111 10.23 {1}
+@0:55 perform_fast_payment NL68DUMA0111111111 NL41DUMC0111111111 10.23 {1}
+@0:60 stop_log_connections_loop
+@0:60 write_stats
+@0:60 stop_bank_server {1}
+@0:65 stop

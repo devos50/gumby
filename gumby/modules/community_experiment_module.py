@@ -5,8 +5,8 @@ from gumby.modules.base_dispersy_module import BaseDispersyModule
 from gumby.modules.experiment_module import ExperimentModule
 
 from Tribler.Core import permid
-from Tribler.dispersy.candidate import WalkCandidate
-from Tribler.dispersy.crypto import M2CryptoPK
+from dispersy.candidate import WalkCandidate
+from dispersy.crypto import M2CryptoPK
 
 
 class CommunityExperimentModule(ExperimentModule):

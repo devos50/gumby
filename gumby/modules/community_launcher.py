@@ -109,7 +109,7 @@ class CommunityLauncher(object):
 class DiscoveryCommunityLauncher(CommunityLauncher):
 
     def get_community_class(self):
-        from Tribler.dispersy.discovery.community import DiscoveryCommunity
+        from dispersy.discovery.community import DiscoveryCommunity
         return DiscoveryCommunity
 
     def get_my_member(self, dispersy, session):
@@ -208,3 +208,17 @@ class TrustChainCommunityLauncher(CommunityLauncher):
 
     def get_kwargs(self, session):
         return {}
+
+
+class MoneyCommunityLauncher(CommunityLauncher):
+
+    def should_launch(self, session):
+        return True
+
+    def get_community_class(self):
+        from internetofmoney.moneycommunity.community import MoneyCommunity
+        return MoneyCommunity
+
+    def get_my_member(self, dispersy, session):
+        keypair = session.trustchain_keypair
+        return dispersy.get_member(private_key=keypair.key_to_bin())

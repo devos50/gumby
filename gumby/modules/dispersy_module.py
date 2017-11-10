@@ -9,10 +9,10 @@ from gumby.modules.community_launcher import DiscoveryCommunityLauncher
 from gumby.modules.experiment_module import static_module
 from gumby.modules.base_dispersy_module import BaseDispersyModule
 
-from Tribler.dispersy.dispersy import Dispersy
-from Tribler.dispersy.crypto import ECCrypto, NoCrypto, M2CryptoSK
-from Tribler.dispersy.endpoint import StandaloneEndpoint
-from Tribler.dispersy.candidate import CANDIDATE_STUMBLE_LIFETIME, CANDIDATE_WALK_LIFETIME, CANDIDATE_INTRO_LIFETIME
+from dispersy.dispersy import Dispersy
+from dispersy.crypto import ECCrypto, NoCrypto, M2CryptoSK
+from dispersy.endpoint import StandaloneEndpoint
+from dispersy.candidate import CANDIDATE_STUMBLE_LIFETIME, CANDIDATE_WALK_LIFETIME, CANDIDATE_INTRO_LIFETIME
 
 from Tribler.Core import permid
 

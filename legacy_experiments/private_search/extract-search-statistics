@@ -5,7 +5,7 @@ import re
 from os import listdir
 import os
 from sys import argv, exit, maxint
-from Tribler.dispersy.tool.ldecoder import parse, parselast
+from dispersy.tool.ldecoder import parse, parselast
 from collections import defaultdict
 
 def get_nodes(peer_dir, node_count):

@@ -179,8 +179,8 @@ The module code for our running example is given below:
     from gumby.modules.experiment_module import static_module
     from gumby.modules.isolated_community_loader import IsolatedCommunityLoader
 
-    from Tribler.dispersy.community import Community
-    from Tribler.dispersy.conversion import DefaultConversion
+    from dispersy.community import Community
+    from dispersy.conversion import DefaultConversion
 
 
     class HelloWorldCommunityLoader(IsolatedCommunityLoader):

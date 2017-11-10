@@ -165,6 +165,7 @@ def setupLogging():
         log_level = getattr(logging, log_level_override)
 
     config_file = path.join(environ['EXPERIMENT_DIR'], "logger.conf")
+    print "Experiment directory: %s" % environ['EXPERIMENT_DIR']
     root = logging.getLogger()
 
     # Wipe out any existing handlers

@@ -1,0 +1,2826 @@
+&module gumby.modules.dispersy_module.DispersyModule
+&module experiments.internetofmoney.iom_module.IOMModule
+
+@0:0 isolate_community MoneyCommunity
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:2 init_db
+@0:2 start_bank_server {1}
+@0:10 connect_to_all_peers
+@0:10 set_malicious 0.5 {105-200}
+@0:60 start_log_stolen_loop
+@0:5 initialize_manager DUMD {165}
+@0:5 initialize_manager DUMC {165}
+@0:5 initialize_manager DUMD {133}
+@0:5 initialize_manager DUMC {133}
+@0:5 initialize_manager DUMB {132}
+@0:5 initialize_manager DUMD {132}
+@0:5 initialize_manager DUMD {131}
+@0:5 initialize_manager DUMC {131}
+@0:5 initialize_manager DUMA {130}
+@0:5 initialize_manager DUMC {130}
+@0:5 initialize_manager DUMA {137}
+@0:5 initialize_manager DUMB {137}
+@0:5 initialize_manager DUMB {136}
+@0:5 initialize_manager DUMC {136}
+@0:5 initialize_manager DUMB {135}
+@0:5 initialize_manager DUMC {135}
+@0:5 initialize_manager DUMB {134}
+@0:5 initialize_manager DUMC {134}
+@0:5 initialize_manager DUMB {139}
+@0:5 initialize_manager DUMD {139}
+@0:5 initialize_manager DUME {138}
+@0:5 initialize_manager DUMD {138}
+@0:5 initialize_manager DUME {166}
+@0:5 initialize_manager DUMB {166}
+@0:5 initialize_manager DUMB {24}
+@0:5 initialize_manager DUMB {25}
+@0:5 initialize_manager DUMC {26}
+@0:5 initialize_manager DUMA {27}
+@0:5 initialize_manager DUMA {20}
+@0:5 initialize_manager DUMA {21}
+@0:5 initialize_manager DUMC {22}
+@0:5 initialize_manager DUME {23}
+@0:5 initialize_manager DUME {160}
+@0:5 initialize_manager DUMC {160}
+@0:5 initialize_manager DUMB {28}
+@0:5 initialize_manager DUMC {29}
+@0:5 initialize_manager DUMC {161}
+@0:5 initialize_manager DUMD {161}
+@0:5 initialize_manager DUMB {4}
+@0:5 initialize_manager DUMD {8}
+@0:5 initialize_manager DUMA {163}
+@0:5 initialize_manager DUME {163}
+@0:5 initialize_manager DUMA {119}
+@0:5 initialize_manager DUMC {119}
+@0:5 initialize_manager DUMA {120}
+@0:5 initialize_manager DUMB {120}
+@0:5 initialize_manager DUMD {121}
+@0:5 initialize_manager DUMB {121}
+@0:5 initialize_manager DUMB {122}
+@0:5 initialize_manager DUME {122}
+@0:5 initialize_manager DUMA {123}
+@0:5 initialize_manager DUMB {123}
+@0:5 initialize_manager DUMC {124}
+@0:5 initialize_manager DUMA {124}
+@0:5 initialize_manager DUMA {125}
+@0:5 initialize_manager DUMD {125}
+@0:5 initialize_manager DUMC {126}
+@0:5 initialize_manager DUMA {126}
+@0:5 initialize_manager DUMD {127}
+@0:5 initialize_manager DUME {127}
+@0:5 initialize_manager DUMA {128}
+@0:5 initialize_manager DUME {128}
+@0:5 initialize_manager DUMA {129}
+@0:5 initialize_manager DUMC {129}
+@0:5 initialize_manager DUMB {167}
+@0:5 initialize_manager DUME {167}
+@0:5 initialize_manager DUMB {118}
+@0:5 initialize_manager DUMA {118}
+@0:5 initialize_manager DUMD {59}
+@0:5 initialize_manager DUMB {58}
+@0:5 initialize_manager DUMC {55}
+@0:5 initialize_manager DUME {54}
+@0:5 initialize_manager DUMA {57}
+@0:5 initialize_manager DUMC {56}
+@0:5 initialize_manager DUMB {51}
+@0:5 initialize_manager DUMD {50}
+@0:5 initialize_manager DUME {53}
+@0:5 initialize_manager DUMC {52}
+@0:5 initialize_manager DUME {164}
+@0:5 initialize_manager DUMA {164}
+@0:5 initialize_manager DUMB {199}
+@0:5 initialize_manager DUME {199}
+@0:5 initialize_manager DUMD {199}
+@0:5 initialize_manager DUMC {199}
+@0:5 initialize_manager DUMA {199}
+@0:5 initialize_manager DUME {179}
+@0:5 initialize_manager DUMB {179}
+@0:5 initialize_manager DUMA {200}
+@0:5 initialize_manager DUME {200}
+@0:5 initialize_manager DUMD {200}
+@0:5 initialize_manager DUMD {195}
+@0:5 initialize_manager DUMC {195}
+@0:5 initialize_manager DUMA {195}
+@0:5 initialize_manager DUMB {195}
+@0:5 initialize_manager DUME {194}
+@0:5 initialize_manager DUMA {194}
+@0:5 initialize_manager DUMD {194}
+@0:5 initialize_manager DUMB {194}
+@0:5 initialize_manager DUMC {194}
+@0:5 initialize_manager DUMC {197}
+@0:5 initialize_manager DUME {197}
+@0:5 initialize_manager DUMB {197}
+@0:5 initialize_manager DUMD {197}
+@0:5 initialize_manager DUMA {197}
+@0:5 initialize_manager DUME {178}
+@0:5 initialize_manager DUMC {178}
+@0:5 initialize_manager DUMC {191}
+@0:5 initialize_manager DUMA {191}
+@0:5 initialize_manager DUMB {191}
+@0:5 initialize_manager DUME {190}
+@0:5 initialize_manager DUMB {190}
+@0:5 initialize_manager DUMC {193}
+@0:5 initialize_manager DUMB {193}
+@0:5 initialize_manager DUMA {193}
+@0:5 initialize_manager DUMD {193}
+@0:5 initialize_manager DUMA {192}
+@0:5 initialize_manager DUMD {192}
+@0:5 initialize_manager DUME {192}
+@0:5 initialize_manager DUMA {115}
+@0:5 initialize_manager DUME {115}
+@0:5 initialize_manager DUMD {114}
+@0:5 initialize_manager DUMA {114}
+@0:5 initialize_manager DUMC {88}
+@0:5 initialize_manager DUMB {89}
+@0:5 initialize_manager DUME {111}
+@0:5 initialize_manager DUMD {111}
+@0:5 initialize_manager DUMA {110}
+@0:5 initialize_manager DUMC {110}
+@0:5 initialize_manager DUMB {113}
+@0:5 initialize_manager DUMD {113}
+@0:5 initialize_manager DUMD {112}
+@0:5 initialize_manager DUME {112}
+@0:5 initialize_manager DUMC {82}
+@0:5 initialize_manager DUME {83}
+@0:5 initialize_manager DUME {80}
+@0:5 initialize_manager DUMD {81}
+@0:5 initialize_manager DUME {86}
+@0:5 initialize_manager DUMC {87}
+@0:5 initialize_manager DUMB {84}
+@0:5 initialize_manager DUMC {85}
+@0:5 initialize_manager DUMB {198}
+@0:5 initialize_manager DUME {198}
+@0:5 initialize_manager DUMC {198}
+@0:5 initialize_manager DUMD {3}
+@0:5 initialize_manager DUMA {177}
+@0:5 initialize_manager DUMB {177}
+@0:5 initialize_manager DUMD {7}
+@0:5 initialize_manager DUMD {108}
+@0:5 initialize_manager DUMB {108}
+@0:5 initialize_manager DUMA {109}
+@0:5 initialize_manager DUME {109}
+@0:5 initialize_manager DUME {102}
+@0:5 initialize_manager DUMC {103}
+@0:5 initialize_manager DUMC {100}
+@0:5 initialize_manager DUMA {101}
+@0:5 initialize_manager DUMB {106}
+@0:5 initialize_manager DUME {106}
+@0:5 initialize_manager DUMC {107}
+@0:5 initialize_manager DUME {107}
+@0:5 initialize_manager DUMA {104}
+@0:5 initialize_manager DUMC {105}
+@0:5 initialize_manager DUMB {105}
+@0:5 initialize_manager DUMD {39}
+@0:5 initialize_manager DUMC {38}
+@0:5 initialize_manager DUMB {33}
+@0:5 initialize_manager DUMB {32}
+@0:5 initialize_manager DUMB {31}
+@0:5 initialize_manager DUMC {30}
+@0:5 initialize_manager DUME {37}
+@0:5 initialize_manager DUMA {36}
+@0:5 initialize_manager DUMB {35}
+@0:5 initialize_manager DUMC {34}
+@0:5 initialize_manager DUMC {176}
+@0:5 initialize_manager DUMA {176}
+@0:5 initialize_manager DUMC {60}
+@0:5 initialize_manager DUMA {61}
+@0:5 initialize_manager DUMC {62}
+@0:5 initialize_manager DUMD {63}
+@0:5 initialize_manager DUMD {64}
+@0:5 initialize_manager DUMB {65}
+@0:5 initialize_manager DUMC {66}
+@0:5 initialize_manager DUMC {67}
+@0:5 initialize_manager DUMD {68}
+@0:5 initialize_manager DUMC {69}
+@0:5 initialize_manager DUMD {175}
+@0:5 initialize_manager DUMB {175}
+@0:5 initialize_manager DUMB {174}
+@0:5 initialize_manager DUMC {174}
+@0:5 initialize_manager DUMD {173}
+@0:5 initialize_manager DUME {173}
+@0:5 initialize_manager DUMA {172}
+@0:5 initialize_manager DUMD {172}
+@0:5 initialize_manager DUMA {171}
+@0:5 initialize_manager DUME {171}
+@0:5 initialize_manager DUMA {170}
+@0:5 initialize_manager DUMC {170}
+@0:5 initialize_manager DUME {181}
+@0:5 initialize_manager DUMA {181}
+@0:5 initialize_manager DUMD {182}
+@0:5 initialize_manager DUMA {182}
+@0:5 initialize_manager DUMA {183}
+@0:5 initialize_manager DUMD {183}
+@0:5 initialize_manager DUMB {180}
+@0:5 initialize_manager DUMD {180}
+@0:5 initialize_manager DUME {2}
+@0:5 initialize_manager DUMB {162}
+@0:5 initialize_manager DUMC {162}
+@0:5 initialize_manager DUMB {187}
+@0:5 initialize_manager DUMC {187}
+@0:5 initialize_manager DUMA {184}
+@0:5 initialize_manager DUME {184}
+@0:5 initialize_manager DUMC {6}
+@0:5 initialize_manager DUMA {186}
+@0:5 initialize_manager DUME {186}
+@0:5 initialize_manager DUMA {188}
+@0:5 initialize_manager DUMD {188}
+@0:5 initialize_manager DUMB {189}
+@0:5 initialize_manager DUMD {189}
+@0:5 initialize_manager DUMB {196}
+@0:5 initialize_manager DUMA {196}
+@0:5 initialize_manager DUMD {196}
+@0:5 initialize_manager DUME {185}
+@0:5 initialize_manager DUMB {185}
+@0:5 initialize_manager DUMC {99}
+@0:5 initialize_manager DUMC {98}
+@0:5 initialize_manager DUME {168}
+@0:5 initialize_manager DUMC {168}
+@0:5 initialize_manager DUME {169}
+@0:5 initialize_manager DUMD {169}
+@0:5 initialize_manager DUME {91}
+@0:5 initialize_manager DUMC {90}
+@0:5 initialize_manager DUMD {93}
+@0:5 initialize_manager DUMA {92}
+@0:5 initialize_manager DUME {95}
+@0:5 initialize_manager DUME {94}
+@0:5 initialize_manager DUME {97}
+@0:5 initialize_manager DUMD {96}
+@0:5 initialize_manager DUME {11}
+@0:5 initialize_manager DUMA {10}
+@0:5 initialize_manager DUMD {13}
+@0:5 initialize_manager DUMC {12}
+@0:5 initialize_manager DUMC {15}
+@0:5 initialize_manager DUMA {14}
+@0:5 initialize_manager DUMB {17}
+@0:5 initialize_manager DUMD {16}
+@0:5 initialize_manager DUME {19}
+@0:5 initialize_manager DUME {18}
+@0:5 initialize_manager DUMA {117}
+@0:5 initialize_manager DUMC {117}
+@0:5 initialize_manager DUMD {116}
+@0:5 initialize_manager DUMA {116}
+@0:5 initialize_manager DUMA {151}
+@0:5 initialize_manager DUMC {151}
+@0:5 initialize_manager DUMC {150}
+@0:5 initialize_manager DUMA {150}
+@0:5 initialize_manager DUMB {153}
+@0:5 initialize_manager DUMD {153}
+@0:5 initialize_manager DUMB {152}
+@0:5 initialize_manager DUME {152}
+@0:5 initialize_manager DUMB {155}
+@0:5 initialize_manager DUME {155}
+@0:5 initialize_manager DUME {154}
+@0:5 initialize_manager DUMA {154}
+@0:5 initialize_manager DUMB {157}
+@0:5 initialize_manager DUMA {157}
+@0:5 initialize_manager DUME {156}
+@0:5 initialize_manager DUMD {156}
+@0:5 initialize_manager DUME {159}
+@0:5 initialize_manager DUMB {159}
+@0:5 initialize_manager DUMD {158}
+@0:5 initialize_manager DUME {158}
+@0:5 initialize_manager DUMC {48}
+@0:5 initialize_manager DUME {49}
+@0:5 initialize_manager DUMD {46}
+@0:5 initialize_manager DUME {47}
+@0:5 initialize_manager DUMB {44}
+@0:5 initialize_manager DUMD {45}
+@0:5 initialize_manager DUME {42}
+@0:5 initialize_manager DUMA {43}
+@0:5 initialize_manager DUMA {40}
+@0:5 initialize_manager DUME {41}
+@0:5 initialize_manager DUMA {1}
+@0:5 initialize_manager DUMC {5}
+@0:5 initialize_manager DUMA {9}
+@0:5 initialize_manager DUME {146}
+@0:5 initialize_manager DUMD {146}
+@0:5 initialize_manager DUMD {147}
+@0:5 initialize_manager DUMC {147}
+@0:5 initialize_manager DUME {144}
+@0:5 initialize_manager DUMD {144}
+@0:5 initialize_manager DUMC {145}
+@0:5 initialize_manager DUMA {145}
+@0:5 initialize_manager DUMB {142}
+@0:5 initialize_manager DUMA {142}
+@0:5 initialize_manager DUME {143}
+@0:5 initialize_manager DUMA {143}
+@0:5 initialize_manager DUMB {140}
+@0:5 initialize_manager DUMD {140}
+@0:5 initialize_manager DUMD {141}
+@0:5 initialize_manager DUMB {141}
+@0:5 initialize_manager DUMB {148}
+@0:5 initialize_manager DUME {148}
+@0:5 initialize_manager DUMB {149}
+@0:5 initialize_manager DUMC {149}
+@0:5 initialize_manager DUMB {77}
+@0:5 initialize_manager DUMC {76}
+@0:5 initialize_manager DUME {75}
+@0:5 initialize_manager DUMD {74}
+@0:5 initialize_manager DUMA {73}
+@0:5 initialize_manager DUMA {72}
+@0:5 initialize_manager DUMC {71}
+@0:5 initialize_manager DUMB {70}
+@0:5 initialize_manager DUMC {79}
+@0:5 initialize_manager DUMA {78}
+@0:60 perform_fast_payment 58 70.93 DUMB {1}
+@0:65 perform_fast_payment 8 635.39 DUMD {1}
+@0:70 perform_fast_payment 31 792.19 DUMB {1}
+@0:75 perform_fast_payment 52 862.65 DUMC {1}
+@0:80 perform_fast_payment 17 501.43 DUMB {1}
+@0:85 perform_fast_payment 83 77.12 DUME {1}
+@0:90 perform_fast_payment 99 173.25 DUMC {1}
+@0:95 perform_fast_payment 81 984.90 DUMD {1}
+@0:100 perform_fast_payment 86 319.79 DUME {1}
+@0:105 perform_fast_payment 12 514.36 DUMC {1}
+@0:110 perform_fast_payment 96 293.50 DUMD {1}
+@0:115 perform_fast_payment 93 141.69 DUMD {1}
+@0:120 perform_fast_payment 95 31.77 DUME {1}
+@0:125 perform_fast_payment 33 903.09 DUMB {1}
+@0:130 perform_fast_payment 84 907.15 DUMB {1}
+@0:135 perform_fast_payment 88 746.19 DUMC {1}
+@0:140 perform_fast_payment 19 432.64 DUME {1}
+@0:145 perform_fast_payment 17 714.83 DUMB {1}
+@0:150 perform_fast_payment 70 252.59 DUMB {1}
+@0:155 perform_fast_payment 7 963.39 DUMD {1}
+@0:160 perform_fast_payment 85 549.27 DUMC {1}
+@0:165 perform_fast_payment 89 453.32 DUMB {1}
+@0:170 perform_fast_payment 42 338.68 DUME {1}
+@0:175 perform_fast_payment 3 646.44 DUMD {1}
+@0:60 perform_fast_payment 44 570.61 DUMB {2}
+@0:65 perform_fast_payment 7 354.95 DUMD {2}
+@0:70 perform_fast_payment 15 125.14 DUMC {2}
+@0:75 perform_fast_payment 27 828.94 DUMA {2}
+@0:80 perform_fast_payment 64 233.54 DUMD {2}
+@0:85 perform_fast_payment 1 528.71 DUMA {2}
+@0:90 perform_fast_payment 68 438.32 DUMD {2}
+@0:95 perform_fast_payment 72 731.42 DUMA {2}
+@0:100 perform_fast_payment 25 495.08 DUMB {2}
+@0:105 perform_fast_payment 50 225.07 DUMD {2}
+@0:110 perform_fast_payment 43 560.41 DUMA {2}
+@0:115 perform_fast_payment 96 275.23 DUMD {2}
+@0:120 perform_fast_payment 68 48.21 DUMD {2}
+@0:125 perform_fast_payment 8 511.70 DUMD {2}
+@0:130 perform_fast_payment 92 159.48 DUMA {2}
+@0:135 perform_fast_payment 92 311.81 DUMA {2}
+@0:140 perform_fast_payment 73 848.99 DUMA {2}
+@0:145 perform_fast_payment 39 701.29 DUMD {2}
+@0:150 perform_fast_payment 77 594.58 DUMB {2}
+@0:155 perform_fast_payment 90 896.61 DUMC {2}
+@0:160 perform_fast_payment 100 571.24 DUMC {2}
+@0:165 perform_fast_payment 27 217.63 DUMA {2}
+@0:170 perform_fast_payment 60 757.75 DUMC {2}
+@0:175 perform_fast_payment 6 681.64 DUMC {2}
+@0:60 perform_fast_payment 75 347.99 DUME {3}
+@0:65 perform_fast_payment 54 164.81 DUME {3}
+@0:70 perform_fast_payment 76 40.72 DUMC {3}
+@0:75 perform_fast_payment 103 807.95 DUMC {3}
+@0:80 perform_fast_payment 66 267.53 DUMC {3}
+@0:85 perform_fast_payment 95 959.44 DUME {3}
+@0:90 perform_fast_payment 15 775.76 DUMC {3}
+@0:95 perform_fast_payment 88 659.72 DUMC {3}
+@0:100 perform_fast_payment 73 445.06 DUMA {3}
+@0:105 perform_fast_payment 97 971.21 DUME {3}
+@0:110 perform_fast_payment 40 802.71 DUMA {3}
+@0:115 perform_fast_payment 18 325.47 DUME {3}
+@0:120 perform_fast_payment 14 908.89 DUMA {3}
+@0:125 perform_fast_payment 100 119.20 DUMC {3}
+@0:130 perform_fast_payment 43 118.10 DUMA {3}
+@0:135 perform_fast_payment 31 248.22 DUMB {3}
+@0:140 perform_fast_payment 78 4.02 DUMA {3}
+@0:145 perform_fast_payment 20 438.78 DUMA {3}
+@0:150 perform_fast_payment 66 605.63 DUMC {3}
+@0:155 perform_fast_payment 87 206.61 DUMC {3}
+@0:160 perform_fast_payment 30 542.34 DUMC {3}
+@0:165 perform_fast_payment 29 585.74 DUMC {3}
+@0:170 perform_fast_payment 27 683.53 DUMA {3}
+@0:175 perform_fast_payment 83 808.66 DUME {3}
+@0:60 perform_fast_payment 102 545.38 DUME {4}
+@0:65 perform_fast_payment 52 855.70 DUMC {4}
+@0:70 perform_fast_payment 80 570.55 DUME {4}
+@0:75 perform_fast_payment 40 284.05 DUMA {4}
+@0:80 perform_fast_payment 12 807.55 DUMC {4}
+@0:85 perform_fast_payment 13 747.27 DUMD {4}
+@0:90 perform_fast_payment 57 964.95 DUMA {4}
+@0:95 perform_fast_payment 80 973.52 DUME {4}
+@0:100 perform_fast_payment 15 500.38 DUMC {4}
+@0:105 perform_fast_payment 60 311.26 DUMC {4}
+@0:110 perform_fast_payment 53 356.83 DUME {4}
+@0:115 perform_fast_payment 55 0.85 DUMC {4}
+@0:120 perform_fast_payment 47 449.56 DUME {4}
+@0:125 perform_fast_payment 42 783.09 DUME {4}
+@0:130 perform_fast_payment 72 492.30 DUMA {4}
+@0:135 perform_fast_payment 68 377.56 DUMD {4}
+@0:140 perform_fast_payment 22 3.89 DUMC {4}
+@0:145 perform_fast_payment 29 598.17 DUMC {4}
+@0:150 perform_fast_payment 92 829.42 DUMA {4}
+@0:155 perform_fast_payment 54 987.02 DUME {4}
+@0:160 perform_fast_payment 49 834.60 DUME {4}
+@0:165 perform_fast_payment 43 744.63 DUMA {4}
+@0:170 perform_fast_payment 103 305.34 DUMC {4}
+@0:175 perform_fast_payment 18 620.04 DUME {4}
+@0:60 perform_fast_payment 1 389.17 DUMA {5}
+@0:65 perform_fast_payment 45 405.26 DUMD {5}
+@0:70 perform_fast_payment 61 733.83 DUMA {5}
+@0:75 perform_fast_payment 94 748.78 DUME {5}
+@0:80 perform_fast_payment 78 640.36 DUMA {5}
+@0:85 perform_fast_payment 68 629.68 DUMD {5}
+@0:90 perform_fast_payment 43 629.27 DUMA {5}
+@0:95 perform_fast_payment 89 767.50 DUMB {5}
+@0:100 perform_fast_payment 63 349.46 DUMD {5}
+@0:105 perform_fast_payment 28 708.02 DUMB {5}
+@0:110 perform_fast_payment 91 544.25 DUME {5}
+@0:115 perform_fast_payment 16 832.98 DUMD {5}
+@0:120 perform_fast_payment 51 467.11 DUMB {5}
+@0:125 perform_fast_payment 54 744.75 DUME {5}
+@0:130 perform_fast_payment 44 355.18 DUMB {5}
+@0:135 perform_fast_payment 3 507.17 DUMD {5}
+@0:140 perform_fast_payment 72 401.93 DUMA {5}
+@0:145 perform_fast_payment 72 605.00 DUMA {5}
+@0:150 perform_fast_payment 93 269.08 DUMD {5}
+@0:155 perform_fast_payment 8 830.68 DUMD {5}
+@0:160 perform_fast_payment 39 511.52 DUMD {5}
+@0:165 perform_fast_payment 77 168.56 DUMB {5}
+@0:170 perform_fast_payment 68 713.44 DUMD {5}
+@0:175 perform_fast_payment 64 232.12 DUMD {5}
+@0:60 perform_fast_payment 59 172.37 DUMD {6}
+@0:65 perform_fast_payment 83 866.72 DUME {6}
+@0:70 perform_fast_payment 35 222.33 DUMB {6}
+@0:75 perform_fast_payment 101 706.69 DUMA {6}
+@0:80 perform_fast_payment 4 899.39 DUMB {6}
+@0:85 perform_fast_payment 65 316.54 DUMB {6}
+@0:90 perform_fast_payment 45 761.60 DUMD {6}
+@0:95 perform_fast_payment 20 625.89 DUMA {6}
+@0:100 perform_fast_payment 18 973.05 DUME {6}
+@0:105 perform_fast_payment 47 913.15 DUME {6}
+@0:110 perform_fast_payment 64 261.99 DUMD {6}
+@0:115 perform_fast_payment 75 361.10 DUME {6}
+@0:120 perform_fast_payment 75 718.48 DUME {6}
+@0:125 perform_fast_payment 32 106.39 DUMB {6}
+@0:130 perform_fast_payment 42 492.37 DUME {6}
+@0:135 perform_fast_payment 11 186.77 DUME {6}
+@0:140 perform_fast_payment 63 888.88 DUMD {6}
+@0:145 perform_fast_payment 23 34.72 DUME {6}
+@0:150 perform_fast_payment 74 814.91 DUMD {6}
+@0:155 perform_fast_payment 101 613.18 DUMA {6}
+@0:160 perform_fast_payment 36 837.87 DUMA {6}
+@0:165 perform_fast_payment 13 692.64 DUMD {6}
+@0:170 perform_fast_payment 10 399.71 DUMA {6}
+@0:175 perform_fast_payment 40 168.61 DUMA {6}
+@0:60 perform_fast_payment 25 820.15 DUMB {7}
+@0:65 perform_fast_payment 49 579.94 DUME {7}
+@0:70 perform_fast_payment 23 714.94 DUME {7}
+@0:75 perform_fast_payment 35 593.62 DUMB {7}
+@0:80 perform_fast_payment 95 994.39 DUME {7}
+@0:85 perform_fast_payment 5 797.44 DUMC {7}
+@0:90 perform_fast_payment 90 319.58 DUMC {7}
+@0:95 perform_fast_payment 40 580.26 DUMA {7}
+@0:100 perform_fast_payment 42 880.03 DUME {7}
+@0:105 perform_fast_payment 79 152.28 DUMC {7}
+@0:110 perform_fast_payment 2 145.19 DUME {7}
+@0:115 perform_fast_payment 70 57.13 DUMB {7}
+@0:120 perform_fast_payment 40 129.99 DUMA {7}
+@0:125 perform_fast_payment 49 839.98 DUME {7}
+@0:130 perform_fast_payment 95 35.48 DUME {7}
+@0:135 perform_fast_payment 88 42.82 DUMC {7}
+@0:140 perform_fast_payment 29 117.45 DUMC {7}
+@0:145 perform_fast_payment 10 27.63 DUMA {7}
+@0:150 perform_fast_payment 67 744.62 DUMC {7}
+@0:155 perform_fast_payment 72 845.62 DUMA {7}
+@0:160 perform_fast_payment 69 389.71 DUMC {7}
+@0:165 perform_fast_payment 66 969.60 DUMC {7}
+@0:170 perform_fast_payment 67 243.10 DUMC {7}
+@0:175 perform_fast_payment 98 590.50 DUMC {7}
+@0:60 perform_fast_payment 37 605.36 DUME {8}
+@0:65 perform_fast_payment 55 60.81 DUMC {8}
+@0:70 perform_fast_payment 37 412.66 DUME {8}
+@0:75 perform_fast_payment 21 880.11 DUMA {8}
+@0:80 perform_fast_payment 69 713.55 DUMC {8}
+@0:85 perform_fast_payment 78 721.12 DUMA {8}
+@0:90 perform_fast_payment 79 251.59 DUMC {8}
+@0:95 perform_fast_payment 102 151.02 DUME {8}
+@0:100 perform_fast_payment 89 852.17 DUMB {8}
+@0:105 perform_fast_payment 6 91.23 DUMC {8}
+@0:110 perform_fast_payment 85 469.17 DUMC {8}
+@0:115 perform_fast_payment 103 40.13 DUMC {8}
+@0:120 perform_fast_payment 56 443.36 DUMC {8}
+@0:125 perform_fast_payment 14 395.19 DUMA {8}
+@0:130 perform_fast_payment 92 24.63 DUMA {8}
+@0:135 perform_fast_payment 55 90.39 DUMC {8}
+@0:140 perform_fast_payment 84 85.79 DUMB {8}
+@0:145 perform_fast_payment 4 384.24 DUMB {8}
+@0:150 perform_fast_payment 77 313.21 DUMB {8}
+@0:155 perform_fast_payment 14 794.57 DUMA {8}
+@0:160 perform_fast_payment 84 855.86 DUMB {8}
+@0:165 perform_fast_payment 32 424.84 DUMB {8}
+@0:170 perform_fast_payment 26 557.18 DUMC {8}
+@0:175 perform_fast_payment 35 338.67 DUMB {8}
+@0:60 perform_fast_payment 82 956.30 DUMC {9}
+@0:65 perform_fast_payment 11 652.58 DUME {9}
+@0:70 perform_fast_payment 47 988.03 DUME {9}
+@0:75 perform_fast_payment 75 834.79 DUME {9}
+@0:80 perform_fast_payment 56 896.82 DUMC {9}
+@0:85 perform_fast_payment 87 291.33 DUMC {9}
+@0:90 perform_fast_payment 17 370.36 DUMB {9}
+@0:95 perform_fast_payment 55 97.39 DUMC {9}
+@0:100 perform_fast_payment 60 43.58 DUMC {9}
+@0:105 perform_fast_payment 85 651.12 DUMC {9}
+@0:110 perform_fast_payment 33 298.33 DUMB {9}
+@0:115 perform_fast_payment 37 325.30 DUME {9}
+@0:120 perform_fast_payment 53 526.13 DUME {9}
+@0:125 perform_fast_payment 16 914.42 DUMD {9}
+@0:130 perform_fast_payment 34 327.57 DUMC {9}
+@0:135 perform_fast_payment 8 979.41 DUMD {9}
+@0:140 perform_fast_payment 50 912.89 DUMD {9}
+@0:145 perform_fast_payment 97 969.75 DUME {9}
+@0:150 perform_fast_payment 85 925.44 DUMC {9}
+@0:155 perform_fast_payment 96 801.37 DUMD {9}
+@0:160 perform_fast_payment 55 575.61 DUMC {9}
+@0:165 perform_fast_payment 82 702.92 DUMC {9}
+@0:170 perform_fast_payment 38 942.31 DUMC {9}
+@0:175 perform_fast_payment 67 402.58 DUMC {9}
+@0:60 perform_fast_payment 49 979.76 DUME {10}
+@0:65 perform_fast_payment 56 167.81 DUMC {10}
+@0:70 perform_fast_payment 16 687.25 DUMD {10}
+@0:75 perform_fast_payment 59 906.81 DUMD {10}
+@0:80 perform_fast_payment 76 50.11 DUMC {10}
+@0:85 perform_fast_payment 11 545.71 DUME {10}
+@0:90 perform_fast_payment 28 106.95 DUMB {10}
+@0:95 perform_fast_payment 28 632.14 DUMB {10}
+@0:100 perform_fast_payment 55 78.51 DUMC {10}
+@0:105 perform_fast_payment 8 850.63 DUMD {10}
+@0:110 perform_fast_payment 67 173.38 DUMC {10}
+@0:115 perform_fast_payment 90 21.86 DUMC {10}
+@0:120 perform_fast_payment 39 847.63 DUMD {10}
+@0:125 perform_fast_payment 74 283.76 DUMD {10}
+@0:130 perform_fast_payment 93 598.08 DUMD {10}
+@0:135 perform_fast_payment 91 892.79 DUME {10}
+@0:140 perform_fast_payment 45 675.60 DUMD {10}
+@0:145 perform_fast_payment 99 798.16 DUMC {10}
+@0:150 perform_fast_payment 76 814.03 DUMC {10}
+@0:155 perform_fast_payment 81 514.29 DUMD {10}
+@0:160 perform_fast_payment 51 403.75 DUMB {10}
+@0:165 perform_fast_payment 83 584.60 DUME {10}
+@0:170 perform_fast_payment 5 851.14 DUMC {10}
+@0:175 perform_fast_payment 48 189.77 DUMC {10}
+@0:60 perform_fast_payment 32 691.34 DUMB {11}
+@0:65 perform_fast_payment 1 120.05 DUMA {11}
+@0:70 perform_fast_payment 32 887.19 DUMB {11}
+@0:75 perform_fast_payment 78 970.79 DUMA {11}
+@0:80 perform_fast_payment 57 571.97 DUMA {11}
+@0:85 perform_fast_payment 58 525.63 DUMB {11}
+@0:90 perform_fast_payment 57 818.57 DUMA {11}
+@0:95 perform_fast_payment 100 408.31 DUMC {11}
+@0:100 perform_fast_payment 66 307.77 DUMC {11}
+@0:105 perform_fast_payment 32 506.32 DUMB {11}
+@0:110 perform_fast_payment 61 550.00 DUMA {11}
+@0:115 perform_fast_payment 17 636.67 DUMB {11}
+@0:120 perform_fast_payment 104 736.14 DUMA {11}
+@0:125 perform_fast_payment 59 368.37 DUMD {11}
+@0:130 perform_fast_payment 98 895.33 DUMC {11}
+@0:135 perform_fast_payment 70 898.75 DUMB {11}
+@0:140 perform_fast_payment 89 383.42 DUMB {11}
+@0:145 perform_fast_payment 39 749.37 DUMD {11}
+@0:150 perform_fast_payment 51 336.55 DUMB {11}
+@0:155 perform_fast_payment 48 116.52 DUMC {11}
+@0:160 perform_fast_payment 44 18.17 DUMB {11}
+@0:165 perform_fast_payment 28 857.89 DUMB {11}
+@0:170 perform_fast_payment 62 287.15 DUMC {11}
+@0:175 perform_fast_payment 104 257.93 DUMA {11}
+@0:60 perform_fast_payment 54 739.52 DUME {12}
+@0:65 perform_fast_payment 72 433.51 DUMA {12}
+@0:70 perform_fast_payment 81 485.80 DUMD {12}
+@0:75 perform_fast_payment 75 491.38 DUME {12}
+@0:80 perform_fast_payment 102 716.18 DUME {12}
+@0:85 perform_fast_payment 10 129.48 DUMA {12}
+@0:90 perform_fast_payment 101 229.24 DUMA {12}
+@0:95 perform_fast_payment 3 253.23 DUMD {12}
+@0:100 perform_fast_payment 50 952.17 DUMD {12}
+@0:105 perform_fast_payment 42 723.51 DUME {12}
+@0:110 perform_fast_payment 10 611.90 DUMA {12}
+@0:115 perform_fast_payment 104 549.60 DUMA {12}
+@0:120 perform_fast_payment 37 946.11 DUME {12}
+@0:125 perform_fast_payment 101 103.18 DUMA {12}
+@0:130 perform_fast_payment 58 419.64 DUMB {12}
+@0:135 perform_fast_payment 70 118.66 DUMB {12}
+@0:140 perform_fast_payment 28 278.76 DUMB {12}
+@0:145 perform_fast_payment 50 793.28 DUMD {12}
+@0:150 perform_fast_payment 10 389.72 DUMA {12}
+@0:155 perform_fast_payment 70 294.25 DUMB {12}
+@0:160 perform_fast_payment 53 905.08 DUME {12}
+@0:165 perform_fast_payment 13 853.88 DUMD {12}
+@0:170 perform_fast_payment 41 905.39 DUME {12}
+@0:175 perform_fast_payment 21 520.75 DUMA {12}
+@0:60 perform_fast_payment 44 887.95 DUMB {13}
+@0:65 perform_fast_payment 104 288.60 DUMA {13}
+@0:70 perform_fast_payment 52 895.01 DUMC {13}
+@0:75 perform_fast_payment 57 214.63 DUMA {13}
+@0:80 perform_fast_payment 80 337.10 DUME {13}
+@0:85 perform_fast_payment 51 8.57 DUMB {13}
+@0:90 perform_fast_payment 103 657.29 DUMC {13}
+@0:95 perform_fast_payment 97 968.69 DUME {13}
+@0:100 perform_fast_payment 28 540.54 DUMB {13}
+@0:105 perform_fast_payment 80 842.39 DUME {13}
+@0:110 perform_fast_payment 24 274.57 DUMB {13}
+@0:115 perform_fast_payment 43 130.21 DUMA {13}
+@0:120 perform_fast_payment 21 560.85 DUMA {13}
+@0:125 perform_fast_payment 100 532.78 DUMC {13}
+@0:130 perform_fast_payment 44 279.80 DUMB {13}
+@0:135 perform_fast_payment 73 267.06 DUMA {13}
+@0:140 perform_fast_payment 23 367.69 DUME {13}
+@0:145 perform_fast_payment 49 338.40 DUME {13}
+@0:150 perform_fast_payment 19 879.91 DUME {13}
+@0:155 perform_fast_payment 73 534.77 DUMA {13}
+@0:160 perform_fast_payment 34 690.11 DUMC {13}
+@0:165 perform_fast_payment 85 891.51 DUMC {13}
+@0:170 perform_fast_payment 33 493.74 DUMB {13}
+@0:175 perform_fast_payment 35 127.93 DUMB {13}
+@0:60 perform_fast_payment 15 256.48 DUMC {14}
+@0:65 perform_fast_payment 74 563.08 DUMD {14}
+@0:70 perform_fast_payment 24 199.41 DUMB {14}
+@0:75 perform_fast_payment 60 884.29 DUMC {14}
+@0:80 perform_fast_payment 44 4.25 DUMB {14}
+@0:85 perform_fast_payment 3 305.31 DUMD {14}
+@0:90 perform_fast_payment 64 84.57 DUMD {14}
+@0:95 perform_fast_payment 24 680.69 DUMB {14}
+@0:100 perform_fast_payment 103 341.08 DUMC {14}
+@0:105 perform_fast_payment 63 518.43 DUMD {14}
+@0:110 perform_fast_payment 3 329.84 DUMD {14}
+@0:115 perform_fast_payment 15 250.83 DUMC {14}
+@0:120 perform_fast_payment 81 681.21 DUMD {14}
+@0:125 perform_fast_payment 5 77.38 DUMC {14}
+@0:130 perform_fast_payment 76 103.22 DUMC {14}
+@0:135 perform_fast_payment 33 269.34 DUMB {14}
+@0:140 perform_fast_payment 6 31.18 DUMC {14}
+@0:145 perform_fast_payment 15 399.33 DUMC {14}
+@0:150 perform_fast_payment 98 638.38 DUMC {14}
+@0:155 perform_fast_payment 26 679.65 DUMC {14}
+@0:160 perform_fast_payment 29 515.24 DUMC {14}
+@0:165 perform_fast_payment 34 948.67 DUMC {14}
+@0:170 perform_fast_payment 37 803.56 DUME {14}
+@0:175 perform_fast_payment 67 843.33 DUMC {14}
+@0:60 perform_fast_payment 64 870.39 DUMD {15}
+@0:65 perform_fast_payment 43 679.01 DUMA {15}
+@0:70 perform_fast_payment 65 527.74 DUMB {15}
+@0:75 perform_fast_payment 59 535.77 DUMD {15}
+@0:80 perform_fast_payment 41 898.32 DUME {15}
+@0:85 perform_fast_payment 58 53.95 DUMB {15}
+@0:90 perform_fast_payment 53 175.15 DUME {15}
+@0:95 perform_fast_payment 23 434.62 DUME {15}
+@0:100 perform_fast_payment 57 250.42 DUMA {15}
+@0:105 perform_fast_payment 50 403.29 DUMD {15}
+@0:110 perform_fast_payment 11 373.48 DUME {15}
+@0:115 perform_fast_payment 57 544.76 DUMA {15}
+@0:120 perform_fast_payment 72 30.42 DUMA {15}
+@0:125 perform_fast_payment 33 682.42 DUMB {15}
+@0:130 perform_fast_payment 17 913.47 DUMB {15}
+@0:135 perform_fast_payment 92 216.28 DUMA {15}
+@0:140 perform_fast_payment 89 335.47 DUMB {15}
+@0:145 perform_fast_payment 93 159.78 DUMD {15}
+@0:150 perform_fast_payment 89 381.74 DUMB {15}
+@0:155 perform_fast_payment 46 117.87 DUMD {15}
+@0:160 perform_fast_payment 63 269.76 DUMD {15}
+@0:165 perform_fast_payment 70 799.39 DUMB {15}
+@0:170 perform_fast_payment 63 8.19 DUMD {15}
+@0:175 perform_fast_payment 96 642.94 DUMD {15}
+@0:60 perform_fast_payment 40 561.92 DUMA {16}
+@0:65 perform_fast_payment 92 459.53 DUMA {16}
+@0:70 perform_fast_payment 82 598.56 DUMC {16}
+@0:75 perform_fast_payment 44 933.53 DUMB {16}
+@0:80 perform_fast_payment 43 605.78 DUMA {16}
+@0:85 perform_fast_payment 6 470.77 DUMC {16}
+@0:90 perform_fast_payment 4 704.14 DUMB {16}
+@0:95 perform_fast_payment 1 42.08 DUMA {16}
+@0:100 perform_fast_payment 12 139.58 DUMC {16}
+@0:105 perform_fast_payment 53 356.29 DUME {16}
+@0:110 perform_fast_payment 29 983.62 DUMC {16}
+@0:115 perform_fast_payment 95 654.87 DUME {16}
+@0:120 perform_fast_payment 84 819.71 DUMB {16}
+@0:125 perform_fast_payment 26 808.29 DUMC {16}
+@0:130 perform_fast_payment 25 562.36 DUMB {16}
+@0:135 perform_fast_payment 38 158.67 DUMC {16}
+@0:140 perform_fast_payment 33 879.76 DUMB {16}
+@0:145 perform_fast_payment 37 657.56 DUME {16}
+@0:150 perform_fast_payment 104 772.07 DUMA {16}
+@0:155 perform_fast_payment 6 434.88 DUMC {16}
+@0:160 perform_fast_payment 40 293.94 DUMA {16}
+@0:165 perform_fast_payment 85 441.03 DUMC {16}
+@0:170 perform_fast_payment 73 634.93 DUMA {16}
+@0:175 perform_fast_payment 54 56.04 DUME {16}
+@0:60 perform_fast_payment 93 172.21 DUMD {17}
+@0:65 perform_fast_payment 67 487.44 DUMC {17}
+@0:70 perform_fast_payment 36 710.43 DUMA {17}
+@0:75 perform_fast_payment 102 21.67 DUME {17}
+@0:80 perform_fast_payment 94 383.24 DUME {17}
+@0:85 perform_fast_payment 87 174.72 DUMC {17}
+@0:90 perform_fast_payment 75 99.71 DUME {17}
+@0:95 perform_fast_payment 101 656.62 DUMA {17}
+@0:100 perform_fast_payment 82 461.31 DUMC {17}
+@0:105 perform_fast_payment 50 492.63 DUMD {17}
+@0:110 perform_fast_payment 81 723.25 DUMD {17}
+@0:115 perform_fast_payment 21 440.61 DUMA {17}
+@0:120 perform_fast_payment 57 571.43 DUMA {17}
+@0:125 perform_fast_payment 97 839.75 DUME {17}
+@0:130 perform_fast_payment 16 376.13 DUMD {17}
+@0:135 perform_fast_payment 12 26.23 DUMC {17}
+@0:140 perform_fast_payment 8 182.97 DUMD {17}
+@0:145 perform_fast_payment 80 667.22 DUME {17}
+@0:150 perform_fast_payment 83 288.51 DUME {17}
+@0:155 perform_fast_payment 102 826.03 DUME {17}
+@0:160 perform_fast_payment 99 18.80 DUMC {17}
+@0:165 perform_fast_payment 42 633.80 DUME {17}
+@0:170 perform_fast_payment 95 537.74 DUME {17}
+@0:175 perform_fast_payment 41 5.33 DUME {17}
+@0:60 perform_fast_payment 84 982.16 DUMB {18}
+@0:65 perform_fast_payment 69 342.48 DUMC {18}
+@0:70 perform_fast_payment 25 775.02 DUMB {18}
+@0:75 perform_fast_payment 98 960.33 DUMC {18}
+@0:80 perform_fast_payment 61 513.12 DUMA {18}
+@0:85 perform_fast_payment 45 794.40 DUMD {18}
+@0:90 perform_fast_payment 98 724.63 DUMC {18}
+@0:95 perform_fast_payment 73 690.62 DUMA {18}
+@0:100 perform_fast_payment 68 536.76 DUMD {18}
+@0:105 perform_fast_payment 26 779.48 DUMC {18}
+@0:110 perform_fast_payment 13 643.89 DUMD {18}
+@0:115 perform_fast_payment 59 641.44 DUMD {18}
+@0:120 perform_fast_payment 50 978.09 DUMD {18}
+@0:125 perform_fast_payment 25 12.18 DUMB {18}
+@0:130 perform_fast_payment 100 312.01 DUMC {18}
+@0:135 perform_fast_payment 29 415.56 DUMC {18}
+@0:140 perform_fast_payment 62 986.11 DUMC {18}
+@0:145 perform_fast_payment 74 318.33 DUMD {18}
+@0:150 perform_fast_payment 56 448.69 DUMC {18}
+@0:155 perform_fast_payment 44 167.63 DUMB {18}
+@0:160 perform_fast_payment 21 816.92 DUMA {18}
+@0:165 perform_fast_payment 38 151.49 DUMC {18}
+@0:170 perform_fast_payment 59 844.84 DUMD {18}
+@0:175 perform_fast_payment 82 622.04 DUMC {18}
+@0:60 perform_fast_payment 77 336.12 DUMB {19}
+@0:65 perform_fast_payment 15 255.02 DUMC {19}
+@0:70 perform_fast_payment 30 467.77 DUMC {19}
+@0:75 perform_fast_payment 16 130.27 DUMD {19}
+@0:80 perform_fast_payment 27 196.51 DUMA {19}
+@0:85 perform_fast_payment 84 537.56 DUMB {19}
+@0:90 perform_fast_payment 21 429.22 DUMA {19}
+@0:95 perform_fast_payment 61 553.92 DUMA {19}
+@0:100 perform_fast_payment 21 625.41 DUMA {19}
+@0:105 perform_fast_payment 9 786.19 DUMA {19}
+@0:110 perform_fast_payment 6 746.35 DUMC {19}
+@0:115 perform_fast_payment 40 682.41 DUMA {19}
+@0:120 perform_fast_payment 62 129.18 DUMC {19}
+@0:125 perform_fast_payment 57 74.18 DUMA {19}
+@0:130 perform_fast_payment 26 381.68 DUMC {19}
+@0:135 perform_fast_payment 30 661.76 DUMC {19}
+@0:140 perform_fast_payment 103 356.87 DUMC {19}
+@0:145 perform_fast_payment 88 225.11 DUMC {19}
+@0:150 perform_fast_payment 74 347.73 DUMD {19}
+@0:155 perform_fast_payment 56 88.59 DUMC {19}
+@0:160 perform_fast_payment 87 208.84 DUMC {19}
+@0:165 perform_fast_payment 31 810.20 DUMB {19}
+@0:170 perform_fast_payment 62 615.19 DUMC {19}
+@0:175 perform_fast_payment 79 254.90 DUMC {19}
+@0:60 perform_fast_payment 7 828.56 DUMD {20}
+@0:65 perform_fast_payment 33 812.27 DUMB {20}
+@0:70 perform_fast_payment 100 629.19 DUMC {20}
+@0:75 perform_fast_payment 11 853.99 DUME {20}
+@0:80 perform_fast_payment 66 245.91 DUMC {20}
+@0:85 perform_fast_payment 22 507.73 DUMC {20}
+@0:90 perform_fast_payment 13 906.02 DUMD {20}
+@0:95 perform_fast_payment 74 819.28 DUMD {20}
+@0:100 perform_fast_payment 97 133.96 DUME {20}
+@0:105 perform_fast_payment 75 254.61 DUME {20}
+@0:110 perform_fast_payment 13 201.55 DUMD {20}
+@0:115 perform_fast_payment 80 378.06 DUME {20}
+@0:120 perform_fast_payment 51 613.59 DUMB {20}
+@0:125 perform_fast_payment 28 638.44 DUMB {20}
+@0:130 perform_fast_payment 70 921.37 DUMB {20}
+@0:135 perform_fast_payment 53 855.29 DUME {20}
+@0:140 perform_fast_payment 80 421.20 DUME {20}
+@0:145 perform_fast_payment 29 97.74 DUMC {20}
+@0:150 perform_fast_payment 87 129.61 DUMC {20}
+@0:155 perform_fast_payment 59 453.94 DUMD {20}
+@0:160 perform_fast_payment 5 214.35 DUMC {20}
+@0:165 perform_fast_payment 86 538.66 DUME {20}
+@0:170 perform_fast_payment 97 907.97 DUME {20}
+@0:175 perform_fast_payment 71 42.67 DUMC {20}
+@0:60 perform_fast_payment 44 441.78 DUMB {21}
+@0:65 perform_fast_payment 100 595.32 DUMC {21}
+@0:70 perform_fast_payment 54 521.83 DUME {21}
+@0:75 perform_fast_payment 38 877.50 DUMC {21}
+@0:80 perform_fast_payment 103 776.87 DUMC {21}
+@0:85 perform_fast_payment 7 905.88 DUMD {21}
+@0:90 perform_fast_payment 48 834.06 DUMC {21}
+@0:95 perform_fast_payment 19 147.69 DUME {21}
+@0:100 perform_fast_payment 95 285.53 DUME {21}
+@0:105 perform_fast_payment 5 501.05 DUMC {21}
+@0:110 perform_fast_payment 87 396.31 DUMC {21}
+@0:115 perform_fast_payment 83 842.07 DUME {21}
+@0:120 perform_fast_payment 68 394.39 DUMD {21}
+@0:125 perform_fast_payment 95 470.63 DUME {21}
+@0:130 perform_fast_payment 98 552.20 DUMC {21}
+@0:135 perform_fast_payment 95 477.16 DUME {21}
+@0:140 perform_fast_payment 45 588.69 DUMD {21}
+@0:145 perform_fast_payment 34 149.41 DUMC {21}
+@0:150 perform_fast_payment 62 850.96 DUMC {21}
+@0:155 perform_fast_payment 29 865.02 DUMC {21}
+@0:160 perform_fast_payment 82 775.68 DUMC {21}
+@0:165 perform_fast_payment 44 998.76 DUMB {21}
+@0:170 perform_fast_payment 83 575.65 DUME {21}
+@0:175 perform_fast_payment 12 573.82 DUMC {21}
+@0:60 perform_fast_payment 2 902.21 DUME {22}
+@0:65 perform_fast_payment 36 368.35 DUMA {22}
+@0:70 perform_fast_payment 58 637.47 DUMB {22}
+@0:75 perform_fast_payment 61 484.93 DUMA {22}
+@0:80 perform_fast_payment 89 446.21 DUMB {22}
+@0:85 perform_fast_payment 53 810.35 DUME {22}
+@0:90 perform_fast_payment 1 160.72 DUMA {22}
+@0:95 perform_fast_payment 23 896.01 DUME {22}
+@0:100 perform_fast_payment 16 107.90 DUMD {22}
+@0:105 perform_fast_payment 33 508.65 DUMB {22}
+@0:110 perform_fast_payment 86 995.65 DUME {22}
+@0:115 perform_fast_payment 89 608.84 DUMB {22}
+@0:120 perform_fast_payment 4 63.47 DUMB {22}
+@0:125 perform_fast_payment 86 265.52 DUME {22}
+@0:130 perform_fast_payment 101 550.39 DUMA {22}
+@0:135 perform_fast_payment 65 74.92 DUMB {22}
+@0:140 perform_fast_payment 18 936.19 DUME {22}
+@0:145 perform_fast_payment 28 83.30 DUMB {22}
+@0:150 perform_fast_payment 28 210.59 DUMB {22}
+@0:155 perform_fast_payment 50 737.55 DUMD {22}
+@0:160 perform_fast_payment 32 873.51 DUMB {22}
+@0:165 perform_fast_payment 102 822.02 DUME {22}
+@0:170 perform_fast_payment 8 315.47 DUMD {22}
+@0:175 perform_fast_payment 97 859.39 DUME {22}
+@0:60 perform_fast_payment 14 442.23 DUMA {23}
+@0:65 perform_fast_payment 38 747.47 DUMC {23}
+@0:70 perform_fast_payment 3 315.48 DUMD {23}
+@0:75 perform_fast_payment 78 886.87 DUMA {23}
+@0:80 perform_fast_payment 5 588.36 DUMC {23}
+@0:85 perform_fast_payment 70 872.92 DUMB {23}
+@0:90 perform_fast_payment 45 973.05 DUMD {23}
+@0:95 perform_fast_payment 21 114.77 DUMA {23}
+@0:100 perform_fast_payment 14 586.73 DUMA {23}
+@0:105 perform_fast_payment 13 266.60 DUMD {23}
+@0:110 perform_fast_payment 21 55.30 DUMA {23}
+@0:115 perform_fast_payment 101 334.93 DUMA {23}
+@0:120 perform_fast_payment 101 723.24 DUMA {23}
+@0:125 perform_fast_payment 1 981.66 DUMA {23}
+@0:130 perform_fast_payment 4 253.32 DUMB {23}
+@0:135 perform_fast_payment 58 9.19 DUMB {23}
+@0:140 perform_fast_payment 9 817.09 DUMA {23}
+@0:145 perform_fast_payment 4 528.16 DUMB {23}
+@0:150 perform_fast_payment 22 288.77 DUMC {23}
+@0:155 perform_fast_payment 52 371.38 DUMC {23}
+@0:160 perform_fast_payment 68 195.25 DUMD {23}
+@0:165 perform_fast_payment 72 296.97 DUMA {23}
+@0:170 perform_fast_payment 98 426.25 DUMC {23}
+@0:175 perform_fast_payment 50 23.18 DUMD {23}
+@0:60 perform_fast_payment 3 104.78 DUMD {24}
+@0:65 perform_fast_payment 66 664.55 DUMC {24}
+@0:70 perform_fast_payment 100 432.48 DUMC {24}
+@0:75 perform_fast_payment 74 343.61 DUMD {24}
+@0:80 perform_fast_payment 8 420.19 DUMD {24}
+@0:85 perform_fast_payment 73 804.23 DUMA {24}
+@0:90 perform_fast_payment 100 832.17 DUMC {24}
+@0:95 perform_fast_payment 59 550.37 DUMD {24}
+@0:100 perform_fast_payment 53 477.61 DUME {24}
+@0:105 perform_fast_payment 71 575.71 DUMC {24}
+@0:110 perform_fast_payment 90 450.08 DUMC {24}
+@0:115 perform_fast_payment 50 832.08 DUMD {24}
+@0:120 perform_fast_payment 71 524.46 DUMC {24}
+@0:125 perform_fast_payment 59 805.71 DUMD {24}
+@0:130 perform_fast_payment 64 259.16 DUMD {24}
+@0:135 perform_fast_payment 63 45.86 DUMD {24}
+@0:140 perform_fast_payment 48 891.91 DUMC {24}
+@0:145 perform_fast_payment 47 699.51 DUME {24}
+@0:150 perform_fast_payment 97 696.28 DUME {24}
+@0:155 perform_fast_payment 66 383.90 DUMC {24}
+@0:160 perform_fast_payment 46 641.95 DUMD {24}
+@0:165 perform_fast_payment 38 784.87 DUMC {24}
+@0:170 perform_fast_payment 1 751.42 DUMA {24}
+@0:175 perform_fast_payment 78 306.45 DUMA {24}
+@0:60 perform_fast_payment 2 338.17 DUME {25}
+@0:65 perform_fast_payment 62 786.95 DUMC {25}
+@0:70 perform_fast_payment 91 208.57 DUME {25}
+@0:75 perform_fast_payment 9 119.89 DUMA {25}
+@0:80 perform_fast_payment 103 645.44 DUMC {25}
+@0:85 perform_fast_payment 14 690.77 DUMA {25}
+@0:90 perform_fast_payment 100 607.44 DUMC {25}
+@0:95 perform_fast_payment 101 700.56 DUMA {25}
+@0:100 perform_fast_payment 20 766.22 DUMA {25}
+@0:105 perform_fast_payment 53 574.05 DUME {25}
+@0:110 perform_fast_payment 39 293.76 DUMD {25}
+@0:115 perform_fast_payment 55 461.45 DUMC {25}
+@0:120 perform_fast_payment 91 74.21 DUME {25}
+@0:125 perform_fast_payment 21 937.51 DUMA {25}
+@0:130 perform_fast_payment 64 617.53 DUMD {25}
+@0:135 perform_fast_payment 66 243.50 DUMC {25}
+@0:140 perform_fast_payment 42 210.16 DUME {25}
+@0:145 perform_fast_payment 16 989.51 DUMD {25}
+@0:150 perform_fast_payment 78 879.14 DUMA {25}
+@0:155 perform_fast_payment 1 704.47 DUMA {25}
+@0:160 perform_fast_payment 52 675.25 DUMC {25}
+@0:165 perform_fast_payment 39 553.90 DUMD {25}
+@0:170 perform_fast_payment 91 513.21 DUME {25}
+@0:175 perform_fast_payment 34 603.76 DUMC {25}
+@0:60 perform_fast_payment 61 292.30 DUMA {26}
+@0:65 perform_fast_payment 57 276.13 DUMA {26}
+@0:70 perform_fast_payment 2 310.73 DUME {26}
+@0:75 perform_fast_payment 9 491.90 DUMA {26}
+@0:80 perform_fast_payment 53 870.22 DUME {26}
+@0:85 perform_fast_payment 78 749.38 DUMA {26}
+@0:90 perform_fast_payment 28 372.74 DUMB {26}
+@0:95 perform_fast_payment 24 102.50 DUMB {26}
+@0:100 perform_fast_payment 54 511.33 DUME {26}
+@0:105 perform_fast_payment 14 922.54 DUMA {26}
+@0:110 perform_fast_payment 102 68.32 DUME {26}
+@0:115 perform_fast_payment 1 61.81 DUMA {26}
+@0:120 perform_fast_payment 77 852.52 DUMB {26}
+@0:125 perform_fast_payment 7 8.97 DUMD {26}
+@0:130 perform_fast_payment 35 18.75 DUMB {26}
+@0:135 perform_fast_payment 1 211.37 DUMA {26}
+@0:140 perform_fast_payment 21 295.37 DUMA {26}
+@0:145 perform_fast_payment 58 251.39 DUMB {26}
+@0:150 perform_fast_payment 25 210.76 DUMB {26}
+@0:155 perform_fast_payment 93 238.60 DUMD {26}
+@0:160 perform_fast_payment 58 452.64 DUMB {26}
+@0:165 perform_fast_payment 35 406.77 DUMB {26}
+@0:170 perform_fast_payment 2 185.06 DUME {26}
+@0:175 perform_fast_payment 80 218.38 DUME {26}
+@0:60 perform_fast_payment 19 905.69 DUME {27}
+@0:65 perform_fast_payment 11 794.86 DUME {27}
+@0:70 perform_fast_payment 16 832.98 DUMD {27}
+@0:75 perform_fast_payment 16 43.12 DUMD {27}
+@0:80 perform_fast_payment 30 344.33 DUMC {27}
+@0:85 perform_fast_payment 62 442.53 DUMC {27}
+@0:90 perform_fast_payment 83 664.77 DUME {27}
+@0:95 perform_fast_payment 13 202.38 DUMD {27}
+@0:100 perform_fast_payment 13 952.64 DUMD {27}
+@0:105 perform_fast_payment 85 219.84 DUMC {27}
+@0:110 perform_fast_payment 30 252.13 DUMC {27}
+@0:115 perform_fast_payment 44 248.65 DUMB {27}
+@0:120 perform_fast_payment 4 251.77 DUMB {27}
+@0:125 perform_fast_payment 37 454.27 DUME {27}
+@0:130 perform_fast_payment 91 659.56 DUME {27}
+@0:135 perform_fast_payment 65 864.53 DUMB {27}
+@0:140 perform_fast_payment 41 426.10 DUME {27}
+@0:145 perform_fast_payment 26 830.20 DUMC {27}
+@0:150 perform_fast_payment 95 604.93 DUME {27}
+@0:155 perform_fast_payment 12 72.28 DUMC {27}
+@0:160 perform_fast_payment 83 885.47 DUME {27}
+@0:165 perform_fast_payment 56 920.77 DUMC {27}
+@0:170 perform_fast_payment 97 754.75 DUME {27}
+@0:175 perform_fast_payment 39 456.35 DUMD {27}
+@0:60 perform_fast_payment 37 396.06 DUME {28}
+@0:65 perform_fast_payment 50 17.12 DUMD {28}
+@0:70 perform_fast_payment 14 168.02 DUMA {28}
+@0:75 perform_fast_payment 59 871.61 DUMD {28}
+@0:80 perform_fast_payment 74 149.50 DUMD {28}
+@0:85 perform_fast_payment 48 627.31 DUMC {28}
+@0:90 perform_fast_payment 15 79.70 DUMC {28}
+@0:95 perform_fast_payment 64 235.44 DUMD {28}
+@0:100 perform_fast_payment 68 171.55 DUMD {28}
+@0:105 perform_fast_payment 90 309.75 DUMC {28}
+@0:110 perform_fast_payment 45 549.97 DUMD {28}
+@0:115 perform_fast_payment 93 916.38 DUMD {28}
+@0:120 perform_fast_payment 88 684.52 DUMC {28}
+@0:125 perform_fast_payment 8 186.80 DUMD {28}
+@0:130 perform_fast_payment 56 985.13 DUMC {28}
+@0:135 perform_fast_payment 76 191.67 DUMC {28}
+@0:140 perform_fast_payment 38 962.47 DUMC {28}
+@0:145 perform_fast_payment 53 870.32 DUME {28}
+@0:150 perform_fast_payment 90 781.77 DUMC {28}
+@0:155 perform_fast_payment 66 665.85 DUMC {28}
+@0:160 perform_fast_payment 36 120.42 DUMA {28}
+@0:165 perform_fast_payment 99 32.64 DUMC {28}
+@0:170 perform_fast_payment 29 613.90 DUMC {28}
+@0:175 perform_fast_payment 101 210.18 DUMA {28}
+@0:60 perform_fast_payment 89 327.07 DUMB {29}
+@0:65 perform_fast_payment 42 359.75 DUME {29}
+@0:70 perform_fast_payment 73 6.84 DUMA {29}
+@0:75 perform_fast_payment 11 135.46 DUME {29}
+@0:80 perform_fast_payment 39 890.32 DUMD {29}
+@0:85 perform_fast_payment 24 311.45 DUMB {29}
+@0:90 perform_fast_payment 54 901.09 DUME {29}
+@0:95 perform_fast_payment 57 903.56 DUMA {29}
+@0:100 perform_fast_payment 57 432.13 DUMA {29}
+@0:105 perform_fast_payment 91 580.84 DUME {29}
+@0:110 perform_fast_payment 50 512.46 DUMD {29}
+@0:115 perform_fast_payment 37 433.11 DUME {29}
+@0:120 perform_fast_payment 8 205.22 DUMD {29}
+@0:125 perform_fast_payment 80 133.59 DUME {29}
+@0:130 perform_fast_payment 18 362.89 DUME {29}
+@0:135 perform_fast_payment 64 677.98 DUMD {29}
+@0:140 perform_fast_payment 91 87.09 DUME {29}
+@0:145 perform_fast_payment 21 342.43 DUMA {29}
+@0:150 perform_fast_payment 70 985.30 DUMB {29}
+@0:155 perform_fast_payment 2 316.10 DUME {29}
+@0:160 perform_fast_payment 50 36.22 DUMD {29}
+@0:165 perform_fast_payment 39 559.16 DUMD {29}
+@0:170 perform_fast_payment 8 318.84 DUMD {29}
+@0:175 perform_fast_payment 78 567.18 DUMA {29}
+@0:60 perform_fast_payment 104 605.11 DUMA {30}
+@0:65 perform_fast_payment 93 572.89 DUMD {30}
+@0:70 perform_fast_payment 51 415.55 DUMB {30}
+@0:75 perform_fast_payment 8 62.94 DUMD {30}
+@0:80 perform_fast_payment 2 180.23 DUME {30}
+@0:85 perform_fast_payment 35 313.08 DUMB {30}
+@0:90 perform_fast_payment 27 306.22 DUMA {30}
+@0:95 perform_fast_payment 51 950.81 DUMB {30}
+@0:100 perform_fast_payment 31 633.71 DUMB {30}
+@0:105 perform_fast_payment 45 927.21 DUMD {30}
+@0:110 perform_fast_payment 23 356.47 DUME {30}
+@0:115 perform_fast_payment 59 576.04 DUMD {30}
+@0:120 perform_fast_payment 64 675.39 DUMD {30}
+@0:125 perform_fast_payment 37 397.01 DUME {30}
+@0:130 perform_fast_payment 59 873.97 DUMD {30}
+@0:135 perform_fast_payment 42 449.25 DUME {30}
+@0:140 perform_fast_payment 101 242.90 DUMA {30}
+@0:145 perform_fast_payment 78 38.54 DUMA {30}
+@0:150 perform_fast_payment 53 569.98 DUME {30}
+@0:155 perform_fast_payment 73 917.03 DUMA {30}
+@0:160 perform_fast_payment 83 563.08 DUME {30}
+@0:165 perform_fast_payment 2 552.67 DUME {30}
+@0:170 perform_fast_payment 59 742.10 DUMD {30}
+@0:175 perform_fast_payment 18 588.67 DUME {30}
+@0:60 perform_fast_payment 6 725.90 DUMC {31}
+@0:65 perform_fast_payment 86 437.78 DUME {31}
+@0:70 perform_fast_payment 72 662.31 DUMA {31}
+@0:75 perform_fast_payment 10 758.00 DUMA {31}
+@0:80 perform_fast_payment 38 161.38 DUMC {31}
+@0:85 perform_fast_payment 46 832.94 DUMD {31}
+@0:90 perform_fast_payment 100 567.34 DUMC {31}
+@0:95 perform_fast_payment 101 173.43 DUMA {31}
+@0:100 perform_fast_payment 52 8.39 DUMC {31}
+@0:105 perform_fast_payment 92 59.40 DUMA {31}
+@0:110 perform_fast_payment 69 509.55 DUMC {31}
+@0:115 perform_fast_payment 103 993.60 DUMC {31}
+@0:120 perform_fast_payment 13 262.08 DUMD {31}
+@0:125 perform_fast_payment 104 329.95 DUMA {31}
+@0:130 perform_fast_payment 19 911.77 DUME {31}
+@0:135 perform_fast_payment 45 457.99 DUMD {31}
+@0:140 perform_fast_payment 18 615.61 DUME {31}
+@0:145 perform_fast_payment 100 592.04 DUMC {31}
+@0:150 perform_fast_payment 82 282.54 DUMC {31}
+@0:155 perform_fast_payment 1 981.32 DUMA {31}
+@0:160 perform_fast_payment 13 380.02 DUMD {31}
+@0:165 perform_fast_payment 69 734.60 DUMC {31}
+@0:170 perform_fast_payment 46 814.94 DUMD {31}
+@0:175 perform_fast_payment 47 835.31 DUME {31}
+@0:60 perform_fast_payment 6 722.01 DUMC {32}
+@0:65 perform_fast_payment 11 387.57 DUME {32}
+@0:70 perform_fast_payment 47 182.00 DUME {32}
+@0:75 perform_fast_payment 47 852.90 DUME {32}
+@0:80 perform_fast_payment 21 975.62 DUMA {32}
+@0:85 perform_fast_payment 47 389.74 DUME {32}
+@0:90 perform_fast_payment 95 775.88 DUME {32}
+@0:95 perform_fast_payment 19 597.89 DUME {32}
+@0:100 perform_fast_payment 19 775.72 DUME {32}
+@0:105 perform_fast_payment 7 928.01 DUMD {32}
+@0:110 perform_fast_payment 46 888.85 DUMD {32}
+@0:115 perform_fast_payment 11 53.80 DUME {32}
+@0:120 perform_fast_payment 49 930.47 DUME {32}
+@0:125 perform_fast_payment 49 507.48 DUME {32}
+@0:130 perform_fast_payment 18 541.04 DUME {32}
+@0:135 perform_fast_payment 45 887.92 DUMD {32}
+@0:140 perform_fast_payment 78 477.77 DUMA {32}
+@0:145 perform_fast_payment 16 145.96 DUMD {32}
+@0:150 perform_fast_payment 102 611.02 DUME {32}
+@0:155 perform_fast_payment 85 216.13 DUMC {32}
+@0:160 perform_fast_payment 48 877.18 DUMC {32}
+@0:165 perform_fast_payment 11 102.96 DUME {32}
+@0:170 perform_fast_payment 6 151.71 DUMC {32}
+@0:175 perform_fast_payment 39 321.65 DUMD {32}
+@0:60 perform_fast_payment 30 14.17 DUMC {33}
+@0:65 perform_fast_payment 47 740.80 DUME {33}
+@0:70 perform_fast_payment 61 313.15 DUMA {33}
+@0:75 perform_fast_payment 79 174.15 DUMC {33}
+@0:80 perform_fast_payment 47 458.74 DUME {33}
+@0:85 perform_fast_payment 56 536.14 DUMC {33}
+@0:90 perform_fast_payment 86 951.49 DUME {33}
+@0:95 perform_fast_payment 59 635.50 DUMD {33}
+@0:100 perform_fast_payment 76 319.81 DUMC {33}
+@0:105 perform_fast_payment 62 462.60 DUMC {33}
+@0:110 perform_fast_payment 41 536.26 DUME {33}
+@0:115 perform_fast_payment 23 241.03 DUME {33}
+@0:120 perform_fast_payment 21 594.49 DUMA {33}
+@0:125 perform_fast_payment 26 780.63 DUMC {33}
+@0:130 perform_fast_payment 95 759.73 DUME {33}
+@0:135 perform_fast_payment 99 344.29 DUMC {33}
+@0:140 perform_fast_payment 38 595.28 DUMC {33}
+@0:145 perform_fast_payment 69 408.84 DUMC {33}
+@0:150 perform_fast_payment 82 853.53 DUMC {33}
+@0:155 perform_fast_payment 42 698.61 DUME {33}
+@0:160 perform_fast_payment 19 388.70 DUME {33}
+@0:165 perform_fast_payment 94 959.91 DUME {33}
+@0:170 perform_fast_payment 63 780.12 DUMD {33}
+@0:175 perform_fast_payment 88 222.20 DUMC {33}
+@0:60 perform_fast_payment 7 611.36 DUMD {34}
+@0:65 perform_fast_payment 41 710.76 DUME {34}
+@0:70 perform_fast_payment 31 433.97 DUMB {34}
+@0:75 perform_fast_payment 10 407.85 DUMA {34}
+@0:80 perform_fast_payment 16 533.62 DUMD {34}
+@0:85 perform_fast_payment 77 987.19 DUMB {34}
+@0:90 perform_fast_payment 16 437.01 DUMD {34}
+@0:95 perform_fast_payment 57 637.76 DUMA {34}
+@0:100 perform_fast_payment 73 973.31 DUMA {34}
+@0:105 perform_fast_payment 17 970.03 DUMB {34}
+@0:110 perform_fast_payment 17 968.23 DUMB {34}
+@0:115 perform_fast_payment 13 584.95 DUMD {34}
+@0:120 perform_fast_payment 14 133.81 DUMA {34}
+@0:125 perform_fast_payment 35 793.75 DUMB {34}
+@0:130 perform_fast_payment 74 317.28 DUMD {34}
+@0:135 perform_fast_payment 19 235.03 DUME {34}
+@0:140 perform_fast_payment 51 922.61 DUMB {34}
+@0:145 perform_fast_payment 10 532.90 DUMA {34}
+@0:150 perform_fast_payment 59 142.78 DUMD {34}
+@0:155 perform_fast_payment 93 348.55 DUMD {34}
+@0:160 perform_fast_payment 7 475.18 DUMD {34}
+@0:165 perform_fast_payment 93 719.09 DUMD {34}
+@0:170 perform_fast_payment 95 5.07 DUME {34}
+@0:175 perform_fast_payment 73 42.17 DUMA {34}
+@0:60 perform_fast_payment 86 189.41 DUME {35}
+@0:65 perform_fast_payment 83 813.42 DUME {35}
+@0:70 perform_fast_payment 81 110.16 DUMD {35}
+@0:75 perform_fast_payment 42 104.81 DUME {35}
+@0:80 perform_fast_payment 75 994.06 DUME {35}
+@0:85 perform_fast_payment 55 651.97 DUMC {35}
+@0:90 perform_fast_payment 15 371.47 DUMC {35}
+@0:95 perform_fast_payment 37 750.63 DUME {35}
+@0:100 perform_fast_payment 43 368.05 DUMA {35}
+@0:105 perform_fast_payment 22 65.30 DUMC {35}
+@0:110 perform_fast_payment 3 669.47 DUMD {35}
+@0:115 perform_fast_payment 48 616.65 DUMC {35}
+@0:120 perform_fast_payment 60 54.20 DUMC {35}
+@0:125 perform_fast_payment 85 818.87 DUMC {35}
+@0:130 perform_fast_payment 1 430.19 DUMA {35}
+@0:135 perform_fast_payment 82 415.45 DUMC {35}
+@0:140 perform_fast_payment 90 695.21 DUMC {35}
+@0:145 perform_fast_payment 69 905.77 DUMC {35}
+@0:150 perform_fast_payment 82 584.97 DUMC {35}
+@0:155 perform_fast_payment 5 454.48 DUMC {35}
+@0:160 perform_fast_payment 72 523.17 DUMA {35}
+@0:165 perform_fast_payment 61 349.36 DUMA {35}
+@0:170 perform_fast_payment 88 245.45 DUMC {35}
+@0:175 perform_fast_payment 67 436.76 DUMC {35}
+@0:60 perform_fast_payment 16 19.09 DUMD {36}
+@0:65 perform_fast_payment 30 472.37 DUMC {36}
+@0:70 perform_fast_payment 3 67.15 DUMD {36}
+@0:75 perform_fast_payment 83 980.23 DUME {36}
+@0:80 perform_fast_payment 45 469.79 DUMD {36}
+@0:85 perform_fast_payment 63 96.88 DUMD {36}
+@0:90 perform_fast_payment 71 944.27 DUMC {36}
+@0:95 perform_fast_payment 67 544.91 DUMC {36}
+@0:100 perform_fast_payment 95 523.35 DUME {36}
+@0:105 perform_fast_payment 50 733.78 DUMD {36}
+@0:110 perform_fast_payment 46 67.26 DUMD {36}
+@0:115 perform_fast_payment 62 866.02 DUMC {36}
+@0:120 perform_fast_payment 39 96.18 DUMD {36}
+@0:125 perform_fast_payment 11 906.33 DUME {36}
+@0:130 perform_fast_payment 12 654.20 DUMC {36}
+@0:135 perform_fast_payment 54 911.19 DUME {36}
+@0:140 perform_fast_payment 25 307.38 DUMB {36}
+@0:145 perform_fast_payment 64 573.48 DUMD {36}
+@0:150 perform_fast_payment 59 392.04 DUMD {36}
+@0:155 perform_fast_payment 5 595.24 DUMC {36}
+@0:160 perform_fast_payment 29 620.43 DUMC {36}
+@0:165 perform_fast_payment 46 268.63 DUMD {36}
+@0:170 perform_fast_payment 34 971.05 DUMC {36}
+@0:175 perform_fast_payment 50 534.02 DUMD {36}
+@0:60 perform_fast_payment 28 173.82 DUMB {37}
+@0:65 perform_fast_payment 74 455.55 DUMD {37}
+@0:70 perform_fast_payment 61 182.60 DUMA {37}
+@0:75 perform_fast_payment 69 759.76 DUMC {37}
+@0:80 perform_fast_payment 70 413.79 DUMB {37}
+@0:85 perform_fast_payment 72 596.88 DUMA {37}
+@0:90 perform_fast_payment 50 630.30 DUMD {37}
+@0:95 perform_fast_payment 32 63.18 DUMB {37}
+@0:100 perform_fast_payment 16 972.72 DUMD {37}
+@0:105 perform_fast_payment 93 827.04 DUMD {37}
+@0:110 perform_fast_payment 27 838.85 DUMA {37}
+@0:115 perform_fast_payment 57 302.99 DUMA {37}
+@0:120 perform_fast_payment 12 997.79 DUMC {37}
+@0:125 perform_fast_payment 104 850.91 DUMA {37}
+@0:130 perform_fast_payment 76 910.50 DUMC {37}
+@0:135 perform_fast_payment 57 125.14 DUMA {37}
+@0:140 perform_fast_payment 56 769.63 DUMC {37}
+@0:145 perform_fast_payment 65 64.78 DUMB {37}
+@0:150 perform_fast_payment 28 961.54 DUMB {37}
+@0:155 perform_fast_payment 72 565.70 DUMA {37}
+@0:160 perform_fast_payment 12 685.24 DUMC {37}
+@0:165 perform_fast_payment 63 637.47 DUMD {37}
+@0:170 perform_fast_payment 72 927.90 DUMA {37}
+@0:175 perform_fast_payment 64 529.77 DUMD {37}
+@0:60 perform_fast_payment 20 55.56 DUMA {38}
+@0:65 perform_fast_payment 13 42.72 DUMD {38}
+@0:70 perform_fast_payment 58 305.12 DUMB {38}
+@0:75 perform_fast_payment 17 150.19 DUMB {38}
+@0:80 perform_fast_payment 91 89.68 DUME {38}
+@0:85 perform_fast_payment 37 690.05 DUME {38}
+@0:90 perform_fast_payment 59 266.83 DUMD {38}
+@0:95 perform_fast_payment 61 248.13 DUMA {38}
+@0:100 perform_fast_payment 28 933.10 DUMB {38}
+@0:105 perform_fast_payment 3 610.92 DUMD {38}
+@0:110 perform_fast_payment 50 436.52 DUMD {38}
+@0:115 perform_fast_payment 20 767.80 DUMA {38}
+@0:120 perform_fast_payment 4 636.74 DUMB {38}
+@0:125 perform_fast_payment 86 429.42 DUME {38}
+@0:130 perform_fast_payment 89 354.79 DUMB {38}
+@0:135 perform_fast_payment 37 910.84 DUME {38}
+@0:140 perform_fast_payment 104 789.19 DUMA {38}
+@0:145 perform_fast_payment 24 942.36 DUMB {38}
+@0:150 perform_fast_payment 39 867.67 DUMD {38}
+@0:155 perform_fast_payment 23 257.72 DUME {38}
+@0:160 perform_fast_payment 72 979.56 DUMA {38}
+@0:165 perform_fast_payment 72 898.56 DUMA {38}
+@0:170 perform_fast_payment 1 312.19 DUMA {38}
+@0:175 perform_fast_payment 81 701.35 DUMD {38}
+@0:60 perform_fast_payment 104 898.19 DUMA {39}
+@0:65 perform_fast_payment 84 689.55 DUMB {39}
+@0:70 perform_fast_payment 40 35.01 DUMA {39}
+@0:75 perform_fast_payment 80 457.07 DUME {39}
+@0:80 perform_fast_payment 90 131.79 DUMC {39}
+@0:85 perform_fast_payment 90 645.44 DUMC {39}
+@0:90 perform_fast_payment 73 436.16 DUMA {39}
+@0:95 perform_fast_payment 54 98.37 DUME {39}
+@0:100 perform_fast_payment 26 574.95 DUMC {39}
+@0:105 perform_fast_payment 19 358.49 DUME {39}
+@0:110 perform_fast_payment 67 594.75 DUMC {39}
+@0:115 perform_fast_payment 58 421.85 DUMB {39}
+@0:120 perform_fast_payment 79 625.69 DUMC {39}
+@0:125 perform_fast_payment 99 141.49 DUMC {39}
+@0:130 perform_fast_payment 14 292.49 DUMA {39}
+@0:135 perform_fast_payment 65 638.53 DUMB {39}
+@0:140 perform_fast_payment 21 271.42 DUMA {39}
+@0:145 perform_fast_payment 62 264.39 DUMC {39}
+@0:150 perform_fast_payment 87 106.60 DUMC {39}
+@0:155 perform_fast_payment 82 153.04 DUMC {39}
+@0:160 perform_fast_payment 75 782.10 DUME {39}
+@0:165 perform_fast_payment 99 902.08 DUMC {39}
+@0:170 perform_fast_payment 69 910.42 DUMC {39}
+@0:175 perform_fast_payment 48 750.28 DUMC {39}
+@0:60 perform_fast_payment 30 803.09 DUMC {40}
+@0:65 perform_fast_payment 3 582.72 DUMD {40}
+@0:70 perform_fast_payment 80 970.50 DUME {40}
+@0:75 perform_fast_payment 52 841.33 DUMC {40}
+@0:80 perform_fast_payment 25 28.15 DUMB {40}
+@0:85 perform_fast_payment 84 410.55 DUMB {40}
+@0:90 perform_fast_payment 70 901.11 DUMB {40}
+@0:95 perform_fast_payment 64 347.62 DUMD {40}
+@0:100 perform_fast_payment 5 73.23 DUMC {40}
+@0:105 perform_fast_payment 5 306.71 DUMC {40}
+@0:110 perform_fast_payment 33 537.46 DUMB {40}
+@0:115 perform_fast_payment 65 850.44 DUMB {40}
+@0:120 perform_fast_payment 90 171.14 DUMC {40}
+@0:125 perform_fast_payment 66 876.66 DUMC {40}
+@0:130 perform_fast_payment 26 603.01 DUMC {40}
+@0:135 perform_fast_payment 103 634.39 DUMC {40}
+@0:140 perform_fast_payment 33 992.52 DUMB {40}
+@0:145 perform_fast_payment 87 322.77 DUMC {40}
+@0:150 perform_fast_payment 32 4.81 DUMB {40}
+@0:155 perform_fast_payment 51 873.41 DUMB {40}
+@0:160 perform_fast_payment 82 147.56 DUMC {40}
+@0:165 perform_fast_payment 26 161.24 DUMC {40}
+@0:170 perform_fast_payment 28 202.58 DUMB {40}
+@0:175 perform_fast_payment 18 553.18 DUME {40}
+@0:60 perform_fast_payment 96 854.61 DUMD {41}
+@0:65 perform_fast_payment 65 316.20 DUMB {41}
+@0:70 perform_fast_payment 22 38.69 DUMC {41}
+@0:75 perform_fast_payment 73 310.81 DUMA {41}
+@0:80 perform_fast_payment 67 511.52 DUMC {41}
+@0:85 perform_fast_payment 9 70.46 DUMA {41}
+@0:90 perform_fast_payment 25 523.58 DUMB {41}
+@0:95 perform_fast_payment 58 9.78 DUMB {41}
+@0:100 perform_fast_payment 100 458.17 DUMC {41}
+@0:105 perform_fast_payment 57 192.22 DUMA {41}
+@0:110 perform_fast_payment 26 214.19 DUMC {41}
+@0:115 perform_fast_payment 64 908.68 DUMD {41}
+@0:120 perform_fast_payment 28 349.46 DUMB {41}
+@0:125 perform_fast_payment 30 29.09 DUMC {41}
+@0:130 perform_fast_payment 82 977.52 DUMC {41}
+@0:135 perform_fast_payment 5 76.92 DUMC {41}
+@0:140 perform_fast_payment 48 304.23 DUMC {41}
+@0:145 perform_fast_payment 26 869.77 DUMC {41}
+@0:150 perform_fast_payment 21 194.68 DUMA {41}
+@0:155 perform_fast_payment 65 686.05 DUMB {41}
+@0:160 perform_fast_payment 70 25.80 DUMB {41}
+@0:165 perform_fast_payment 3 227.41 DUMD {41}
+@0:170 perform_fast_payment 50 837.62 DUMD {41}
+@0:175 perform_fast_payment 99 8.85 DUMC {41}
+@0:60 perform_fast_payment 15 15.99 DUMC {42}
+@0:65 perform_fast_payment 15 913.76 DUMC {42}
+@0:70 perform_fast_payment 9 539.17 DUMA {42}
+@0:75 perform_fast_payment 21 7.92 DUMA {42}
+@0:80 perform_fast_payment 30 258.95 DUMC {42}
+@0:85 perform_fast_payment 57 873.77 DUMA {42}
+@0:90 perform_fast_payment 56 533.28 DUMC {42}
+@0:95 perform_fast_payment 30 179.95 DUMC {42}
+@0:100 perform_fast_payment 50 393.98 DUMD {42}
+@0:105 perform_fast_payment 22 25.64 DUMC {42}
+@0:110 perform_fast_payment 6 317.16 DUMC {42}
+@0:115 perform_fast_payment 92 728.17 DUMA {42}
+@0:120 perform_fast_payment 62 831.94 DUMC {42}
+@0:125 perform_fast_payment 92 64.95 DUMA {42}
+@0:130 perform_fast_payment 72 131.12 DUMA {42}
+@0:135 perform_fast_payment 43 389.62 DUMA {42}
+@0:140 perform_fast_payment 29 44.39 DUMC {42}
+@0:145 perform_fast_payment 21 706.37 DUMA {42}
+@0:150 perform_fast_payment 100 909.57 DUMC {42}
+@0:155 perform_fast_payment 3 569.57 DUMD {42}
+@0:160 perform_fast_payment 20 520.88 DUMA {42}
+@0:165 perform_fast_payment 56 162.39 DUMC {42}
+@0:170 perform_fast_payment 10 480.43 DUMA {42}
+@0:175 perform_fast_payment 6 841.06 DUMC {42}
+@0:60 perform_fast_payment 93 14.87 DUMD {43}
+@0:65 perform_fast_payment 84 838.70 DUMB {43}
+@0:70 perform_fast_payment 5 587.16 DUMC {43}
+@0:75 perform_fast_payment 50 175.23 DUMD {43}
+@0:80 perform_fast_payment 86 566.31 DUME {43}
+@0:85 perform_fast_payment 85 935.12 DUMC {43}
+@0:90 perform_fast_payment 69 872.87 DUMC {43}
+@0:95 perform_fast_payment 7 337.91 DUMD {43}
+@0:100 perform_fast_payment 50 512.22 DUMD {43}
+@0:105 perform_fast_payment 39 816.99 DUMD {43}
+@0:110 perform_fast_payment 89 443.08 DUMB {43}
+@0:115 perform_fast_payment 98 355.87 DUMC {43}
+@0:120 perform_fast_payment 59 377.23 DUMD {43}
+@0:125 perform_fast_payment 65 106.27 DUMB {43}
+@0:130 perform_fast_payment 63 805.19 DUMD {43}
+@0:135 perform_fast_payment 8 419.49 DUMD {43}
+@0:140 perform_fast_payment 7 762.62 DUMD {43}
+@0:145 perform_fast_payment 94 625.70 DUME {43}
+@0:150 perform_fast_payment 80 944.43 DUME {43}
+@0:155 perform_fast_payment 48 511.91 DUMC {43}
+@0:160 perform_fast_payment 93 676.77 DUMD {43}
+@0:165 perform_fast_payment 29 589.42 DUMC {43}
+@0:170 perform_fast_payment 80 844.18 DUME {43}
+@0:175 perform_fast_payment 18 687.47 DUME {43}
+@0:60 perform_fast_payment 75 729.55 DUME {44}
+@0:65 perform_fast_payment 40 960.42 DUMA {44}
+@0:70 perform_fast_payment 27 286.77 DUMA {44}
+@0:75 perform_fast_payment 3 84.47 DUMD {44}
+@0:80 perform_fast_payment 66 662.71 DUMC {44}
+@0:85 perform_fast_payment 23 740.09 DUME {44}
+@0:90 perform_fast_payment 18 371.98 DUME {44}
+@0:95 perform_fast_payment 67 777.34 DUMC {44}
+@0:100 perform_fast_payment 48 808.36 DUMC {44}
+@0:105 perform_fast_payment 50 663.91 DUMD {44}
+@0:110 perform_fast_payment 87 562.70 DUMC {44}
+@0:115 perform_fast_payment 59 932.92 DUMD {44}
+@0:120 perform_fast_payment 2 36.41 DUME {44}
+@0:125 perform_fast_payment 56 617.89 DUMC {44}
+@0:130 perform_fast_payment 71 17.05 DUMC {44}
+@0:135 perform_fast_payment 91 237.54 DUME {44}
+@0:140 perform_fast_payment 101 345.84 DUMA {44}
+@0:145 perform_fast_payment 88 712.67 DUMC {44}
+@0:150 perform_fast_payment 3 512.07 DUMD {44}
+@0:155 perform_fast_payment 41 993.38 DUME {44}
+@0:160 perform_fast_payment 42 174.24 DUME {44}
+@0:165 perform_fast_payment 1 538.40 DUMA {44}
+@0:170 perform_fast_payment 88 222.12 DUMC {44}
+@0:175 perform_fast_payment 98 673.40 DUMC {44}
+@0:60 perform_fast_payment 102 437.89 DUME {45}
+@0:65 perform_fast_payment 88 605.23 DUMC {45}
+@0:70 perform_fast_payment 75 410.53 DUME {45}
+@0:75 perform_fast_payment 54 271.88 DUME {45}
+@0:80 perform_fast_payment 36 925.55 DUMA {45}
+@0:85 perform_fast_payment 9 832.17 DUMA {45}
+@0:90 perform_fast_payment 78 162.01 DUMA {45}
+@0:95 perform_fast_payment 87 508.82 DUMC {45}
+@0:100 perform_fast_payment 53 503.78 DUME {45}
+@0:105 perform_fast_payment 18 990.72 DUME {45}
+@0:110 perform_fast_payment 78 285.58 DUMA {45}
+@0:115 perform_fast_payment 37 707.64 DUME {45}
+@0:120 perform_fast_payment 91 551.50 DUME {45}
+@0:125 perform_fast_payment 30 358.84 DUMC {45}
+@0:130 perform_fast_payment 57 886.34 DUMA {45}
+@0:135 perform_fast_payment 24 20.07 DUMB {45}
+@0:140 perform_fast_payment 69 263.31 DUMC {45}
+@0:145 perform_fast_payment 92 160.46 DUMA {45}
+@0:150 perform_fast_payment 104 800.76 DUMA {45}
+@0:155 perform_fast_payment 27 15.72 DUMA {45}
+@0:160 perform_fast_payment 86 110.52 DUME {45}
+@0:165 perform_fast_payment 40 172.59 DUMA {45}
+@0:170 perform_fast_payment 10 549.21 DUMA {45}
+@0:175 perform_fast_payment 69 785.32 DUMC {45}
+@0:60 perform_fast_payment 6 472.35 DUMC {46}
+@0:65 perform_fast_payment 78 207.87 DUMA {46}
+@0:70 perform_fast_payment 62 110.54 DUMC {46}
+@0:75 perform_fast_payment 94 873.54 DUME {46}
+@0:80 perform_fast_payment 98 389.08 DUMC {46}
+@0:85 perform_fast_payment 9 817.54 DUMA {46}
+@0:90 perform_fast_payment 37 427.39 DUME {46}
+@0:95 perform_fast_payment 76 435.84 DUMC {46}
+@0:100 perform_fast_payment 28 150.86 DUMB {46}
+@0:105 perform_fast_payment 6 962.22 DUMC {46}
+@0:110 perform_fast_payment 101 67.29 DUMA {46}
+@0:115 perform_fast_payment 62 973.15 DUMC {46}
+@0:120 perform_fast_payment 60 970.67 DUMC {46}
+@0:125 perform_fast_payment 75 841.28 DUME {46}
+@0:130 perform_fast_payment 12 204.34 DUMC {46}
+@0:135 perform_fast_payment 99 233.15 DUMC {46}
+@0:140 perform_fast_payment 65 911.76 DUMB {46}
+@0:145 perform_fast_payment 32 849.55 DUMB {46}
+@0:150 perform_fast_payment 15 399.96 DUMC {46}
+@0:155 perform_fast_payment 51 703.92 DUMB {46}
+@0:160 perform_fast_payment 4 75.21 DUMB {46}
+@0:165 perform_fast_payment 17 909.67 DUMB {46}
+@0:170 perform_fast_payment 47 589.25 DUME {46}
+@0:175 perform_fast_payment 90 925.59 DUMC {46}
+@0:60 perform_fast_payment 9 610.90 DUMA {47}
+@0:65 perform_fast_payment 81 917.54 DUMD {47}
+@0:70 perform_fast_payment 58 469.92 DUMB {47}
+@0:75 perform_fast_payment 1 24.09 DUMA {47}
+@0:80 perform_fast_payment 29 720.31 DUMC {47}
+@0:85 perform_fast_payment 57 271.34 DUMA {47}
+@0:90 perform_fast_payment 96 264.03 DUMD {47}
+@0:95 perform_fast_payment 40 105.39 DUMA {47}
+@0:100 perform_fast_payment 26 726.63 DUMC {47}
+@0:105 perform_fast_payment 33 685.89 DUMB {47}
+@0:110 perform_fast_payment 3 706.77 DUMD {47}
+@0:115 perform_fast_payment 67 290.42 DUMC {47}
+@0:120 perform_fast_payment 81 864.19 DUMD {47}
+@0:125 perform_fast_payment 73 439.12 DUMA {47}
+@0:130 perform_fast_payment 61 762.04 DUMA {47}
+@0:135 perform_fast_payment 33 883.37 DUMB {47}
+@0:140 perform_fast_payment 82 694.34 DUMC {47}
+@0:145 perform_fast_payment 79 51.20 DUMC {47}
+@0:150 perform_fast_payment 85 446.63 DUMC {47}
+@0:155 perform_fast_payment 72 650.71 DUMA {47}
+@0:160 perform_fast_payment 45 735.76 DUMD {47}
+@0:165 perform_fast_payment 90 994.44 DUMC {47}
+@0:170 perform_fast_payment 96 775.07 DUMD {47}
+@0:175 perform_fast_payment 62 762.25 DUMC {47}
+@0:60 perform_fast_payment 37 404.51 DUME {48}
+@0:65 perform_fast_payment 97 807.32 DUME {48}
+@0:70 perform_fast_payment 54 612.61 DUME {48}
+@0:75 perform_fast_payment 86 166.20 DUME {48}
+@0:80 perform_fast_payment 61 976.73 DUMA {48}
+@0:85 perform_fast_payment 27 679.35 DUMA {48}
+@0:90 perform_fast_payment 41 940.26 DUME {48}
+@0:95 perform_fast_payment 43 146.47 DUMA {48}
+@0:100 perform_fast_payment 18 393.13 DUME {48}
+@0:105 perform_fast_payment 96 899.61 DUMD {48}
+@0:110 perform_fast_payment 53 642.34 DUME {48}
+@0:115 perform_fast_payment 63 954.73 DUMD {48}
+@0:120 perform_fast_payment 41 391.83 DUME {48}
+@0:125 perform_fast_payment 84 739.33 DUMB {48}
+@0:130 perform_fast_payment 17 633.58 DUMB {48}
+@0:135 perform_fast_payment 28 274.18 DUMB {48}
+@0:140 perform_fast_payment 27 8.83 DUMA {48}
+@0:145 perform_fast_payment 13 671.81 DUMD {48}
+@0:150 perform_fast_payment 83 106.87 DUME {48}
+@0:155 perform_fast_payment 49 782.46 DUME {48}
+@0:160 perform_fast_payment 9 814.55 DUMA {48}
+@0:165 perform_fast_payment 11 37.45 DUME {48}
+@0:170 perform_fast_payment 44 815.14 DUMB {48}
+@0:175 perform_fast_payment 95 975.06 DUME {48}
+@0:60 perform_fast_payment 64 821.34 DUMD {49}
+@0:65 perform_fast_payment 17 574.13 DUMB {49}
+@0:70 perform_fast_payment 92 865.53 DUMA {49}
+@0:75 perform_fast_payment 87 398.06 DUMC {49}
+@0:80 perform_fast_payment 70 325.98 DUMB {49}
+@0:85 perform_fast_payment 90 930.77 DUMC {49}
+@0:90 perform_fast_payment 85 49.81 DUMC {49}
+@0:95 perform_fast_payment 60 99.44 DUMC {49}
+@0:100 perform_fast_payment 10 871.21 DUMA {49}
+@0:105 perform_fast_payment 5 281.18 DUMC {49}
+@0:110 perform_fast_payment 32 932.54 DUMB {49}
+@0:115 perform_fast_payment 99 784.58 DUMC {49}
+@0:120 perform_fast_payment 48 117.24 DUMC {49}
+@0:125 perform_fast_payment 101 223.48 DUMA {49}
+@0:130 perform_fast_payment 67 778.48 DUMC {49}
+@0:135 perform_fast_payment 93 938.92 DUMD {49}
+@0:140 perform_fast_payment 39 709.40 DUMD {49}
+@0:145 perform_fast_payment 10 430.92 DUMA {49}
+@0:150 perform_fast_payment 70 274.79 DUMB {49}
+@0:155 perform_fast_payment 39 759.47 DUMD {49}
+@0:160 perform_fast_payment 22 922.33 DUMC {49}
+@0:165 perform_fast_payment 15 222.98 DUMC {49}
+@0:170 perform_fast_payment 64 230.08 DUMD {49}
+@0:175 perform_fast_payment 88 358.83 DUMC {49}
+@0:60 perform_fast_payment 14 669.04 DUMA {50}
+@0:65 perform_fast_payment 65 111.95 DUMB {50}
+@0:70 perform_fast_payment 6 295.34 DUMC {50}
+@0:75 perform_fast_payment 54 199.08 DUME {50}
+@0:80 perform_fast_payment 22 836.16 DUMC {50}
+@0:85 perform_fast_payment 26 347.02 DUMC {50}
+@0:90 perform_fast_payment 91 997.90 DUME {50}
+@0:95 perform_fast_payment 15 764.70 DUMC {50}
+@0:100 perform_fast_payment 10 799.52 DUMA {50}
+@0:105 perform_fast_payment 29 219.25 DUMC {50}
+@0:110 perform_fast_payment 15 666.87 DUMC {50}
+@0:115 perform_fast_payment 86 666.37 DUME {50}
+@0:120 perform_fast_payment 83 161.28 DUME {50}
+@0:125 perform_fast_payment 29 837.40 DUMC {50}
+@0:130 perform_fast_payment 34 746.94 DUMC {50}
+@0:135 perform_fast_payment 24 923.28 DUMB {50}
+@0:140 perform_fast_payment 94 595.97 DUME {50}
+@0:145 perform_fast_payment 2 16.79 DUME {50}
+@0:150 perform_fast_payment 98 798.66 DUMC {50}
+@0:155 perform_fast_payment 73 259.57 DUMA {50}
+@0:160 perform_fast_payment 95 73.07 DUME {50}
+@0:165 perform_fast_payment 72 688.20 DUMA {50}
+@0:170 perform_fast_payment 85 189.57 DUMC {50}
+@0:175 perform_fast_payment 101 932.90 DUMA {50}
+@0:60 perform_fast_payment 36 329.79 DUMA {51}
+@0:65 perform_fast_payment 83 343.06 DUME {51}
+@0:70 perform_fast_payment 62 691.12 DUMC {51}
+@0:75 perform_fast_payment 99 753.99 DUMC {51}
+@0:80 perform_fast_payment 29 353.27 DUMC {51}
+@0:85 perform_fast_payment 8 804.32 DUMD {51}
+@0:90 perform_fast_payment 88 223.04 DUMC {51}
+@0:95 perform_fast_payment 50 346.14 DUMD {51}
+@0:100 perform_fast_payment 30 29.27 DUMC {51}
+@0:105 perform_fast_payment 62 950.49 DUMC {51}
+@0:110 perform_fast_payment 18 754.20 DUME {51}
+@0:115 perform_fast_payment 81 535.47 DUMD {51}
+@0:120 perform_fast_payment 45 621.19 DUMD {51}
+@0:125 perform_fast_payment 8 152.73 DUMD {51}
+@0:130 perform_fast_payment 62 842.22 DUMC {51}
+@0:135 perform_fast_payment 50 933.59 DUMD {51}
+@0:140 perform_fast_payment 52 410.15 DUMC {51}
+@0:145 perform_fast_payment 82 920.65 DUMC {51}
+@0:150 perform_fast_payment 94 659.51 DUME {51}
+@0:155 perform_fast_payment 23 308.81 DUME {51}
+@0:160 perform_fast_payment 82 251.11 DUMC {51}
+@0:165 perform_fast_payment 68 303.88 DUMD {51}
+@0:170 perform_fast_payment 14 333.46 DUMA {51}
+@0:175 perform_fast_payment 34 277.90 DUMC {51}
+@0:60 perform_fast_payment 33 918.60 DUMB {52}
+@0:65 perform_fast_payment 28 289.79 DUMB {52}
+@0:70 perform_fast_payment 84 334.03 DUMB {52}
+@0:75 perform_fast_payment 16 387.27 DUMD {52}
+@0:80 perform_fast_payment 18 886.07 DUME {52}
+@0:85 perform_fast_payment 61 971.53 DUMA {52}
+@0:90 perform_fast_payment 33 522.91 DUMB {52}
+@0:95 perform_fast_payment 32 415.53 DUMB {52}
+@0:100 perform_fast_payment 65 701.42 DUMB {52}
+@0:105 perform_fast_payment 14 10.42 DUMA {52}
+@0:110 perform_fast_payment 37 434.56 DUME {52}
+@0:115 perform_fast_payment 75 520.32 DUME {52}
+@0:120 perform_fast_payment 4 19.04 DUMB {52}
+@0:125 perform_fast_payment 47 168.48 DUME {52}
+@0:130 perform_fast_payment 78 804.16 DUMA {52}
+@0:135 perform_fast_payment 65 209.46 DUMB {52}
+@0:140 perform_fast_payment 83 289.30 DUME {52}
+@0:145 perform_fast_payment 18 38.90 DUME {52}
+@0:150 perform_fast_payment 41 954.98 DUME {52}
+@0:155 perform_fast_payment 72 659.99 DUMA {52}
+@0:160 perform_fast_payment 40 436.16 DUMA {52}
+@0:165 perform_fast_payment 95 998.93 DUME {52}
+@0:170 perform_fast_payment 35 587.88 DUMB {52}
+@0:175 perform_fast_payment 51 203.18 DUMB {52}
+@0:60 perform_fast_payment 10 796.16 DUMA {53}
+@0:65 perform_fast_payment 43 654.31 DUMA {53}
+@0:70 perform_fast_payment 82 235.46 DUMC {53}
+@0:75 perform_fast_payment 99 986.94 DUMC {53}
+@0:80 perform_fast_payment 51 72.23 DUMB {53}
+@0:85 perform_fast_payment 67 678.52 DUMC {53}
+@0:90 perform_fast_payment 81 281.92 DUMD {53}
+@0:95 perform_fast_payment 28 85.31 DUMB {53}
+@0:100 perform_fast_payment 65 756.00 DUMB {53}
+@0:105 perform_fast_payment 73 305.48 DUMA {53}
+@0:110 perform_fast_payment 31 53.93 DUMB {53}
+@0:115 perform_fast_payment 27 208.81 DUMA {53}
+@0:120 perform_fast_payment 5 399.26 DUMC {53}
+@0:125 perform_fast_payment 1 381.67 DUMA {53}
+@0:130 perform_fast_payment 17 696.82 DUMB {53}
+@0:135 perform_fast_payment 8 780.43 DUMD {53}
+@0:140 perform_fast_payment 71 640.82 DUMC {53}
+@0:145 perform_fast_payment 56 722.18 DUMC {53}
+@0:150 perform_fast_payment 43 17.88 DUMA {53}
+@0:155 perform_fast_payment 1 415.70 DUMA {53}
+@0:160 perform_fast_payment 65 965.48 DUMB {53}
+@0:165 perform_fast_payment 88 53.39 DUMC {53}
+@0:170 perform_fast_payment 96 395.81 DUMD {53}
+@0:175 perform_fast_payment 44 159.19 DUMB {53}
+@0:60 perform_fast_payment 10 451.94 DUMA {54}
+@0:65 perform_fast_payment 57 852.18 DUMA {54}
+@0:70 perform_fast_payment 70 191.82 DUMB {54}
+@0:75 perform_fast_payment 62 820.79 DUMC {54}
+@0:80 perform_fast_payment 26 292.47 DUMC {54}
+@0:85 perform_fast_payment 27 972.15 DUMA {54}
+@0:90 perform_fast_payment 16 632.45 DUMD {54}
+@0:95 perform_fast_payment 38 724.84 DUMC {54}
+@0:100 perform_fast_payment 90 537.10 DUMC {54}
+@0:105 perform_fast_payment 3 218.60 DUMD {54}
+@0:110 perform_fast_payment 34 162.81 DUMC {54}
+@0:115 perform_fast_payment 68 608.50 DUMD {54}
+@0:120 perform_fast_payment 27 635.22 DUMA {54}
+@0:125 perform_fast_payment 40 767.98 DUMA {54}
+@0:130 perform_fast_payment 90 719.59 DUMC {54}
+@0:135 perform_fast_payment 98 301.36 DUMC {54}
+@0:140 perform_fast_payment 89 405.71 DUMB {54}
+@0:145 perform_fast_payment 90 617.42 DUMC {54}
+@0:150 perform_fast_payment 30 280.28 DUMC {54}
+@0:155 perform_fast_payment 90 483.31 DUMC {54}
+@0:160 perform_fast_payment 16 580.10 DUMD {54}
+@0:165 perform_fast_payment 15 61.19 DUMC {54}
+@0:170 perform_fast_payment 28 775.03 DUMB {54}
+@0:175 perform_fast_payment 22 863.47 DUMC {54}
+@0:60 perform_fast_payment 36 4.29 DUMA {55}
+@0:65 perform_fast_payment 72 615.15 DUMA {55}
+@0:70 perform_fast_payment 95 423.64 DUME {55}
+@0:75 perform_fast_payment 39 608.57 DUMD {55}
+@0:80 perform_fast_payment 51 193.59 DUMB {55}
+@0:85 perform_fast_payment 45 391.59 DUMD {55}
+@0:90 perform_fast_payment 93 80.91 DUMD {55}
+@0:95 perform_fast_payment 74 913.97 DUMD {55}
+@0:100 perform_fast_payment 74 123.11 DUMD {55}
+@0:105 perform_fast_payment 91 51.95 DUME {55}
+@0:110 perform_fast_payment 64 112.69 DUMD {55}
+@0:115 perform_fast_payment 24 687.58 DUMB {55}
+@0:120 perform_fast_payment 40 686.13 DUMA {55}
+@0:125 perform_fast_payment 23 95.85 DUME {55}
+@0:130 perform_fast_payment 37 505.75 DUME {55}
+@0:135 perform_fast_payment 91 378.41 DUME {55}
+@0:140 perform_fast_payment 59 184.24 DUMD {55}
+@0:145 perform_fast_payment 53 679.87 DUME {55}
+@0:150 perform_fast_payment 80 119.51 DUME {55}
+@0:155 perform_fast_payment 102 557.00 DUME {55}
+@0:160 perform_fast_payment 1 285.47 DUMA {55}
+@0:165 perform_fast_payment 33 678.43 DUMB {55}
+@0:170 perform_fast_payment 14 717.94 DUMA {55}
+@0:175 perform_fast_payment 28 810.36 DUMB {55}
+@0:60 perform_fast_payment 8 193.35 DUMD {56}
+@0:65 perform_fast_payment 80 602.03 DUME {56}
+@0:70 perform_fast_payment 23 392.59 DUME {56}
+@0:75 perform_fast_payment 89 173.13 DUMB {56}
+@0:80 perform_fast_payment 7 498.51 DUMD {56}
+@0:85 perform_fast_payment 20 613.79 DUMA {56}
+@0:90 perform_fast_payment 58 966.23 DUMB {56}
+@0:95 perform_fast_payment 104 751.58 DUMA {56}
+@0:100 perform_fast_payment 39 78.88 DUMD {56}
+@0:105 perform_fast_payment 19 566.95 DUME {56}
+@0:110 perform_fast_payment 46 556.82 DUMD {56}
+@0:115 perform_fast_payment 59 927.53 DUMD {56}
+@0:120 perform_fast_payment 58 117.54 DUMB {56}
+@0:125 perform_fast_payment 92 741.58 DUMA {56}
+@0:130 perform_fast_payment 39 443.76 DUMD {56}
+@0:135 perform_fast_payment 59 391.76 DUMD {56}
+@0:140 perform_fast_payment 70 998.11 DUMB {56}
+@0:145 perform_fast_payment 96 990.04 DUMD {56}
+@0:150 perform_fast_payment 49 663.25 DUME {56}
+@0:155 perform_fast_payment 49 373.22 DUME {56}
+@0:160 perform_fast_payment 17 200.99 DUMB {56}
+@0:165 perform_fast_payment 50 282.18 DUMD {56}
+@0:170 perform_fast_payment 64 282.68 DUMD {56}
+@0:175 perform_fast_payment 10 226.98 DUMA {56}
+@0:60 perform_fast_payment 45 214.21 DUMD {57}
+@0:65 perform_fast_payment 88 492.20 DUMC {57}
+@0:70 perform_fast_payment 7 204.01 DUMD {57}
+@0:75 perform_fast_payment 33 299.40 DUMB {57}
+@0:80 perform_fast_payment 22 12.50 DUMC {57}
+@0:85 perform_fast_payment 79 325.59 DUMC {57}
+@0:90 perform_fast_payment 26 105.27 DUMC {57}
+@0:95 perform_fast_payment 53 738.77 DUME {57}
+@0:100 perform_fast_payment 99 932.64 DUMC {57}
+@0:105 perform_fast_payment 2 495.98 DUME {57}
+@0:110 perform_fast_payment 51 549.24 DUMB {57}
+@0:115 perform_fast_payment 45 927.57 DUMD {57}
+@0:120 perform_fast_payment 62 435.94 DUMC {57}
+@0:125 perform_fast_payment 54 8.13 DUME {57}
+@0:130 perform_fast_payment 66 965.09 DUMC {57}
+@0:135 perform_fast_payment 68 199.74 DUMD {57}
+@0:140 perform_fast_payment 88 35.77 DUMC {57}
+@0:145 perform_fast_payment 89 134.88 DUMB {57}
+@0:150 perform_fast_payment 88 178.49 DUMC {57}
+@0:155 perform_fast_payment 16 251.64 DUMD {57}
+@0:160 perform_fast_payment 53 692.26 DUME {57}
+@0:165 perform_fast_payment 54 70.97 DUME {57}
+@0:170 perform_fast_payment 99 838.57 DUMC {57}
+@0:175 perform_fast_payment 39 37.65 DUMD {57}
+@0:60 perform_fast_payment 43 963.08 DUMA {58}
+@0:65 perform_fast_payment 100 168.85 DUMC {58}
+@0:70 perform_fast_payment 21 976.83 DUMA {58}
+@0:75 perform_fast_payment 36 696.05 DUMA {58}
+@0:80 perform_fast_payment 97 825.81 DUME {58}
+@0:85 perform_fast_payment 64 807.76 DUMD {58}
+@0:90 perform_fast_payment 95 213.05 DUME {58}
+@0:95 perform_fast_payment 13 769.67 DUMD {58}
+@0:100 perform_fast_payment 104 759.01 DUMA {58}
+@0:105 perform_fast_payment 10 528.32 DUMA {58}
+@0:110 perform_fast_payment 19 540.76 DUME {58}
+@0:115 perform_fast_payment 43 140.28 DUMA {58}
+@0:120 perform_fast_payment 57 791.46 DUMA {58}
+@0:125 perform_fast_payment 75 140.20 DUME {58}
+@0:130 perform_fast_payment 98 931.98 DUMC {58}
+@0:135 perform_fast_payment 38 977.79 DUMC {58}
+@0:140 perform_fast_payment 20 400.28 DUMA {58}
+@0:145 perform_fast_payment 88 85.94 DUMC {58}
+@0:150 perform_fast_payment 42 9.82 DUME {58}
+@0:155 perform_fast_payment 23 356.06 DUME {58}
+@0:160 perform_fast_payment 87 625.31 DUMC {58}
+@0:165 perform_fast_payment 10 796.53 DUMA {58}
+@0:170 perform_fast_payment 79 306.70 DUMC {58}
+@0:175 perform_fast_payment 19 734.87 DUME {58}
+@0:60 perform_fast_payment 98 219.26 DUMC {59}
+@0:65 perform_fast_payment 35 332.42 DUMB {59}
+@0:70 perform_fast_payment 101 50.97 DUMA {59}
+@0:75 perform_fast_payment 2 181.96 DUME {59}
+@0:80 perform_fast_payment 49 965.87 DUME {59}
+@0:85 perform_fast_payment 4 797.64 DUMB {59}
+@0:90 perform_fast_payment 55 890.22 DUMC {59}
+@0:95 perform_fast_payment 101 717.92 DUMA {59}
+@0:100 perform_fast_payment 26 910.40 DUMC {59}
+@0:105 perform_fast_payment 2 987.95 DUME {59}
+@0:110 perform_fast_payment 43 269.98 DUMA {59}
+@0:115 perform_fast_payment 92 498.47 DUMA {59}
+@0:120 perform_fast_payment 41 305.25 DUME {59}
+@0:125 perform_fast_payment 44 248.20 DUMB {59}
+@0:130 perform_fast_payment 54 435.98 DUME {59}
+@0:135 perform_fast_payment 28 5.84 DUMB {59}
+@0:140 perform_fast_payment 82 708.61 DUMC {59}
+@0:145 perform_fast_payment 97 149.15 DUME {59}
+@0:150 perform_fast_payment 97 887.27 DUME {59}
+@0:155 perform_fast_payment 37 954.50 DUME {59}
+@0:160 perform_fast_payment 103 845.63 DUMC {59}
+@0:165 perform_fast_payment 58 871.07 DUMB {59}
+@0:170 perform_fast_payment 17 132.76 DUMB {59}
+@0:175 perform_fast_payment 15 694.75 DUMC {59}
+@0:60 perform_fast_payment 21 136.86 DUMA {60}
+@0:65 perform_fast_payment 93 878.17 DUMD {60}
+@0:70 perform_fast_payment 14 33.44 DUMA {60}
+@0:75 perform_fast_payment 1 145.37 DUMA {60}
+@0:80 perform_fast_payment 7 456.20 DUMD {60}
+@0:85 perform_fast_payment 75 714.08 DUME {60}
+@0:90 perform_fast_payment 33 133.68 DUMB {60}
+@0:95 perform_fast_payment 45 360.02 DUMD {60}
+@0:100 perform_fast_payment 47 292.38 DUME {60}
+@0:105 perform_fast_payment 50 974.38 DUMD {60}
+@0:110 perform_fast_payment 1 229.94 DUMA {60}
+@0:115 perform_fast_payment 89 499.48 DUMB {60}
+@0:120 perform_fast_payment 9 989.90 DUMA {60}
+@0:125 perform_fast_payment 1 786.22 DUMA {60}
+@0:130 perform_fast_payment 75 804.72 DUME {60}
+@0:135 perform_fast_payment 77 954.81 DUMB {60}
+@0:140 perform_fast_payment 24 852.13 DUMB {60}
+@0:145 perform_fast_payment 65 183.34 DUMB {60}
+@0:150 perform_fast_payment 23 90.59 DUME {60}
+@0:155 perform_fast_payment 94 330.38 DUME {60}
+@0:160 perform_fast_payment 37 122.01 DUME {60}
+@0:165 perform_fast_payment 84 556.23 DUMB {60}
+@0:170 perform_fast_payment 83 536.41 DUME {60}
+@0:175 perform_fast_payment 83 705.86 DUME {60}
+@0:60 perform_fast_payment 45 356.38 DUMD {61}
+@0:65 perform_fast_payment 93 181.10 DUMD {61}
+@0:70 perform_fast_payment 11 858.71 DUME {61}
+@0:75 perform_fast_payment 97 610.66 DUME {61}
+@0:80 perform_fast_payment 45 63.42 DUMD {61}
+@0:85 perform_fast_payment 70 251.70 DUMB {61}
+@0:90 perform_fast_payment 41 368.38 DUME {61}
+@0:95 perform_fast_payment 34 516.63 DUMC {61}
+@0:100 perform_fast_payment 63 70.71 DUMD {61}
+@0:105 perform_fast_payment 93 347.64 DUMD {61}
+@0:110 perform_fast_payment 77 346.59 DUMB {61}
+@0:115 perform_fast_payment 13 329.29 DUMD {61}
+@0:120 perform_fast_payment 24 304.14 DUMB {61}
+@0:125 perform_fast_payment 70 678.53 DUMB {61}
+@0:130 perform_fast_payment 74 616.04 DUMD {61}
+@0:135 perform_fast_payment 17 580.06 DUMB {61}
+@0:140 perform_fast_payment 6 660.62 DUMC {61}
+@0:145 perform_fast_payment 28 589.39 DUMB {61}
+@0:150 perform_fast_payment 98 706.34 DUMC {61}
+@0:155 perform_fast_payment 59 569.88 DUMD {61}
+@0:160 perform_fast_payment 26 468.53 DUMC {61}
+@0:165 perform_fast_payment 6 492.86 DUMC {61}
+@0:170 perform_fast_payment 53 744.15 DUME {61}
+@0:175 perform_fast_payment 94 565.93 DUME {61}
+@0:60 perform_fast_payment 14 990.12 DUMA {62}
+@0:65 perform_fast_payment 53 427.99 DUME {62}
+@0:70 perform_fast_payment 7 723.24 DUMD {62}
+@0:75 perform_fast_payment 89 532.09 DUMB {62}
+@0:80 perform_fast_payment 20 706.28 DUMA {62}
+@0:85 perform_fast_payment 20 347.08 DUMA {62}
+@0:90 perform_fast_payment 25 526.91 DUMB {62}
+@0:95 perform_fast_payment 68 558.34 DUMD {62}
+@0:100 perform_fast_payment 18 234.74 DUME {62}
+@0:105 perform_fast_payment 23 510.43 DUME {62}
+@0:110 perform_fast_payment 101 655.64 DUMA {62}
+@0:115 perform_fast_payment 10 24.72 DUMA {62}
+@0:120 perform_fast_payment 57 229.61 DUMA {62}
+@0:125 perform_fast_payment 35 730.98 DUMB {62}
+@0:130 perform_fast_payment 10 878.44 DUMA {62}
+@0:135 perform_fast_payment 43 593.82 DUMA {62}
+@0:140 perform_fast_payment 7 673.29 DUMD {62}
+@0:145 perform_fast_payment 4 636.69 DUMB {62}
+@0:150 perform_fast_payment 33 300.23 DUMB {62}
+@0:155 perform_fast_payment 32 384.95 DUMB {62}
+@0:160 perform_fast_payment 31 119.91 DUMB {62}
+@0:165 perform_fast_payment 68 714.48 DUMD {62}
+@0:170 perform_fast_payment 45 208.57 DUMD {62}
+@0:175 perform_fast_payment 95 944.96 DUME {62}
+@0:60 perform_fast_payment 101 214.85 DUMA {63}
+@0:65 perform_fast_payment 31 862.38 DUMB {63}
+@0:70 perform_fast_payment 49 558.30 DUME {63}
+@0:75 perform_fast_payment 75 210.43 DUME {63}
+@0:80 perform_fast_payment 49 83.53 DUME {63}
+@0:85 perform_fast_payment 4 968.37 DUMB {63}
+@0:90 perform_fast_payment 76 621.88 DUMC {63}
+@0:95 perform_fast_payment 22 295.27 DUMC {63}
+@0:100 perform_fast_payment 104 642.55 DUMA {63}
+@0:105 perform_fast_payment 97 394.71 DUME {63}
+@0:110 perform_fast_payment 88 727.97 DUMC {63}
+@0:115 perform_fast_payment 24 921.70 DUMB {63}
+@0:120 perform_fast_payment 2 268.37 DUME {63}
+@0:125 perform_fast_payment 52 938.07 DUMC {63}
+@0:130 perform_fast_payment 37 109.45 DUME {63}
+@0:135 perform_fast_payment 76 670.02 DUMC {63}
+@0:140 perform_fast_payment 72 388.06 DUMA {63}
+@0:145 perform_fast_payment 44 940.66 DUMB {63}
+@0:150 perform_fast_payment 87 977.23 DUMC {63}
+@0:155 perform_fast_payment 41 373.56 DUME {63}
+@0:160 perform_fast_payment 15 67.98 DUMC {63}
+@0:165 perform_fast_payment 54 159.76 DUME {63}
+@0:170 perform_fast_payment 61 212.14 DUMA {63}
+@0:175 perform_fast_payment 53 898.06 DUME {63}
+@0:60 perform_fast_payment 49 924.59 DUME {64}
+@0:65 perform_fast_payment 32 134.77 DUMB {64}
+@0:70 perform_fast_payment 70 578.71 DUMB {64}
+@0:75 perform_fast_payment 38 217.87 DUMC {64}
+@0:80 perform_fast_payment 104 203.33 DUMA {64}
+@0:85 perform_fast_payment 48 892.39 DUMC {64}
+@0:90 perform_fast_payment 85 982.66 DUMC {64}
+@0:95 perform_fast_payment 65 284.55 DUMB {64}
+@0:100 perform_fast_payment 91 65.83 DUME {64}
+@0:105 perform_fast_payment 99 447.73 DUMC {64}
+@0:110 perform_fast_payment 71 894.06 DUMC {64}
+@0:115 perform_fast_payment 54 820.40 DUME {64}
+@0:120 perform_fast_payment 88 509.04 DUMC {64}
+@0:125 perform_fast_payment 95 248.26 DUME {64}
+@0:130 perform_fast_payment 17 708.10 DUMB {64}
+@0:135 perform_fast_payment 86 411.78 DUME {64}
+@0:140 perform_fast_payment 4 429.30 DUMB {64}
+@0:145 perform_fast_payment 24 71.92 DUMB {64}
+@0:150 perform_fast_payment 18 602.22 DUME {64}
+@0:155 perform_fast_payment 40 796.72 DUMA {64}
+@0:160 perform_fast_payment 23 603.82 DUME {64}
+@0:165 perform_fast_payment 28 283.82 DUMB {64}
+@0:170 perform_fast_payment 78 281.69 DUMA {64}
+@0:175 perform_fast_payment 70 688.50 DUMB {64}
+@0:60 perform_fast_payment 69 681.90 DUMC {65}
+@0:65 perform_fast_payment 11 772.56 DUME {65}
+@0:70 perform_fast_payment 54 814.53 DUME {65}
+@0:75 perform_fast_payment 12 57.53 DUMC {65}
+@0:80 perform_fast_payment 68 307.25 DUMD {65}
+@0:85 perform_fast_payment 103 306.25 DUMC {65}
+@0:90 perform_fast_payment 47 344.15 DUME {65}
+@0:95 perform_fast_payment 59 212.62 DUMD {65}
+@0:100 perform_fast_payment 100 273.85 DUMC {65}
+@0:105 perform_fast_payment 96 984.86 DUMD {65}
+@0:110 perform_fast_payment 36 816.83 DUMA {65}
+@0:115 perform_fast_payment 94 35.64 DUME {65}
+@0:120 perform_fast_payment 101 383.71 DUMA {65}
+@0:125 perform_fast_payment 36 803.40 DUMA {65}
+@0:130 perform_fast_payment 18 27.33 DUME {65}
+@0:135 perform_fast_payment 101 17.64 DUMA {65}
+@0:140 perform_fast_payment 67 568.90 DUMC {65}
+@0:145 perform_fast_payment 86 816.28 DUME {65}
+@0:150 perform_fast_payment 3 618.11 DUMD {65}
+@0:155 perform_fast_payment 90 389.11 DUMC {65}
+@0:160 perform_fast_payment 13 574.22 DUMD {65}
+@0:165 perform_fast_payment 2 383.71 DUME {65}
+@0:170 perform_fast_payment 52 214.79 DUMC {65}
+@0:175 perform_fast_payment 61 827.70 DUMA {65}
+@0:60 perform_fast_payment 50 542.30 DUMD {66}
+@0:65 perform_fast_payment 20 8.39 DUMA {66}
+@0:70 perform_fast_payment 50 250.56 DUMD {66}
+@0:75 perform_fast_payment 11 452.53 DUME {66}
+@0:80 perform_fast_payment 54 783.73 DUME {66}
+@0:85 perform_fast_payment 93 153.91 DUMD {66}
+@0:90 perform_fast_payment 96 811.79 DUMD {66}
+@0:95 perform_fast_payment 93 925.48 DUMD {66}
+@0:100 perform_fast_payment 9 361.76 DUMA {66}
+@0:105 perform_fast_payment 35 660.27 DUMB {66}
+@0:110 perform_fast_payment 91 203.52 DUME {66}
+@0:115 perform_fast_payment 91 330.41 DUME {66}
+@0:120 perform_fast_payment 9 746.92 DUMA {66}
+@0:125 perform_fast_payment 31 583.36 DUMB {66}
+@0:130 perform_fast_payment 7 565.04 DUMD {66}
+@0:135 perform_fast_payment 47 364.08 DUME {66}
+@0:140 perform_fast_payment 81 525.14 DUMD {66}
+@0:145 perform_fast_payment 50 174.35 DUMD {66}
+@0:150 perform_fast_payment 1 308.49 DUMA {66}
+@0:155 perform_fast_payment 68 150.02 DUMD {66}
+@0:160 perform_fast_payment 14 243.90 DUMA {66}
+@0:165 perform_fast_payment 95 506.45 DUME {66}
+@0:170 perform_fast_payment 41 610.68 DUME {66}
+@0:175 perform_fast_payment 78 544.24 DUMA {66}
+@0:60 perform_fast_payment 68 681.49 DUMD {67}
+@0:65 perform_fast_payment 46 280.13 DUMD {67}
+@0:70 perform_fast_payment 14 662.72 DUMA {67}
+@0:75 perform_fast_payment 40 953.39 DUMA {67}
+@0:80 perform_fast_payment 46 155.14 DUMD {67}
+@0:85 perform_fast_payment 41 627.67 DUME {67}
+@0:90 perform_fast_payment 37 225.92 DUME {67}
+@0:95 perform_fast_payment 17 592.76 DUMB {67}
+@0:100 perform_fast_payment 94 489.73 DUME {67}
+@0:105 perform_fast_payment 35 798.73 DUMB {67}
+@0:110 perform_fast_payment 7 823.33 DUMD {67}
+@0:115 perform_fast_payment 41 670.68 DUME {67}
+@0:120 perform_fast_payment 8 0.23 DUMD {67}
+@0:125 perform_fast_payment 4 75.05 DUMB {67}
+@0:130 perform_fast_payment 10 861.27 DUMA {67}
+@0:135 perform_fast_payment 58 61.49 DUMB {67}
+@0:140 perform_fast_payment 104 430.74 DUMA {67}
+@0:145 perform_fast_payment 37 825.69 DUME {67}
+@0:150 perform_fast_payment 101 409.78 DUMA {67}
+@0:155 perform_fast_payment 37 422.75 DUME {67}
+@0:160 perform_fast_payment 53 101.58 DUME {67}
+@0:165 perform_fast_payment 2 661.09 DUME {67}
+@0:170 perform_fast_payment 16 766.75 DUMD {67}
+@0:175 perform_fast_payment 63 211.11 DUMD {67}
+@0:60 perform_fast_payment 70 160.24 DUMB {68}
+@0:65 perform_fast_payment 103 513.74 DUMC {68}
+@0:70 perform_fast_payment 35 804.16 DUMB {68}
+@0:75 perform_fast_payment 65 658.66 DUMB {68}
+@0:80 perform_fast_payment 83 452.36 DUME {68}
+@0:85 perform_fast_payment 5 159.39 DUMC {68}
+@0:90 perform_fast_payment 104 623.96 DUMA {68}
+@0:95 perform_fast_payment 12 256.52 DUMC {68}
+@0:100 perform_fast_payment 69 927.27 DUMC {68}
+@0:105 perform_fast_payment 60 499.07 DUMC {68}
+@0:110 perform_fast_payment 14 898.71 DUMA {68}
+@0:115 perform_fast_payment 67 235.97 DUMC {68}
+@0:120 perform_fast_payment 80 174.93 DUME {68}
+@0:125 perform_fast_payment 62 460.12 DUMC {68}
+@0:130 perform_fast_payment 12 937.19 DUMC {68}
+@0:135 perform_fast_payment 21 365.60 DUMA {68}
+@0:140 perform_fast_payment 67 270.13 DUMC {68}
+@0:145 perform_fast_payment 10 300.36 DUMA {68}
+@0:150 perform_fast_payment 40 806.91 DUMA {68}
+@0:155 perform_fast_payment 57 922.25 DUMA {68}
+@0:160 perform_fast_payment 15 826.99 DUMC {68}
+@0:165 perform_fast_payment 103 983.17 DUMC {68}
+@0:170 perform_fast_payment 32 100.45 DUMB {68}
+@0:175 perform_fast_payment 80 440.05 DUME {68}
+@0:60 perform_fast_payment 11 964.07 DUME {69}
+@0:65 perform_fast_payment 42 965.54 DUME {69}
+@0:70 perform_fast_payment 1 293.88 DUMA {69}
+@0:75 perform_fast_payment 49 369.05 DUME {69}
+@0:80 perform_fast_payment 102 548.13 DUME {69}
+@0:85 perform_fast_payment 54 786.20 DUME {69}
+@0:90 perform_fast_payment 73 747.63 DUMA {69}
+@0:95 perform_fast_payment 75 491.34 DUME {69}
+@0:100 perform_fast_payment 101 66.74 DUMA {69}
+@0:105 perform_fast_payment 45 736.97 DUMD {69}
+@0:110 perform_fast_payment 47 818.27 DUME {69}
+@0:115 perform_fast_payment 92 595.55 DUMA {69}
+@0:120 perform_fast_payment 65 643.98 DUMB {69}
+@0:125 perform_fast_payment 39 203.59 DUMD {69}
+@0:130 perform_fast_payment 95 259.55 DUME {69}
+@0:135 perform_fast_payment 86 518.10 DUME {69}
+@0:140 perform_fast_payment 77 787.46 DUMB {69}
+@0:145 perform_fast_payment 92 838.34 DUMA {69}
+@0:150 perform_fast_payment 35 834.34 DUMB {69}
+@0:155 perform_fast_payment 91 641.94 DUME {69}
+@0:160 perform_fast_payment 21 985.09 DUMA {69}
+@0:165 perform_fast_payment 84 384.21 DUMB {69}
+@0:170 perform_fast_payment 32 814.61 DUMB {69}
+@0:175 perform_fast_payment 39 906.85 DUMD {69}
+@0:60 perform_fast_payment 103 678.55 DUMC {70}
+@0:65 perform_fast_payment 87 596.62 DUMC {70}
+@0:70 perform_fast_payment 73 880.98 DUMA {70}
+@0:75 perform_fast_payment 37 938.69 DUME {70}
+@0:80 perform_fast_payment 73 750.47 DUMA {70}
+@0:85 perform_fast_payment 88 455.14 DUMC {70}
+@0:90 perform_fast_payment 88 890.99 DUMC {70}
+@0:95 perform_fast_payment 101 599.41 DUMA {70}
+@0:100 perform_fast_payment 7 241.41 DUMD {70}
+@0:105 perform_fast_payment 21 140.56 DUMA {70}
+@0:110 perform_fast_payment 40 587.66 DUMA {70}
+@0:115 perform_fast_payment 103 82.28 DUMC {70}
+@0:120 perform_fast_payment 100 546.99 DUMC {70}
+@0:125 perform_fast_payment 87 353.63 DUMC {70}
+@0:130 perform_fast_payment 74 743.98 DUMD {70}
+@0:135 perform_fast_payment 97 881.95 DUME {70}
+@0:140 perform_fast_payment 2 854.56 DUME {70}
+@0:145 perform_fast_payment 41 957.41 DUME {70}
+@0:150 perform_fast_payment 7 842.83 DUMD {70}
+@0:155 perform_fast_payment 54 276.46 DUME {70}
+@0:160 perform_fast_payment 52 834.25 DUMC {70}
+@0:165 perform_fast_payment 45 455.71 DUMD {70}
+@0:170 perform_fast_payment 92 840.59 DUMA {70}
+@0:175 perform_fast_payment 23 511.50 DUME {70}
+@0:60 perform_fast_payment 42 191.87 DUME {71}
+@0:65 perform_fast_payment 21 111.80 DUMA {71}
+@0:70 perform_fast_payment 18 421.68 DUME {71}
+@0:75 perform_fast_payment 27 725.21 DUMA {71}
+@0:80 perform_fast_payment 10 239.74 DUMA {71}
+@0:85 perform_fast_payment 101 570.58 DUMA {71}
+@0:90 perform_fast_payment 20 821.21 DUMA {71}
+@0:95 perform_fast_payment 2 305.30 DUME {71}
+@0:100 perform_fast_payment 43 467.13 DUMA {71}
+@0:105 perform_fast_payment 96 495.57 DUMD {71}
+@0:110 perform_fast_payment 94 958.02 DUME {71}
+@0:115 perform_fast_payment 31 463.37 DUMB {71}
+@0:120 perform_fast_payment 45 866.77 DUMD {71}
+@0:125 perform_fast_payment 3 262.50 DUMD {71}
+@0:130 perform_fast_payment 7 259.38 DUMD {71}
+@0:135 perform_fast_payment 3 543.86 DUMD {71}
+@0:140 perform_fast_payment 23 741.25 DUME {71}
+@0:145 perform_fast_payment 18 743.80 DUME {71}
+@0:150 perform_fast_payment 101 79.32 DUMA {71}
+@0:155 perform_fast_payment 95 520.97 DUME {71}
+@0:160 perform_fast_payment 45 923.55 DUMD {71}
+@0:165 perform_fast_payment 43 327.74 DUMA {71}
+@0:170 perform_fast_payment 102 77.67 DUME {71}
+@0:175 perform_fast_payment 92 978.97 DUMA {71}
+@0:60 perform_fast_payment 64 860.31 DUMD {72}
+@0:65 perform_fast_payment 38 515.40 DUMC {72}
+@0:70 perform_fast_payment 80 174.81 DUME {72}
+@0:75 perform_fast_payment 74 424.64 DUMD {72}
+@0:80 perform_fast_payment 5 356.07 DUMC {72}
+@0:85 perform_fast_payment 84 684.69 DUMB {72}
+@0:90 perform_fast_payment 76 370.01 DUMC {72}
+@0:95 perform_fast_payment 33 398.60 DUMB {72}
+@0:100 perform_fast_payment 46 326.17 DUMD {72}
+@0:105 perform_fast_payment 93 700.56 DUMD {72}
+@0:110 perform_fast_payment 16 132.80 DUMD {72}
+@0:115 perform_fast_payment 50 637.00 DUMD {72}
+@0:120 perform_fast_payment 45 577.62 DUMD {72}
+@0:125 perform_fast_payment 63 294.17 DUMD {72}
+@0:130 perform_fast_payment 84 344.66 DUMB {72}
+@0:135 perform_fast_payment 16 648.30 DUMD {72}
+@0:140 perform_fast_payment 50 844.97 DUMD {72}
+@0:145 perform_fast_payment 25 780.06 DUMB {72}
+@0:150 perform_fast_payment 71 562.62 DUMC {72}
+@0:155 perform_fast_payment 18 420.00 DUME {72}
+@0:160 perform_fast_payment 29 616.88 DUMC {72}
+@0:165 perform_fast_payment 89 479.81 DUMB {72}
+@0:170 perform_fast_payment 28 719.45 DUMB {72}
+@0:175 perform_fast_payment 48 45.64 DUMC {72}
+@0:60 perform_fast_payment 56 322.02 DUMC {73}
+@0:65 perform_fast_payment 22 381.28 DUMC {73}
+@0:70 perform_fast_payment 12 886.86 DUMC {73}
+@0:75 perform_fast_payment 34 469.02 DUMC {73}
+@0:80 perform_fast_payment 55 449.11 DUMC {73}
+@0:85 perform_fast_payment 96 154.42 DUMD {73}
+@0:90 perform_fast_payment 52 155.89 DUMC {73}
+@0:95 perform_fast_payment 7 704.52 DUMD {73}
+@0:100 perform_fast_payment 35 740.24 DUMB {73}
+@0:105 perform_fast_payment 51 36.95 DUMB {73}
+@0:110 perform_fast_payment 3 575.52 DUMD {73}
+@0:115 perform_fast_payment 31 300.25 DUMB {73}
+@0:120 perform_fast_payment 45 864.97 DUMD {73}
+@0:125 perform_fast_payment 93 823.93 DUMD {73}
+@0:130 perform_fast_payment 13 371.79 DUMD {73}
+@0:135 perform_fast_payment 86 203.26 DUME {73}
+@0:140 perform_fast_payment 76 108.74 DUMC {73}
+@0:145 perform_fast_payment 85 258.31 DUMC {73}
+@0:150 perform_fast_payment 12 899.77 DUMC {73}
+@0:155 perform_fast_payment 31 279.65 DUMB {73}
+@0:160 perform_fast_payment 16 57.64 DUMD {73}
+@0:165 perform_fast_payment 47 313.05 DUME {73}
+@0:170 perform_fast_payment 93 842.48 DUMD {73}
+@0:175 perform_fast_payment 66 136.41 DUMC {73}
+@0:60 perform_fast_payment 51 171.84 DUMB {74}
+@0:65 perform_fast_payment 30 219.26 DUMC {74}
+@0:70 perform_fast_payment 70 207.47 DUMB {74}
+@0:75 perform_fast_payment 99 603.87 DUMC {74}
+@0:80 perform_fast_payment 83 671.16 DUME {74}
+@0:85 perform_fast_payment 49 469.73 DUME {74}
+@0:90 perform_fast_payment 98 344.52 DUMC {74}
+@0:95 perform_fast_payment 6 103.98 DUMC {74}
+@0:100 perform_fast_payment 40 714.85 DUMA {74}
+@0:105 perform_fast_payment 52 330.89 DUMC {74}
+@0:110 perform_fast_payment 95 68.49 DUME {74}
+@0:115 perform_fast_payment 28 883.86 DUMB {74}
+@0:120 perform_fast_payment 49 465.49 DUME {74}
+@0:125 perform_fast_payment 9 596.95 DUMA {74}
+@0:130 perform_fast_payment 76 838.45 DUMC {74}
+@0:135 perform_fast_payment 12 571.35 DUMC {74}
+@0:140 perform_fast_payment 85 892.13 DUMC {74}
+@0:145 perform_fast_payment 10 144.55 DUMA {74}
+@0:150 perform_fast_payment 95 382.30 DUME {74}
+@0:155 perform_fast_payment 77 218.25 DUMB {74}
+@0:160 perform_fast_payment 65 935.12 DUMB {74}
+@0:165 perform_fast_payment 11 645.40 DUME {74}
+@0:170 perform_fast_payment 61 643.48 DUMA {74}
+@0:175 perform_fast_payment 44 394.54 DUMB {74}
+@0:60 perform_fast_payment 44 822.59 DUMB {75}
+@0:65 perform_fast_payment 89 451.12 DUMB {75}
+@0:70 perform_fast_payment 78 435.85 DUMA {75}
+@0:75 perform_fast_payment 46 622.56 DUMD {75}
+@0:80 perform_fast_payment 64 457.23 DUMD {75}
+@0:85 perform_fast_payment 50 861.75 DUMD {75}
+@0:90 perform_fast_payment 35 626.95 DUMB {75}
+@0:95 perform_fast_payment 15 977.71 DUMC {75}
+@0:100 perform_fast_payment 5 780.42 DUMC {75}
+@0:105 perform_fast_payment 69 4.52 DUMC {75}
+@0:110 perform_fast_payment 34 41.20 DUMC {75}
+@0:115 perform_fast_payment 44 619.07 DUMB {75}
+@0:120 perform_fast_payment 58 401.75 DUMB {75}
+@0:125 perform_fast_payment 3 240.16 DUMD {75}
+@0:130 perform_fast_payment 51 390.53 DUMB {75}
+@0:135 perform_fast_payment 33 288.46 DUMB {75}
+@0:140 perform_fast_payment 15 566.11 DUMC {75}
+@0:145 perform_fast_payment 15 141.33 DUMC {75}
+@0:150 perform_fast_payment 16 236.96 DUMD {75}
+@0:155 perform_fast_payment 93 198.38 DUMD {75}
+@0:160 perform_fast_payment 4 949.81 DUMB {75}
+@0:165 perform_fast_payment 51 969.98 DUMB {75}
+@0:170 perform_fast_payment 82 469.70 DUMC {75}
+@0:175 perform_fast_payment 45 0.50 DUMD {75}
+@0:60 perform_fast_payment 44 238.58 DUMB {76}
+@0:65 perform_fast_payment 40 858.25 DUMA {76}
+@0:70 perform_fast_payment 65 942.33 DUMB {76}
+@0:75 perform_fast_payment 80 853.20 DUME {76}
+@0:80 perform_fast_payment 54 822.53 DUME {76}
+@0:85 perform_fast_payment 81 819.16 DUMD {76}
+@0:90 perform_fast_payment 45 129.23 DUMD {76}
+@0:95 perform_fast_payment 80 367.41 DUME {76}
+@0:100 perform_fast_payment 94 876.71 DUME {76}
+@0:105 perform_fast_payment 78 744.65 DUMA {76}
+@0:110 perform_fast_payment 10 349.86 DUMA {76}
+@0:115 perform_fast_payment 46 421.88 DUMD {76}
+@0:120 perform_fast_payment 46 376.63 DUMD {76}
+@0:125 perform_fast_payment 3 47.92 DUMD {76}
+@0:130 perform_fast_payment 51 322.63 DUMB {76}
+@0:135 perform_fast_payment 25 19.57 DUMB {76}
+@0:140 perform_fast_payment 9 179.58 DUMA {76}
+@0:145 perform_fast_payment 50 231.11 DUMD {76}
+@0:150 perform_fast_payment 78 75.59 DUMA {76}
+@0:155 perform_fast_payment 95 994.07 DUME {76}
+@0:160 perform_fast_payment 20 43.52 DUMA {76}
+@0:165 perform_fast_payment 68 543.77 DUMD {76}
+@0:170 perform_fast_payment 95 595.31 DUME {76}
+@0:175 perform_fast_payment 86 11.07 DUME {76}
+@0:60 perform_fast_payment 49 198.46 DUME {77}
+@0:65 perform_fast_payment 19 72.08 DUME {77}
+@0:70 perform_fast_payment 99 391.62 DUMC {77}
+@0:75 perform_fast_payment 83 774.00 DUME {77}
+@0:80 perform_fast_payment 85 302.40 DUMC {77}
+@0:85 perform_fast_payment 80 454.58 DUME {77}
+@0:90 perform_fast_payment 98 680.60 DUMC {77}
+@0:95 perform_fast_payment 94 953.39 DUME {77}
+@0:100 perform_fast_payment 38 356.80 DUMC {77}
+@0:105 perform_fast_payment 1 832.69 DUMA {77}
+@0:110 perform_fast_payment 18 622.42 DUME {77}
+@0:115 perform_fast_payment 99 925.67 DUMC {77}
+@0:120 perform_fast_payment 104 336.92 DUMA {77}
+@0:125 perform_fast_payment 27 3.20 DUMA {77}
+@0:130 perform_fast_payment 15 257.27 DUMC {77}
+@0:135 perform_fast_payment 66 6.29 DUMC {77}
+@0:140 perform_fast_payment 97 648.19 DUME {77}
+@0:145 perform_fast_payment 90 284.55 DUMC {77}
+@0:150 perform_fast_payment 55 913.97 DUMC {77}
+@0:155 perform_fast_payment 12 77.99 DUMC {77}
+@0:160 perform_fast_payment 16 203.00 DUMD {77}
+@0:165 perform_fast_payment 19 31.24 DUME {77}
+@0:170 perform_fast_payment 46 320.62 DUMD {77}
+@0:175 perform_fast_payment 47 501.98 DUME {77}
+@0:60 perform_fast_payment 74 578.64 DUMD {78}
+@0:65 perform_fast_payment 99 898.76 DUMC {78}
+@0:70 perform_fast_payment 55 243.26 DUMC {78}
+@0:75 perform_fast_payment 48 491.63 DUMC {78}
+@0:80 perform_fast_payment 54 939.69 DUME {78}
+@0:85 perform_fast_payment 70 936.05 DUMB {78}
+@0:90 perform_fast_payment 16 639.93 DUMD {78}
+@0:95 perform_fast_payment 28 18.25 DUMB {78}
+@0:100 perform_fast_payment 39 184.09 DUMD {78}
+@0:105 perform_fast_payment 35 42.34 DUMB {78}
+@0:110 perform_fast_payment 4 247.70 DUMB {78}
+@0:115 perform_fast_payment 76 482.23 DUMC {78}
+@0:120 perform_fast_payment 76 915.76 DUMC {78}
+@0:125 perform_fast_payment 52 587.21 DUMC {78}
+@0:130 perform_fast_payment 37 748.49 DUME {78}
+@0:135 perform_fast_payment 82 144.45 DUMC {78}
+@0:140 perform_fast_payment 49 448.16 DUME {78}
+@0:145 perform_fast_payment 64 866.30 DUMD {78}
+@0:150 perform_fast_payment 26 95.11 DUMC {78}
+@0:155 perform_fast_payment 33 369.79 DUMB {78}
+@0:160 perform_fast_payment 13 831.75 DUMD {78}
+@0:165 perform_fast_payment 38 249.37 DUMC {78}
+@0:170 perform_fast_payment 30 883.58 DUMC {78}
+@0:175 perform_fast_payment 66 809.41 DUMC {78}
+@0:60 perform_fast_payment 13 167.41 DUMD {79}
+@0:65 perform_fast_payment 43 463.92 DUMA {79}
+@0:70 perform_fast_payment 21 79.37 DUMA {79}
+@0:75 perform_fast_payment 8 153.95 DUMD {79}
+@0:80 perform_fast_payment 32 601.78 DUMB {79}
+@0:85 perform_fast_payment 104 573.46 DUMA {79}
+@0:90 perform_fast_payment 50 386.34 DUMD {79}
+@0:95 perform_fast_payment 42 212.33 DUME {79}
+@0:100 perform_fast_payment 35 150.30 DUMB {79}
+@0:105 perform_fast_payment 28 952.39 DUMB {79}
+@0:110 perform_fast_payment 21 597.96 DUMA {79}
+@0:115 perform_fast_payment 97 402.44 DUME {79}
+@0:120 perform_fast_payment 14 928.19 DUMA {79}
+@0:125 perform_fast_payment 49 324.56 DUME {79}
+@0:130 perform_fast_payment 74 134.15 DUMD {79}
+@0:135 perform_fast_payment 84 858.76 DUMB {79}
+@0:140 perform_fast_payment 27 156.06 DUMA {79}
+@0:145 perform_fast_payment 13 317.80 DUMD {79}
+@0:150 perform_fast_payment 36 196.45 DUMA {79}
+@0:155 perform_fast_payment 13 415.61 DUMD {79}
+@0:160 perform_fast_payment 44 133.05 DUMB {79}
+@0:165 perform_fast_payment 86 88.85 DUME {79}
+@0:170 perform_fast_payment 41 385.92 DUME {79}
+@0:175 perform_fast_payment 41 618.40 DUME {79}
+@0:60 perform_fast_payment 63 732.18 DUMD {80}
+@0:65 perform_fast_payment 10 965.45 DUMA {80}
+@0:70 perform_fast_payment 55 754.35 DUMC {80}
+@0:75 perform_fast_payment 21 472.97 DUMA {80}
+@0:80 perform_fast_payment 81 317.64 DUMD {80}
+@0:85 perform_fast_payment 58 872.45 DUMB {80}
+@0:90 perform_fast_payment 55 524.04 DUMC {80}
+@0:95 perform_fast_payment 73 921.60 DUMA {80}
+@0:100 perform_fast_payment 28 974.36 DUMB {80}
+@0:105 perform_fast_payment 78 393.22 DUMA {80}
+@0:110 perform_fast_payment 27 406.76 DUMA {80}
+@0:115 perform_fast_payment 74 404.01 DUMD {80}
+@0:120 perform_fast_payment 6 81.63 DUMC {80}
+@0:125 perform_fast_payment 98 79.53 DUMC {80}
+@0:130 perform_fast_payment 96 610.85 DUMD {80}
+@0:135 perform_fast_payment 69 853.60 DUMC {80}
+@0:140 perform_fast_payment 87 712.99 DUMC {80}
+@0:145 perform_fast_payment 79 922.49 DUMC {80}
+@0:150 perform_fast_payment 26 409.89 DUMC {80}
+@0:155 perform_fast_payment 79 683.57 DUMC {80}
+@0:160 perform_fast_payment 104 46.41 DUMA {80}
+@0:165 perform_fast_payment 20 147.60 DUMA {80}
+@0:170 perform_fast_payment 36 938.46 DUMA {80}
+@0:175 perform_fast_payment 104 770.95 DUMA {80}
+@0:60 perform_fast_payment 44 929.29 DUMB {81}
+@0:65 perform_fast_payment 35 537.05 DUMB {81}
+@0:70 perform_fast_payment 75 349.26 DUME {81}
+@0:75 perform_fast_payment 37 774.35 DUME {81}
+@0:80 perform_fast_payment 95 468.01 DUME {81}
+@0:85 perform_fast_payment 38 958.28 DUMC {81}
+@0:90 perform_fast_payment 10 515.45 DUMA {81}
+@0:95 perform_fast_payment 100 377.46 DUMC {81}
+@0:100 perform_fast_payment 28 457.81 DUMB {81}
+@0:105 perform_fast_payment 70 263.68 DUMB {81}
+@0:110 perform_fast_payment 99 915.54 DUMC {81}
+@0:115 perform_fast_payment 82 527.63 DUMC {81}
+@0:120 perform_fast_payment 25 351.19 DUMB {81}
+@0:125 perform_fast_payment 49 331.41 DUME {81}
+@0:130 perform_fast_payment 55 11.58 DUMC {81}
+@0:135 perform_fast_payment 84 759.09 DUMB {81}
+@0:140 perform_fast_payment 82 98.99 DUMC {81}
+@0:145 perform_fast_payment 29 223.98 DUMC {81}
+@0:150 perform_fast_payment 101 357.82 DUMA {81}
+@0:155 perform_fast_payment 87 38.96 DUMC {81}
+@0:160 perform_fast_payment 70 388.73 DUMB {81}
+@0:165 perform_fast_payment 37 661.74 DUME {81}
+@0:170 perform_fast_payment 88 933.51 DUMC {81}
+@0:175 perform_fast_payment 43 509.11 DUMA {81}
+@0:60 perform_fast_payment 58 742.58 DUMB {82}
+@0:65 perform_fast_payment 96 212.48 DUMD {82}
+@0:70 perform_fast_payment 58 795.54 DUMB {82}
+@0:75 perform_fast_payment 21 278.94 DUMA {82}
+@0:80 perform_fast_payment 44 680.24 DUMB {82}
+@0:85 perform_fast_payment 89 292.37 DUMB {82}
+@0:90 perform_fast_payment 63 961.61 DUMD {82}
+@0:95 perform_fast_payment 86 412.96 DUME {82}
+@0:100 perform_fast_payment 73 481.60 DUMA {82}
+@0:105 perform_fast_payment 54 359.10 DUME {82}
+@0:110 perform_fast_payment 104 750.24 DUMA {82}
+@0:115 perform_fast_payment 57 31.26 DUMA {82}
+@0:120 perform_fast_payment 10 884.43 DUMA {82}
+@0:125 perform_fast_payment 46 85.59 DUMD {82}
+@0:130 perform_fast_payment 49 793.56 DUME {82}
+@0:135 perform_fast_payment 72 436.08 DUMA {82}
+@0:140 perform_fast_payment 31 607.32 DUMB {82}
+@0:145 perform_fast_payment 57 118.97 DUMA {82}
+@0:150 perform_fast_payment 93 854.11 DUMD {82}
+@0:155 perform_fast_payment 96 617.45 DUMD {82}
+@0:160 perform_fast_payment 4 941.74 DUMB {82}
+@0:165 perform_fast_payment 70 151.52 DUMB {82}
+@0:170 perform_fast_payment 3 751.88 DUMD {82}
+@0:175 perform_fast_payment 40 132.51 DUMA {82}
+@0:60 perform_fast_payment 70 555.09 DUMB {83}
+@0:65 perform_fast_payment 63 450.44 DUMD {83}
+@0:70 perform_fast_payment 35 991.77 DUMB {83}
+@0:75 perform_fast_payment 99 64.07 DUMC {83}
+@0:80 perform_fast_payment 104 760.39 DUMA {83}
+@0:85 perform_fast_payment 27 783.23 DUMA {83}
+@0:90 perform_fast_payment 68 628.40 DUMD {83}
+@0:95 perform_fast_payment 32 816.75 DUMB {83}
+@0:100 perform_fast_payment 59 377.97 DUMD {83}
+@0:105 perform_fast_payment 8 587.68 DUMD {83}
+@0:110 perform_fast_payment 88 62.59 DUMC {83}
+@0:115 perform_fast_payment 90 526.91 DUMC {83}
+@0:120 perform_fast_payment 58 311.05 DUMB {83}
+@0:125 perform_fast_payment 15 485.20 DUMC {83}
+@0:130 perform_fast_payment 39 547.66 DUMD {83}
+@0:135 perform_fast_payment 22 542.01 DUMC {83}
+@0:140 perform_fast_payment 66 589.16 DUMC {83}
+@0:145 perform_fast_payment 15 316.18 DUMC {83}
+@0:150 perform_fast_payment 46 834.82 DUMD {83}
+@0:155 perform_fast_payment 104 591.82 DUMA {83}
+@0:160 perform_fast_payment 82 370.31 DUMC {83}
+@0:165 perform_fast_payment 99 993.19 DUMC {83}
+@0:170 perform_fast_payment 65 83.88 DUMB {83}
+@0:175 perform_fast_payment 24 609.62 DUMB {83}
+@0:60 perform_fast_payment 37 433.30 DUME {84}
+@0:65 perform_fast_payment 80 96.11 DUME {84}
+@0:70 perform_fast_payment 68 240.06 DUMD {84}
+@0:75 perform_fast_payment 97 529.00 DUME {84}
+@0:80 perform_fast_payment 54 61.53 DUME {84}
+@0:85 perform_fast_payment 67 586.44 DUMC {84}
+@0:90 perform_fast_payment 74 333.82 DUMD {84}
+@0:95 perform_fast_payment 93 423.74 DUMD {84}
+@0:100 perform_fast_payment 81 1.49 DUMD {84}
+@0:105 perform_fast_payment 61 929.82 DUMA {84}
+@0:110 perform_fast_payment 19 2.00 DUME {84}
+@0:115 perform_fast_payment 2 365.89 DUME {84}
+@0:120 perform_fast_payment 86 218.36 DUME {84}
+@0:125 perform_fast_payment 69 800.85 DUMC {84}
+@0:130 perform_fast_payment 26 891.84 DUMC {84}
+@0:135 perform_fast_payment 62 415.35 DUMC {84}
+@0:140 perform_fast_payment 40 171.09 DUMA {84}
+@0:145 perform_fast_payment 87 817.25 DUMC {84}
+@0:150 perform_fast_payment 22 57.41 DUMC {84}
+@0:155 perform_fast_payment 16 393.05 DUMD {84}
+@0:160 perform_fast_payment 38 936.79 DUMC {84}
+@0:165 perform_fast_payment 80 168.64 DUME {84}
+@0:170 perform_fast_payment 93 960.87 DUMD {84}
+@0:175 perform_fast_payment 100 499.80 DUMC {84}
+@0:60 perform_fast_payment 68 907.14 DUMD {85}
+@0:65 perform_fast_payment 20 997.53 DUMA {85}
+@0:70 perform_fast_payment 37 242.36 DUME {85}
+@0:75 perform_fast_payment 74 731.49 DUMD {85}
+@0:80 perform_fast_payment 24 217.76 DUMB {85}
+@0:85 perform_fast_payment 104 806.32 DUMA {85}
+@0:90 perform_fast_payment 28 812.42 DUMB {85}
+@0:95 perform_fast_payment 74 430.25 DUMD {85}
+@0:100 perform_fast_payment 77 279.96 DUMB {85}
+@0:105 perform_fast_payment 95 359.74 DUME {85}
+@0:110 perform_fast_payment 51 410.91 DUMB {85}
+@0:115 perform_fast_payment 21 513.55 DUMA {85}
+@0:120 perform_fast_payment 33 232.55 DUMB {85}
+@0:125 perform_fast_payment 57 423.40 DUMA {85}
+@0:130 perform_fast_payment 57 761.46 DUMA {85}
+@0:135 perform_fast_payment 97 512.59 DUME {85}
+@0:140 perform_fast_payment 63 94.62 DUMD {85}
+@0:145 perform_fast_payment 41 545.19 DUME {85}
+@0:150 perform_fast_payment 78 715.98 DUMA {85}
+@0:155 perform_fast_payment 89 603.31 DUMB {85}
+@0:160 perform_fast_payment 11 635.99 DUME {85}
+@0:165 perform_fast_payment 31 795.60 DUMB {85}
+@0:170 perform_fast_payment 39 855.56 DUMD {85}
+@0:175 perform_fast_payment 92 421.70 DUMA {85}
+@0:60 perform_fast_payment 26 190.32 DUMC {86}
+@0:65 perform_fast_payment 89 85.48 DUMB {86}
+@0:70 perform_fast_payment 71 740.73 DUMC {86}
+@0:75 perform_fast_payment 52 255.97 DUMC {86}
+@0:80 perform_fast_payment 4 393.96 DUMB {86}
+@0:85 perform_fast_payment 22 285.42 DUMC {86}
+@0:90 perform_fast_payment 25 143.01 DUMB {86}
+@0:95 perform_fast_payment 36 874.14 DUMA {86}
+@0:100 perform_fast_payment 57 676.92 DUMA {86}
+@0:105 perform_fast_payment 64 582.01 DUMD {86}
+@0:110 perform_fast_payment 71 374.09 DUMC {86}
+@0:115 perform_fast_payment 33 227.32 DUMB {86}
+@0:120 perform_fast_payment 78 38.18 DUMA {86}
+@0:125 perform_fast_payment 81 799.23 DUMD {86}
+@0:130 perform_fast_payment 71 659.48 DUMC {86}
+@0:135 perform_fast_payment 15 351.60 DUMC {86}
+@0:140 perform_fast_payment 15 500.66 DUMC {86}
+@0:145 perform_fast_payment 103 416.70 DUMC {86}
+@0:150 perform_fast_payment 34 206.86 DUMC {86}
+@0:155 perform_fast_payment 10 637.47 DUMA {86}
+@0:160 perform_fast_payment 101 112.59 DUMA {86}
+@0:165 perform_fast_payment 85 380.06 DUMC {86}
+@0:170 perform_fast_payment 12 771.28 DUMC {86}
+@0:175 perform_fast_payment 101 725.72 DUMA {86}
+@0:60 perform_fast_payment 84 844.40 DUMB {87}
+@0:65 perform_fast_payment 86 466.81 DUME {87}
+@0:70 perform_fast_payment 51 81.85 DUMB {87}
+@0:75 perform_fast_payment 95 954.07 DUME {87}
+@0:80 perform_fast_payment 40 849.62 DUMA {87}
+@0:85 perform_fast_payment 20 61.34 DUMA {87}
+@0:90 perform_fast_payment 21 280.34 DUMA {87}
+@0:95 perform_fast_payment 19 497.43 DUME {87}
+@0:100 perform_fast_payment 78 527.68 DUMA {87}
+@0:105 perform_fast_payment 96 155.25 DUMD {87}
+@0:110 perform_fast_payment 2 307.60 DUME {87}
+@0:115 perform_fast_payment 73 184.48 DUMA {87}
+@0:120 perform_fast_payment 3 289.42 DUMD {87}
+@0:125 perform_fast_payment 94 285.18 DUME {87}
+@0:130 perform_fast_payment 18 298.37 DUME {87}
+@0:135 perform_fast_payment 53 794.73 DUME {87}
+@0:140 perform_fast_payment 70 865.77 DUMB {87}
+@0:145 perform_fast_payment 47 211.46 DUME {87}
+@0:150 perform_fast_payment 21 52.11 DUMA {87}
+@0:155 perform_fast_payment 64 327.74 DUMD {87}
+@0:160 perform_fast_payment 40 44.15 DUMA {87}
+@0:165 perform_fast_payment 42 157.25 DUME {87}
+@0:170 perform_fast_payment 17 895.64 DUMB {87}
+@0:175 perform_fast_payment 19 693.28 DUME {87}
+@0:60 perform_fast_payment 36 970.64 DUMA {88}
+@0:65 perform_fast_payment 54 921.58 DUME {88}
+@0:70 perform_fast_payment 23 543.71 DUME {88}
+@0:75 perform_fast_payment 84 63.24 DUMB {88}
+@0:80 perform_fast_payment 25 946.28 DUMB {88}
+@0:85 perform_fast_payment 49 334.46 DUME {88}
+@0:90 perform_fast_payment 102 972.89 DUME {88}
+@0:95 perform_fast_payment 51 132.70 DUMB {88}
+@0:100 perform_fast_payment 45 187.08 DUMD {88}
+@0:105 perform_fast_payment 59 377.74 DUMD {88}
+@0:110 perform_fast_payment 91 672.41 DUME {88}
+@0:115 perform_fast_payment 84 697.88 DUMB {88}
+@0:120 perform_fast_payment 51 340.08 DUMB {88}
+@0:125 perform_fast_payment 47 78.75 DUME {88}
+@0:130 perform_fast_payment 101 942.57 DUMA {88}
+@0:135 perform_fast_payment 17 52.95 DUMB {88}
+@0:140 perform_fast_payment 50 853.99 DUMD {88}
+@0:145 perform_fast_payment 64 643.47 DUMD {88}
+@0:150 perform_fast_payment 4 934.94 DUMB {88}
+@0:155 perform_fast_payment 50 458.67 DUMD {88}
+@0:160 perform_fast_payment 49 429.32 DUME {88}
+@0:165 perform_fast_payment 43 103.75 DUMA {88}
+@0:170 perform_fast_payment 24 105.50 DUMB {88}
+@0:175 perform_fast_payment 45 664.36 DUMD {88}
+@0:60 perform_fast_payment 95 754.38 DUME {89}
+@0:65 perform_fast_payment 83 306.61 DUME {89}
+@0:70 perform_fast_payment 66 138.83 DUMC {89}
+@0:75 perform_fast_payment 62 985.86 DUMC {89}
+@0:80 perform_fast_payment 21 464.56 DUMA {89}
+@0:85 perform_fast_payment 76 840.48 DUMC {89}
+@0:90 perform_fast_payment 1 934.45 DUMA {89}
+@0:95 perform_fast_payment 12 426.49 DUMC {89}
+@0:100 perform_fast_payment 27 140.02 DUMA {89}
+@0:105 perform_fast_payment 73 504.74 DUMA {89}
+@0:110 perform_fast_payment 39 343.40 DUMD {89}
+@0:115 perform_fast_payment 95 865.19 DUME {89}
+@0:120 perform_fast_payment 6 840.39 DUMC {89}
+@0:125 perform_fast_payment 50 621.86 DUMD {89}
+@0:130 perform_fast_payment 57 109.49 DUMA {89}
+@0:135 perform_fast_payment 102 760.91 DUME {89}
+@0:140 perform_fast_payment 64 973.07 DUMD {89}
+@0:145 perform_fast_payment 104 589.19 DUMA {89}
+@0:150 perform_fast_payment 46 639.44 DUMD {89}
+@0:155 perform_fast_payment 78 31.04 DUMA {89}
+@0:160 perform_fast_payment 73 479.28 DUMA {89}
+@0:165 perform_fast_payment 63 132.46 DUMD {89}
+@0:170 perform_fast_payment 5 538.03 DUMC {89}
+@0:175 perform_fast_payment 101 572.10 DUMA {89}
+@0:60 perform_fast_payment 96 257.16 DUMD {90}
+@0:65 perform_fast_payment 37 333.12 DUME {90}
+@0:70 perform_fast_payment 39 33.92 DUMD {90}
+@0:75 perform_fast_payment 45 496.59 DUMD {90}
+@0:80 perform_fast_payment 102 371.39 DUME {90}
+@0:85 perform_fast_payment 27 962.76 DUMA {90}
+@0:90 perform_fast_payment 7 259.62 DUMD {90}
+@0:95 perform_fast_payment 31 773.41 DUMB {90}
+@0:100 perform_fast_payment 31 923.24 DUMB {90}
+@0:105 perform_fast_payment 74 866.74 DUMD {90}
+@0:110 perform_fast_payment 89 673.08 DUMB {90}
+@0:115 perform_fast_payment 95 199.11 DUME {90}
+@0:120 perform_fast_payment 58 225.84 DUMB {90}
+@0:125 perform_fast_payment 16 719.01 DUMD {90}
+@0:130 perform_fast_payment 74 605.80 DUMD {90}
+@0:135 perform_fast_payment 81 666.95 DUMD {90}
+@0:140 perform_fast_payment 101 884.75 DUMA {90}
+@0:145 perform_fast_payment 80 50.67 DUME {90}
+@0:150 perform_fast_payment 8 784.21 DUMD {90}
+@0:155 perform_fast_payment 94 187.69 DUME {90}
+@0:160 perform_fast_payment 1 425.90 DUMA {90}
+@0:165 perform_fast_payment 95 112.58 DUME {90}
+@0:170 perform_fast_payment 39 843.60 DUMD {90}
+@0:175 perform_fast_payment 63 854.62 DUMD {90}
+@0:60 perform_fast_payment 55 94.00 DUMC {91}
+@0:65 perform_fast_payment 34 632.10 DUMC {91}
+@0:70 perform_fast_payment 104 561.69 DUMA {91}
+@0:75 perform_fast_payment 46 601.32 DUMD {91}
+@0:80 perform_fast_payment 40 344.22 DUMA {91}
+@0:85 perform_fast_payment 31 398.38 DUMB {91}
+@0:90 perform_fast_payment 100 369.23 DUMC {91}
+@0:95 perform_fast_payment 88 407.67 DUMC {91}
+@0:100 perform_fast_payment 45 922.40 DUMD {91}
+@0:105 perform_fast_payment 72 330.61 DUMA {91}
+@0:110 perform_fast_payment 15 913.69 DUMC {91}
+@0:115 perform_fast_payment 33 771.84 DUMB {91}
+@0:120 perform_fast_payment 93 372.64 DUMD {91}
+@0:125 perform_fast_payment 38 80.11 DUMC {91}
+@0:130 perform_fast_payment 79 131.78 DUMC {91}
+@0:135 perform_fast_payment 68 36.25 DUMD {91}
+@0:140 perform_fast_payment 15 732.89 DUMC {91}
+@0:145 perform_fast_payment 28 40.57 DUMB {91}
+@0:150 perform_fast_payment 14 239.94 DUMA {91}
+@0:155 perform_fast_payment 103 210.81 DUMC {91}
+@0:160 perform_fast_payment 17 199.12 DUMB {91}
+@0:165 perform_fast_payment 39 311.17 DUMD {91}
+@0:170 perform_fast_payment 62 460.14 DUMC {91}
+@0:175 perform_fast_payment 60 733.62 DUMC {91}
+@0:60 perform_fast_payment 66 31.64 DUMC {92}
+@0:65 perform_fast_payment 15 659.75 DUMC {92}
+@0:70 perform_fast_payment 54 212.56 DUME {92}
+@0:75 perform_fast_payment 94 602.76 DUME {92}
+@0:80 perform_fast_payment 55 513.62 DUMC {92}
+@0:85 perform_fast_payment 96 709.71 DUMD {92}
+@0:90 perform_fast_payment 77 692.42 DUMB {92}
+@0:95 perform_fast_payment 59 465.57 DUMD {92}
+@0:100 perform_fast_payment 95 565.00 DUME {92}
+@0:105 perform_fast_payment 12 300.05 DUMC {92}
+@0:110 perform_fast_payment 82 237.57 DUMC {92}
+@0:115 perform_fast_payment 22 179.13 DUMC {92}
+@0:120 perform_fast_payment 79 753.33 DUMC {92}
+@0:125 perform_fast_payment 93 633.02 DUMD {92}
+@0:130 perform_fast_payment 86 231.12 DUME {92}
+@0:135 perform_fast_payment 67 487.84 DUMC {92}
+@0:140 perform_fast_payment 95 153.34 DUME {92}
+@0:145 perform_fast_payment 66 116.64 DUMC {92}
+@0:150 perform_fast_payment 47 671.40 DUME {92}
+@0:155 perform_fast_payment 100 805.53 DUMC {92}
+@0:160 perform_fast_payment 67 771.02 DUMC {92}
+@0:165 perform_fast_payment 26 898.06 DUMC {92}
+@0:170 perform_fast_payment 19 608.93 DUME {92}
+@0:175 perform_fast_payment 8 858.50 DUMD {92}
+@0:60 perform_fast_payment 9 831.69 DUMA {93}
+@0:65 perform_fast_payment 73 520.08 DUMA {93}
+@0:70 perform_fast_payment 32 673.91 DUMB {93}
+@0:75 perform_fast_payment 57 638.30 DUMA {93}
+@0:80 perform_fast_payment 33 147.34 DUMB {93}
+@0:85 perform_fast_payment 53 700.02 DUME {93}
+@0:90 perform_fast_payment 18 775.16 DUME {93}
+@0:95 perform_fast_payment 65 0.68 DUMB {93}
+@0:100 perform_fast_payment 57 921.51 DUMA {93}
+@0:105 perform_fast_payment 5 866.04 DUMC {93}
+@0:110 perform_fast_payment 56 459.61 DUMC {93}
+@0:115 perform_fast_payment 102 17.67 DUME {93}
+@0:120 perform_fast_payment 38 80.37 DUMC {93}
+@0:125 perform_fast_payment 19 573.55 DUME {93}
+@0:130 perform_fast_payment 61 193.66 DUMA {93}
+@0:135 perform_fast_payment 70 943.98 DUMB {93}
+@0:140 perform_fast_payment 51 347.90 DUMB {93}
+@0:145 perform_fast_payment 90 910.66 DUMC {93}
+@0:150 perform_fast_payment 52 102.99 DUMC {93}
+@0:155 perform_fast_payment 90 540.31 DUMC {93}
+@0:160 perform_fast_payment 19 913.83 DUME {93}
+@0:165 perform_fast_payment 11 299.97 DUME {93}
+@0:170 perform_fast_payment 94 620.81 DUME {93}
+@0:175 perform_fast_payment 60 537.44 DUMC {93}
+@0:60 perform_fast_payment 60 580.96 DUMC {94}
+@0:65 perform_fast_payment 46 756.91 DUMD {94}
+@0:70 perform_fast_payment 46 785.46 DUMD {94}
+@0:75 perform_fast_payment 56 589.43 DUMC {94}
+@0:80 perform_fast_payment 32 269.57 DUMB {94}
+@0:85 perform_fast_payment 88 827.71 DUMC {94}
+@0:90 perform_fast_payment 103 33.91 DUMC {94}
+@0:95 perform_fast_payment 51 943.55 DUMB {94}
+@0:100 perform_fast_payment 76 717.22 DUMC {94}
+@0:105 perform_fast_payment 70 955.39 DUMB {94}
+@0:110 perform_fast_payment 61 435.76 DUMA {94}
+@0:115 perform_fast_payment 26 540.53 DUMC {94}
+@0:120 perform_fast_payment 8 674.20 DUMD {94}
+@0:125 perform_fast_payment 27 681.97 DUMA {94}
+@0:130 perform_fast_payment 36 917.19 DUMA {94}
+@0:135 perform_fast_payment 40 131.46 DUMA {94}
+@0:140 perform_fast_payment 34 406.82 DUMC {94}
+@0:145 perform_fast_payment 9 582.27 DUMA {94}
+@0:150 perform_fast_payment 46 394.07 DUMD {94}
+@0:155 perform_fast_payment 60 770.94 DUMC {94}
+@0:160 perform_fast_payment 65 756.98 DUMB {94}
+@0:165 perform_fast_payment 14 847.54 DUMA {94}
+@0:170 perform_fast_payment 104 17.92 DUMA {94}
+@0:175 perform_fast_payment 67 53.64 DUMC {94}
+@0:60 perform_fast_payment 46 345.96 DUMD {95}
+@0:65 perform_fast_payment 34 802.80 DUMC {95}
+@0:70 perform_fast_payment 73 960.86 DUMA {95}
+@0:75 perform_fast_payment 76 622.56 DUMC {95}
+@0:80 perform_fast_payment 21 389.25 DUMA {95}
+@0:85 perform_fast_payment 81 708.49 DUMD {95}
+@0:90 perform_fast_payment 30 161.57 DUMC {95}
+@0:95 perform_fast_payment 70 766.58 DUMB {95}
+@0:100 perform_fast_payment 64 70.33 DUMD {95}
+@0:105 perform_fast_payment 65 570.82 DUMB {95}
+@0:110 perform_fast_payment 57 243.70 DUMA {95}
+@0:115 perform_fast_payment 52 449.94 DUMC {95}
+@0:120 perform_fast_payment 57 112.82 DUMA {95}
+@0:125 perform_fast_payment 101 324.72 DUMA {95}
+@0:130 perform_fast_payment 40 224.21 DUMA {95}
+@0:135 perform_fast_payment 10 450.74 DUMA {95}
+@0:140 perform_fast_payment 12 764.90 DUMC {95}
+@0:145 perform_fast_payment 104 251.78 DUMA {95}
+@0:150 perform_fast_payment 32 19.87 DUMB {95}
+@0:155 perform_fast_payment 63 681.33 DUMD {95}
+@0:160 perform_fast_payment 40 431.27 DUMA {95}
+@0:165 perform_fast_payment 50 256.52 DUMD {95}
+@0:170 perform_fast_payment 77 786.76 DUMB {95}
+@0:175 perform_fast_payment 61 67.94 DUMA {95}
+@0:60 perform_fast_payment 40 118.48 DUMA {96}
+@0:65 perform_fast_payment 28 852.20 DUMB {96}
+@0:70 perform_fast_payment 10 344.20 DUMA {96}
+@0:75 perform_fast_payment 41 674.85 DUME {96}
+@0:80 perform_fast_payment 98 746.36 DUMC {96}
+@0:85 perform_fast_payment 67 400.14 DUMC {96}
+@0:90 perform_fast_payment 28 675.33 DUMB {96}
+@0:95 perform_fast_payment 41 15.58 DUME {96}
+@0:100 perform_fast_payment 71 537.49 DUMC {96}
+@0:105 perform_fast_payment 43 107.28 DUMA {96}
+@0:110 perform_fast_payment 95 955.35 DUME {96}
+@0:115 perform_fast_payment 49 404.25 DUME {96}
+@0:120 perform_fast_payment 43 25.72 DUMA {96}
+@0:125 perform_fast_payment 30 776.23 DUMC {96}
+@0:130 perform_fast_payment 51 418.44 DUMB {96}
+@0:135 perform_fast_payment 19 189.05 DUME {96}
+@0:140 perform_fast_payment 40 283.87 DUMA {96}
+@0:145 perform_fast_payment 97 953.29 DUME {96}
+@0:150 perform_fast_payment 57 413.22 DUMA {96}
+@0:155 perform_fast_payment 103 297.10 DUMC {96}
+@0:160 perform_fast_payment 61 31.37 DUMA {96}
+@0:165 perform_fast_payment 55 293.94 DUMC {96}
+@0:170 perform_fast_payment 51 937.18 DUMB {96}
+@0:175 perform_fast_payment 77 778.41 DUMB {96}
+@0:60 perform_fast_payment 79 383.31 DUMC {97}
+@0:65 perform_fast_payment 74 493.06 DUMD {97}
+@0:70 perform_fast_payment 85 781.89 DUMC {97}
+@0:75 perform_fast_payment 44 294.99 DUMB {97}
+@0:80 perform_fast_payment 92 347.03 DUMA {97}
+@0:85 perform_fast_payment 36 244.81 DUMA {97}
+@0:90 perform_fast_payment 99 836.48 DUMC {97}
+@0:95 perform_fast_payment 10 154.55 DUMA {97}
+@0:100 perform_fast_payment 33 592.44 DUMB {97}
+@0:105 perform_fast_payment 104 474.03 DUMA {97}
+@0:110 perform_fast_payment 57 234.54 DUMA {97}
+@0:115 perform_fast_payment 55 550.08 DUMC {97}
+@0:120 perform_fast_payment 96 417.18 DUMD {97}
+@0:125 perform_fast_payment 100 8.45 DUMC {97}
+@0:130 perform_fast_payment 89 571.48 DUMB {97}
+@0:135 perform_fast_payment 59 316.27 DUMD {97}
+@0:140 perform_fast_payment 92 871.86 DUMA {97}
+@0:145 perform_fast_payment 66 218.48 DUMC {97}
+@0:150 perform_fast_payment 46 176.65 DUMD {97}
+@0:155 perform_fast_payment 60 721.60 DUMC {97}
+@0:160 perform_fast_payment 31 895.49 DUMB {97}
+@0:165 perform_fast_payment 50 769.07 DUMD {97}
+@0:170 perform_fast_payment 55 883.01 DUMC {97}
+@0:175 perform_fast_payment 90 639.89 DUMC {97}
+@0:60 perform_fast_payment 25 70.52 DUMB {98}
+@0:65 perform_fast_payment 64 219.54 DUMD {98}
+@0:70 perform_fast_payment 81 161.48 DUMD {98}
+@0:75 perform_fast_payment 86 56.81 DUME {98}
+@0:80 perform_fast_payment 91 618.18 DUME {98}
+@0:85 perform_fast_payment 32 41.47 DUMB {98}
+@0:90 perform_fast_payment 47 983.28 DUME {98}
+@0:95 perform_fast_payment 78 173.58 DUMA {98}
+@0:100 perform_fast_payment 59 808.96 DUMD {98}
+@0:105 perform_fast_payment 32 158.34 DUMB {98}
+@0:110 perform_fast_payment 70 530.49 DUMB {98}
+@0:115 perform_fast_payment 86 757.77 DUME {98}
+@0:120 perform_fast_payment 45 242.25 DUMD {98}
+@0:125 perform_fast_payment 102 363.31 DUME {98}
+@0:130 perform_fast_payment 37 713.06 DUME {98}
+@0:135 perform_fast_payment 39 676.48 DUMD {98}
+@0:140 perform_fast_payment 72 42.99 DUMA {98}
+@0:145 perform_fast_payment 96 518.39 DUMD {98}
+@0:150 perform_fast_payment 41 96.01 DUME {98}
+@0:155 perform_fast_payment 1 2.29 DUMA {98}
+@0:160 perform_fast_payment 19 109.09 DUME {98}
+@0:165 perform_fast_payment 39 512.03 DUMD {98}
+@0:170 perform_fast_payment 42 437.82 DUME {98}
+@0:175 perform_fast_payment 64 515.49 DUMD {98}
+@0:60 perform_fast_payment 50 182.18 DUMD {99}
+@0:65 perform_fast_payment 104 648.35 DUMA {99}
+@0:70 perform_fast_payment 9 936.78 DUMA {99}
+@0:75 perform_fast_payment 17 224.43 DUMB {99}
+@0:80 perform_fast_payment 89 905.49 DUMB {99}
+@0:85 perform_fast_payment 63 6.33 DUMD {99}
+@0:90 perform_fast_payment 73 12.53 DUMA {99}
+@0:95 perform_fast_payment 95 442.23 DUME {99}
+@0:100 perform_fast_payment 20 376.21 DUMA {99}
+@0:105 perform_fast_payment 16 339.29 DUMD {99}
+@0:110 perform_fast_payment 65 108.20 DUMB {99}
+@0:115 perform_fast_payment 65 339.29 DUMB {99}
+@0:120 perform_fast_payment 44 722.10 DUMB {99}
+@0:125 perform_fast_payment 18 500.99 DUME {99}
+@0:130 perform_fast_payment 49 881.43 DUME {99}
+@0:135 perform_fast_payment 9 215.03 DUMA {99}
+@0:140 perform_fast_payment 63 140.22 DUMD {99}
+@0:145 perform_fast_payment 25 858.92 DUMB {99}
+@0:150 perform_fast_payment 21 32.20 DUMA {99}
+@0:155 perform_fast_payment 11 411.07 DUME {99}
+@0:160 perform_fast_payment 53 229.74 DUME {99}
+@0:165 perform_fast_payment 18 792.69 DUME {99}
+@0:170 perform_fast_payment 70 431.43 DUMB {99}
+@0:175 perform_fast_payment 57 268.90 DUMA {99}
+@0:60 perform_fast_payment 94 787.51 DUME {100}
+@0:65 perform_fast_payment 31 236.79 DUMB {100}
+@0:70 perform_fast_payment 57 329.70 DUMA {100}
+@0:75 perform_fast_payment 58 739.85 DUMB {100}
+@0:80 perform_fast_payment 43 544.94 DUMA {100}
+@0:85 perform_fast_payment 63 909.20 DUMD {100}
+@0:90 perform_fast_payment 81 533.82 DUMD {100}
+@0:95 perform_fast_payment 3 477.11 DUMD {100}
+@0:100 perform_fast_payment 11 439.96 DUME {100}
+@0:105 perform_fast_payment 97 494.05 DUME {100}
+@0:110 perform_fast_payment 58 755.88 DUMB {100}
+@0:115 perform_fast_payment 47 679.14 DUME {100}
+@0:120 perform_fast_payment 21 755.26 DUMA {100}
+@0:125 perform_fast_payment 68 635.55 DUMD {100}
+@0:130 perform_fast_payment 63 876.37 DUMD {100}
+@0:135 perform_fast_payment 1 812.19 DUMA {100}
+@0:140 perform_fast_payment 70 386.43 DUMB {100}
+@0:145 perform_fast_payment 84 505.18 DUMB {100}
+@0:150 perform_fast_payment 59 767.85 DUMD {100}
+@0:155 perform_fast_payment 59 452.24 DUMD {100}
+@0:160 perform_fast_payment 40 394.81 DUMA {100}
+@0:165 perform_fast_payment 7 353.74 DUMD {100}
+@0:170 perform_fast_payment 49 37.74 DUME {100}
+@0:175 perform_fast_payment 102 191.12 DUME {100}
+@0:60 perform_fast_payment 34 913.20 DUMC {101}
+@0:65 perform_fast_payment 32 937.30 DUMB {101}
+@0:70 perform_fast_payment 77 248.81 DUMB {101}
+@0:75 perform_fast_payment 17 889.64 DUMB {101}
+@0:80 perform_fast_payment 62 684.20 DUMC {101}
+@0:85 perform_fast_payment 91 374.55 DUME {101}
+@0:90 perform_fast_payment 12 689.84 DUMC {101}
+@0:95 perform_fast_payment 45 424.01 DUMD {101}
+@0:100 perform_fast_payment 85 223.48 DUMC {101}
+@0:105 perform_fast_payment 19 595.53 DUME {101}
+@0:110 perform_fast_payment 65 467.06 DUMB {101}
+@0:115 perform_fast_payment 11 401.12 DUME {101}
+@0:120 perform_fast_payment 91 753.63 DUME {101}
+@0:125 perform_fast_payment 71 573.40 DUMC {101}
+@0:130 perform_fast_payment 98 357.63 DUMC {101}
+@0:135 perform_fast_payment 62 539.52 DUMC {101}
+@0:140 perform_fast_payment 85 589.86 DUMC {101}
+@0:145 perform_fast_payment 25 385.36 DUMB {101}
+@0:150 perform_fast_payment 64 266.72 DUMD {101}
+@0:155 perform_fast_payment 17 960.41 DUMB {101}
+@0:160 perform_fast_payment 82 212.03 DUMC {101}
+@0:165 perform_fast_payment 19 996.53 DUME {101}
+@0:170 perform_fast_payment 31 115.34 DUMB {101}
+@0:175 perform_fast_payment 87 647.50 DUMC {101}
+@0:60 perform_fast_payment 30 145.83 DUMC {102}
+@0:65 perform_fast_payment 61 608.00 DUMA {102}
+@0:70 perform_fast_payment 57 123.05 DUMA {102}
+@0:75 perform_fast_payment 69 202.02 DUMC {102}
+@0:80 perform_fast_payment 65 795.34 DUMB {102}
+@0:85 perform_fast_payment 63 176.31 DUMD {102}
+@0:90 perform_fast_payment 69 190.50 DUMC {102}
+@0:95 perform_fast_payment 100 891.11 DUMC {102}
+@0:100 perform_fast_payment 12 582.35 DUMC {102}
+@0:105 perform_fast_payment 29 2.63 DUMC {102}
+@0:110 perform_fast_payment 67 716.20 DUMC {102}
+@0:115 perform_fast_payment 92 303.27 DUMA {102}
+@0:120 perform_fast_payment 57 404.28 DUMA {102}
+@0:125 perform_fast_payment 33 134.82 DUMB {102}
+@0:130 perform_fast_payment 92 607.00 DUMA {102}
+@0:135 perform_fast_payment 17 461.15 DUMB {102}
+@0:140 perform_fast_payment 40 93.48 DUMA {102}
+@0:145 perform_fast_payment 13 187.01 DUMD {102}
+@0:150 perform_fast_payment 99 860.56 DUMC {102}
+@0:155 perform_fast_payment 85 742.75 DUMC {102}
+@0:160 perform_fast_payment 32 357.11 DUMB {102}
+@0:165 perform_fast_payment 73 670.40 DUMA {102}
+@0:170 perform_fast_payment 88 753.21 DUMC {102}
+@0:175 perform_fast_payment 57 643.48 DUMA {102}
+@0:60 perform_fast_payment 86 431.13 DUME {103}
+@0:65 perform_fast_payment 28 534.22 DUMB {103}
+@0:70 perform_fast_payment 95 630.30 DUME {103}
+@0:75 perform_fast_payment 25 664.72 DUMB {103}
+@0:80 perform_fast_payment 84 662.09 DUMB {103}
+@0:85 perform_fast_payment 74 58.56 DUMD {103}
+@0:90 perform_fast_payment 70 57.48 DUMB {103}
+@0:95 perform_fast_payment 104 36.69 DUMA {103}
+@0:100 perform_fast_payment 37 852.46 DUME {103}
+@0:105 perform_fast_payment 18 180.55 DUME {103}
+@0:110 perform_fast_payment 20 812.18 DUMA {103}
+@0:115 perform_fast_payment 68 43.38 DUMD {103}
+@0:120 perform_fast_payment 64 613.20 DUMD {103}
+@0:125 perform_fast_payment 92 679.34 DUMA {103}
+@0:130 perform_fast_payment 57 239.83 DUMA {103}
+@0:135 perform_fast_payment 102 240.44 DUME {103}
+@0:140 perform_fast_payment 19 905.02 DUME {103}
+@0:145 perform_fast_payment 54 386.46 DUME {103}
+@0:150 perform_fast_payment 37 916.15 DUME {103}
+@0:155 perform_fast_payment 36 437.80 DUMA {103}
+@0:160 perform_fast_payment 50 723.87 DUMD {103}
+@0:165 perform_fast_payment 18 61.01 DUME {103}
+@0:170 perform_fast_payment 74 328.78 DUMD {103}
+@0:175 perform_fast_payment 4 153.95 DUMB {103}
+@0:60 perform_fast_payment 87 609.80 DUMC {104}
+@0:65 perform_fast_payment 49 226.35 DUME {104}
+@0:70 perform_fast_payment 7 614.88 DUMD {104}
+@0:75 perform_fast_payment 18 453.28 DUME {104}
+@0:80 perform_fast_payment 93 1.04 DUMD {104}
+@0:85 perform_fast_payment 5 620.38 DUMC {104}
+@0:90 perform_fast_payment 8 705.32 DUMD {104}
+@0:95 perform_fast_payment 42 891.44 DUME {104}
+@0:100 perform_fast_payment 83 688.48 DUME {104}
+@0:105 perform_fast_payment 86 339.15 DUME {104}
+@0:110 perform_fast_payment 11 389.04 DUME {104}
+@0:115 perform_fast_payment 33 598.56 DUMB {104}
+@0:120 perform_fast_payment 22 977.20 DUMC {104}
+@0:125 perform_fast_payment 68 591.89 DUMD {104}
+@0:130 perform_fast_payment 32 293.25 DUMB {104}
+@0:135 perform_fast_payment 53 160.86 DUME {104}
+@0:140 perform_fast_payment 18 911.40 DUME {104}
+@0:145 perform_fast_payment 59 657.75 DUMD {104}
+@0:150 perform_fast_payment 60 435.77 DUMC {104}
+@0:155 perform_fast_payment 83 960.72 DUME {104}
+@0:160 perform_fast_payment 46 549.34 DUMD {104}
+@0:165 perform_fast_payment 54 462.09 DUME {104}
+@0:170 perform_fast_payment 77 666.26 DUMB {104}
+@0:175 perform_fast_payment 84 572.62 DUMB {104}
+@0:200 stop_log_stolen_loop
+@0:200 write_stats
+@0:200 stop_bank_server {1}
+@0:210 stop_dispersy
+@0:220 stop

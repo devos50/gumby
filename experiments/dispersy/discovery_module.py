@@ -9,7 +9,7 @@ from twisted.internet.task import LoopingCall
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module
 from gumby.modules.community_experiment_module import CommunityExperimentModule
-from Tribler.dispersy.discovery.community import DiscoveryCommunity
+from dispersy.discovery.community import DiscoveryCommunity
 
 
 @static_module

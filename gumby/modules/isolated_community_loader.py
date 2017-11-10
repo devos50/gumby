@@ -3,7 +3,7 @@ import logging
 from gumby.modules.community_launcher import CommunityLauncher
 from gumby.modules.gumby_session import DefaultCommunityLoader
 
-from Tribler.dispersy.crypto import ECCrypto
+from dispersy.crypto import ECCrypto
 
 
 class IsolatedLauncherWrapper(CommunityLauncher):

@@ -19,7 +19,7 @@ from time import mktime
 import re
 from os import listdir, path
 from sys import argv
-from Tribler.dispersy.tool.ldecoder import parse
+from dispersy.tool.ldecoder import parse
 import os.path
 import os
 import sys
