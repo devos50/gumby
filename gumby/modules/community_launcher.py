@@ -187,7 +187,7 @@ class TunnelCommunityLauncher(CommunityLauncher):
 class HiddenTunnelCommunityLauncher(TunnelCommunityLauncher):
 
     def should_launch(self, session):
-        return session.config.get_tunnel_community_enabled and session.config.get_tunnel_community_hidden_seeding()
+        return session.config.get_tunnel_community_enabled() and session.config.get_tunnel_community_hidden_seeding()
 
     def get_community_class(self):
         from Tribler.community.hiddentunnel.hidden_community import HiddenTunnelCommunity
