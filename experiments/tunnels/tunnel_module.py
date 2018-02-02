@@ -52,8 +52,8 @@ from gumby.modules.community_experiment_module import CommunityExperimentModule
 @static_module
 class TunnelModule(CommunityExperimentModule):
 
-    def __init__(self, experiment):
-        super(TunnelModule, self).__init__(experiment, TunnelCommunity)
+    def __init__(self, experiment, community_class=TunnelCommunity):
+        super(TunnelModule, self).__init__(experiment, community_class)
         self.download_states_history = []
 
     def on_id_received(self):

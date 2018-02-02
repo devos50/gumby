@@ -1,3 +1,5 @@
+from Tribler.community.hiddentunnel.hidden_community import HiddenTunnelCommunity
+
 from experiments.tunnels.tunnel_module import TunnelModule
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module
@@ -5,6 +7,9 @@ from gumby.modules.experiment_module import static_module
 
 @static_module
 class HiddenTunnelModule(TunnelModule):
+
+    def __init__(self, experiment, community_class=HiddenTunnelCommunity):
+        super(HiddenTunnelModule, self).__init__(experiment, community_class)
 
     def on_id_received(self):
         super(HiddenTunnelModule, self).on_id_received()

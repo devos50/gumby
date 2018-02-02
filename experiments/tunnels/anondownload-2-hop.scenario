@@ -1,4 +1,4 @@
-&include hidden_services_common.scenario
+&include anon_downloads_common.scenario
 
 @0:20 annotate start-seeding
 @0:20 transfer action=seed hops=0 {4}
