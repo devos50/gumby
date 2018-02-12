@@ -238,7 +238,7 @@ mkdir -p $M2CDEPS
 
 OPENSSL_VERSION=1.0.1h
 OPENSSL_MARKER=`build_marker openssl $OPENSSL_VERSION`
-if [ ! -e $M2CDEPS/lib/libcrypto.so.1.0.0  -o ! -e $OPENSSL_MARKER ]; then
+if [ ! -e $M2CDEPS/lib/libcrypto.a  -o ! -e $OPENSSL_MARKER ]; then
     pushd $VENV/src
     if [ ! -e openssl-$OPENSSL_VERSION*.tar.gz ]; then
         wget --no-check-certificate https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz
@@ -349,13 +349,13 @@ fi
 # Build Libtorrent and its python bindings
 #
 pushd $VENV/src
-LIBTORRENT_VERSION=1.1.0
+LIBTORRENT_VERSION=1.1.6
 LIBTORRENT_MARKER=`build_marker libtorrent $LIBTORRENT_VERSION`
 if [ ! -e $VENV/lib/python*/site-packages/libtorrent.so  -o ! -e $LIBTORRENT_MARKER ]; then
     LIBTORRENT_SRC=libtorrent-rasterbar-$LIBTORRENT_VERSION
     LIBTORRENT_TAR=$LIBTORRENT_SRC.tar.gz
     if [ ! -e $LIBTORRENT_TAR ]; then
-        wget https://github.com/arvidn/libtorrent/releases/download/libtorrent-1_1/$LIBTORRENT_TAR
+        wget https://github.com/arvidn/libtorrent/releases/download/libtorrent-1_1_6/$LIBTORRENT_TAR
     fi
     if [ ! -d $LIBTORRENT_SRC ]; then
         tar xavf $LIBTORRENT_TAR
