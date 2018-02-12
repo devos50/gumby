@@ -119,8 +119,10 @@ class TriblerModule(BaseDispersyModule):
 
     @experiment_callback
     def add_peer_to_downloads(self, peer_nr):
-        self._logger.info("Adding peer %s to all downloads", peer_nr)
         host, port = self.experiment.get_peer_ip_port_by_id(peer_nr)
+        port = 20000 + (port - 12000)
+        self._logger.info("Adding peer %s to all downloads (ip: %s, port: %d)", peer_nr, host, port)
+
         for download in self.session.get_downloads():
             download.add_peer((host, port))
 

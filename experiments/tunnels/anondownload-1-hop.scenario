@@ -24,6 +24,7 @@
 @0:20 transfer action=seed hops=0 {3}
 @0:40 annotate start-downloading
 @0:40 transfer hops=1 {1}
+@0:50 add_peer_to_downloads 3 {1}
 @0:97 print_dht_table
 @0:97 write_tunnels_info
 @0:97 write_triblerchain_stats
