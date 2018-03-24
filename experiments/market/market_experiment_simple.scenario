@@ -1,8 +1,10 @@
 &module gumby.modules.tribler_module.TriblerModule
+&module gumby.modules.profile_module.ProfileModule
 &module experiments.market.market_module.MarketModule
 
 @0:0 isolate_ipv8_overlay MarketCommunity
 @0:1 start_session
+@0:1 start_yappi
 @0:1 annotate start-experiment
 @0:5 init_wallets
 @0:5 init_matchmakers
@@ -49,5 +51,6 @@
 @0:23.9 ask 10 DUM1 10 DUM2 {39}
 @0:24.0 ask 10 DUM1 10 DUM2 {40}
 @0:45 write_stats
+@0:45 stop_yappi
 @0:47 stop_session
 @0:55 stop
