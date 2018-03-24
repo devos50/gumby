@@ -34,9 +34,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.tribler_config.set_dht_enabled(True)
         self.tribler_config.set_market_community_enabled(True)
 
-    def on_dispersy_available(self, dispersy):
-        # Disable threadpool messages
-        self.overlay._use_main_thread = True
+        self.ipv8_community_launcher.community_kwargs["working_directory"] = u":memory:"
 
     @experiment_callback
     def init_wallets(self):
