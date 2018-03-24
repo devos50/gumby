@@ -28,6 +28,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.num_bids = 0
         self.num_asks = 0
         self.order_id_map = {}
+        self.cancelled_orders = set()
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
@@ -81,21 +82,21 @@ class MarketModule(IPv8OverlayExperimentModule):
             self._logger.info("Connecting to matchmaker %d", peer_num)
             self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_num))
 
+    def on_order_created(self, order, order_id):
+        if order_id and order_id not in self.cancelled_orders:
+            self.order_id_map[order_id] = order.order_id
+
     @experiment_callback
     def ask(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
         self.num_asks += 1
         pair = AssetPair(AssetAmount(int(asset1_amount), asset1_type), AssetAmount(int(asset2_amount), asset2_type))
-        order = self.overlay.create_ask(pair, 3600)
-        if order_id:
-            self.order_id_map[order_id] = order.order_id
+        self.overlay.create_ask(pair, 3600).addCallback(lambda order: self.on_order_created(order, order_id))
 
     @experiment_callback
     def bid(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
         self.num_bids += 1
         pair = AssetPair(AssetAmount(int(asset1_amount), asset1_type), AssetAmount(int(asset2_amount), asset2_type))
-        order = self.overlay.create_bid(pair, 3600)
-        if order_id:
-            self.order_id_map[order_id] = order.order_id
+        self.overlay.create_bid(pair, 3600).addCallback(lambda order: self.on_order_created(order, order_id))
 
     @experiment_callback
     def cancel(self, order_id):
@@ -103,6 +104,7 @@ class MarketModule(IPv8OverlayExperimentModule):
             self._logger.warning("Want to cancel order but order id %s not found!", order_id)
             return
 
+        self.cancelled_orders.add(order_id)
         self.overlay.cancel_order(self.order_id_map[order_id])
 
     @experiment_callback
