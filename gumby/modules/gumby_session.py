@@ -146,7 +146,8 @@ class IPv8CommunityLoader(CommunityLoader):
         overlay = overlay_class(peer, ipv8.endpoint, ipv8.network, *args, **kwargs)
 
         ipv8.overlays.append(overlay)
-        ipv8.strategies.append((walk_strategy_class(overlay), walk_strategy_max_peers))
+        if walk_strategy_class:
+            ipv8.strategies.append((walk_strategy_class(overlay), walk_strategy_max_peers))
 
         # Cleanup
         launcher.finalize(ipv8, session, overlay)

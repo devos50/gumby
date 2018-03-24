@@ -281,3 +281,6 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
 
     def get_my_peer(self, ipv8, session):
         return Peer(session.tradechain_keypair)
+
+    def get_walk_strategy_class(self):
+        return None
