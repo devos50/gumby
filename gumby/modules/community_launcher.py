@@ -269,6 +269,9 @@ class TrustChainCommunityLauncher(IPv8CommunityLauncher):
     def get_kwargs(self, session):
         return {'working_directory': session.config.get_state_dir()}
 
+    def get_walk_strategy_class(self):
+        return None
+
 
 class MarketCommunityLauncher(IPv8CommunityLauncher):
 

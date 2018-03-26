@@ -2,6 +2,7 @@ from random import randint, choice
 
 from Tribler.Core import permid
 from Tribler.pyipv8.ipv8.attestation.trustchain.community import TrustChainCommunity
+from Tribler.pyipv8.ipv8.peerdiscovery.discovery import RandomWalk
 
 from gumby.experiment import experiment_callback
 
@@ -72,3 +73,16 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self._logger.info("%s: Requesting signature from peer: %s" % (self.my_id, peer))
         transaction = {"up": up, "down": down}
         self.overlay.sign_block(peer, peer.public_key.key_to_bin(), transaction)
+
+    @experiment_callback
+    def start_crawler(self):
+        peer = self.overlay.my_peer
+        self.ipv8.unload_overlay(self.overlay)
+
+        crawler_overlay = TrustChainCommunity(peer,
+                                              self.ipv8.endpoint,
+                                              self.ipv8.network,
+                                              working_directory=self.session.config.get_state_dir())
+        crawler_overlay.crawling = True
+        self.ipv8.overlays.append(crawler_overlay)
+        self.ipv8.strategies.append((RandomWalk(crawler_overlay), -1))

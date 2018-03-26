@@ -196,11 +196,27 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         return None
 
     @experiment_callback
-    def introduce_peers(self):
-        # bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
+    def introduce_peers(self, exclude_peers=None):
+        """
+        bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
+        """
+        if not exclude_peers:
+            exclude_peers_list = []
+        else:
+            peers = exclude_peers.split(",")
+            exclude_peers_list = [int(peer) for peer in peers]
+
         for peer_id in self.all_vars.iterkeys():
-            if int(peer_id) != self.my_id:
+            if int(peer_id) != self.my_id and peer_id not in exclude_peers_list:
                 self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
+
+    @experiment_callback
+    def introduce_peer(self, peer_to_introduce_to):
+        """
+        Introduce a peer to another peer.
+        """
+        if int(peer_to_introduce_to) != self.my_id:
+            self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_to_introduce_to))
 
     @experiment_callback
     def write_verified_peers(self):
