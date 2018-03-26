@@ -7,4 +7,5 @@
 @0:70 start_requesting_signatures
 @0:130 stop_requesting_signatures
 @0:140 stop_session
+@0:145 write_verified_peers
 @0:150 stop

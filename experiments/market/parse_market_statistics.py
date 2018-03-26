@@ -69,7 +69,7 @@ class MarketStatisticsParser(object):
     def aggregate_candidate_connections(self):
         candidate_connections = set()
 
-        for peer_nr, filename, dir in self.yield_files(file_to_check='verified_candidates.txt'):
+        for peer_nr, filename, dir in self.yield_files(file_to_check='verified_peers.txt'):
             peer_connections = [line.rstrip('\n') for line in open(filename)]
             for peer_connection in peer_connections:
                 candidate_connections.add((peer_nr, int(peer_connection)))

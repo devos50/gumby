@@ -202,6 +202,15 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             if int(peer_id) != self.my_id:
                 self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
 
+    @experiment_callback
+    def write_verified_peers(self):
+        # Write verified candidates
+        with open('verified_peers.txt', 'w', 0) as peers_file:
+            for peer in self.overlay.network.verified_peers:
+                if peer.address[1] > 15000:
+                    continue
+                peers_file.write('%d\n' % (peer.address[1] - 12000))
+
     def get_peer(self, peer_id):
         target = self.all_vars[peer_id]
         address = (str(target['host']), target['port'])
