@@ -191,7 +191,7 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         # CommunityExperimentModule for each instance of the community_class. However it would be difficult to separate
         # the scenario usage of its @experiment_callbacks, they would have to be dynamically named/generated.
         for overlay in self.ipv8.overlays:
-            if isinstance(overlay, self.community_class):
+            if type(overlay) is self.community_class:
                 return overlay
         return None
 

@@ -13,5 +13,6 @@
 @0:110 start_crawler {101}
 @0:112 introduce_peer 1 {101}
 
-@0:170 stop_session
-@0:180 stop
+@0:710 stop_session
+@0:715 write_crawler_stats {101}
+@0:720 stop

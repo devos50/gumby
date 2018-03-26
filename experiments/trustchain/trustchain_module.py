@@ -1,4 +1,5 @@
 from random import randint, choice
+from time import time
 
 from Tribler.Core import permid
 from Tribler.pyipv8.ipv8.attestation.trustchain.community import TrustChainCommunity
@@ -16,6 +17,9 @@ from twisted.internet.task import LoopingCall
 class TrustchainModule(IPv8OverlayExperimentModule):
     def __init__(self, experiment):
         super(TrustchainModule, self).__init__(experiment, TrustChainCommunity)
+        self.crawler_history = []
+        self.crawler_lc = LoopingCall(self.record_num_blocks_lc)
+        self.crawler_started = 0
         self.request_signatures_lc = LoopingCall(self.request_random_signature)
 
     def on_id_received(self):
@@ -74,6 +78,18 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         transaction = {"up": up, "down": down}
         self.overlay.sign_block(peer, peer.public_key.key_to_bin(), transaction)
 
+    def record_num_blocks_lc(self):
+        if self.overlay:
+            num_blocks = list(self.overlay.persistence.execute("SELECT COUNT(*) FROM blocks;"))[0][0]
+            self.crawler_history.append((time() - self.crawler_started, num_blocks))
+
+    @experiment_callback
+    def write_crawler_stats(self):
+        with open('crawler_blocks.txt', 'w', 0) as stats_file:
+            stats_file.write("time,num_blocks\n")
+            for stats in self.crawler_history:
+                stats_file.write("%s,%d\n" % stats)
+
     @experiment_callback
     def start_crawler(self):
         peer = self.overlay.my_peer
@@ -86,3 +102,5 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         crawler_overlay.crawling = True
         self.ipv8.overlays.append(crawler_overlay)
         self.ipv8.strategies.append((RandomWalk(crawler_overlay), -1))
+        self.crawler_started = time()
+        self.crawler_lc.start(1)
