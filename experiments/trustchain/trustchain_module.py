@@ -44,7 +44,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def request_signature(self, peer_id, up, down):
-        self.request_signature_from_peer(self.get_peer(peer_id), up, down)
+        self.request_signature_from_peer(self.get_peer(peer_id), int(up), int(down))
 
     @experiment_callback
     def request_crawl(self, peer_id, sequence_number):
