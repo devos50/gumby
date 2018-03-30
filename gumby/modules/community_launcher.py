@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 from Tribler.Core.DecentralizedTracking.dht_provider import MainlineDHTProvider
 from Tribler.pyipv8.ipv8.peer import Peer
-from Tribler.pyipv8.ipv8.peerdiscovery.discovery import RandomWalk
+from Tribler.pyipv8.ipv8.peerdiscovery.discovery import RandomWalk, EdgeWalk
 
 
 class CommunityLauncher(object):
@@ -263,7 +263,7 @@ class TriblerChainCommunityLauncher(IPv8CommunityLauncher):
         return {'working_directory': session.config.get_state_dir()}
 
     def get_walk_strategy_class(self):
-        return None
+        return EdgeWalk
 
 
 class TrustChainCommunityLauncher(IPv8CommunityLauncher):
@@ -282,7 +282,7 @@ class TrustChainCommunityLauncher(IPv8CommunityLauncher):
         return {'working_directory': session.config.get_state_dir()}
 
     def get_walk_strategy_class(self):
-        return None
+        return EdgeWalk
 
 
 class MarketCommunityLauncher(IPv8CommunityLauncher):
