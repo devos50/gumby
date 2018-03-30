@@ -2,6 +2,7 @@ from random import randint, choice
 from time import time
 
 from Tribler.Core import permid
+from Tribler.community.triblerchain.community import TriblerChainCommunity
 from Tribler.pyipv8.ipv8.attestation.trustchain.community import TrustChainCommunity
 from Tribler.pyipv8.ipv8.peerdiscovery.discovery import RandomWalk
 
@@ -15,8 +16,8 @@ from twisted.internet.task import LoopingCall
 
 @static_module
 class TrustchainModule(IPv8OverlayExperimentModule):
-    def __init__(self, experiment):
-        super(TrustchainModule, self).__init__(experiment, TrustChainCommunity)
+    def __init__(self, experiment, overlay_class=None):
+        super(TrustchainModule, self).__init__(experiment, overlay_class or TrustChainCommunity)
         self.crawler_history = []
         self.crawler_lc = LoopingCall(self.record_num_blocks_lc)
         self.crawler_started = 0
@@ -26,7 +27,9 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         super(TrustchainModule, self).on_id_received()
         self.tribler_config.set_dispersy_enabled(False)
         self.tribler_config.set_trustchain_enabled(True)
+        self.load_trustchain_key()
 
+    def load_trustchain_key(self):
         # We need the trustchain key at this point. However, the configured session is not started yet. So we generate
         # the keys here and place them in the correct place. When the session starts it will load these keys.
         trustchain_keypair = permid.generate_keypair_trustchain()
@@ -105,3 +108,17 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.ipv8.strategies.append((RandomWalk(crawler_overlay), -1))
         self.crawler_started = time()
         self.crawler_lc.start(1)
+
+
+@static_module
+class TriblerchainModule(TrustchainModule):
+
+    def __init__(self, experiment, overlay_class=None):
+        super(TriblerchainModule, self).__init__(experiment, TriblerChainCommunity)
+
+    def on_id_received(self):
+        super(TriblerchainModule, self).on_id_received()
+        self.tribler_config.set_dispersy_enabled(False)
+        self.tribler_config.set_trustchain_enabled(False)
+        self.tribler_config.set_triblerchain_enabled(True)
+        self.load_trustchain_key()
