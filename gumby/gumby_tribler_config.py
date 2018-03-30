@@ -12,8 +12,17 @@ class GumbyTriblerConfig(TriblerConfig):
 
         self.config['trustchain']['enabled'] = False  # Defaults to false
 
-    def set_trustchain_enabled(self, port):
-        self.config['trustchain']['enabled'] = port
+        self.config['triblerchain'] = {}
+        self.config['triblerchain']['enabled'] = False  # Defaults to false
+
+    def set_trustchain_enabled(self, enabled):
+        self.config['trustchain']['enabled'] = enabled
 
     def get_trustchain_enabled(self):
         return self.config['trustchain']['enabled']
+
+    def set_triblerchain_enabled(self, enabled):
+        self.config['triblerchain']['enabled'] = enabled
+
+    def get_triblerchain_enabled(self):
+        return self.config['triblerchain']['enabled']

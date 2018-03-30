@@ -249,6 +249,9 @@ class TriblerTunnelCommunityLauncher(IPv8CommunityLauncher):
 
 class TriblerChainCommunityLauncher(IPv8CommunityLauncher):
 
+    def should_launch(self, session):
+        return session.config.get_triblerchain_enabled()
+
     def get_overlay_class(self):
         from Tribler.community.triblerchain.community import TriblerChainCommunity
         return TriblerChainCommunity
@@ -256,8 +259,17 @@ class TriblerChainCommunityLauncher(IPv8CommunityLauncher):
     def get_my_peer(self, ipv8, session):
         return Peer(session.trustchain_keypair)
 
+    def get_kwargs(self, session):
+        return {'working_directory': session.config.get_state_dir()}
+
+    def get_walk_strategy_class(self):
+        return None
+
 
 class TrustChainCommunityLauncher(IPv8CommunityLauncher):
+
+    def should_launch(self, session):
+        return session.config.get_trustchain_enabled()
 
     def get_overlay_class(self):
         from Tribler.pyipv8.ipv8.attestation.trustchain.community import TrustChainCommunity

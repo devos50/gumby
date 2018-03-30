@@ -25,6 +25,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
     def on_id_received(self):
         super(TrustchainModule, self).on_id_received()
         self.tribler_config.set_dispersy_enabled(False)
+        self.tribler_config.set_trustchain_enabled(True)
 
         # We need the trustchain key at this point. However, the configured session is not started yet. So we generate
         # the keys here and place them in the correct place. When the session starts it will load these keys.
