@@ -3,12 +3,12 @@
 &module experiments.trustchain.trustchain_module.TriblerchainModule
 
 @0:1 isolate_ipv8_overlay TriblerChainCommunity
-@0:1 start_yappi
+@0:1 start_yappi {1}
 @0:2 start_session
 @0:10 introduce_peers
 @0:30 start_requesting_signatures
 @0:60 stop_requesting_signatures
 @0:98 write_verified_peers
 @0:100 stop_session
-@0:105 stop_yappi
+@0:105 stop_yappi {1}
 @0:110 stop
