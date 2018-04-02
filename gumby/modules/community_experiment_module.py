@@ -1,3 +1,4 @@
+import random
 from time import time
 
 from Tribler.pyipv8.ipv8.peer import Peer
@@ -196,7 +197,7 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         return None
 
     @experiment_callback
-    def introduce_peers(self, exclude_peers=None):
+    def introduce_peers(self, exclude_peers=None, max_to_connect=None):
         """
         bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
         """
@@ -206,7 +207,15 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             peers = exclude_peers.split(",")
             exclude_peers_list = [int(peer) for peer in peers]
 
-        for peer_id in self.all_vars.iterkeys():
+        if not max_to_connect:
+            self._logger.info("Connecting to all available peers!")
+            connect_set = self.all_vars.iterkeys()
+        else:
+            self._logger.info("Connecting to %d random peers!", int(max_to_connect))
+            eligible_set = [peer_id for peer_id in self.all_vars.iterkeys() if (peer_id not in exclude_peers_list and int(peer_id) != self.my_id)]
+            connect_set = random.sample(eligible_set, min(len(eligible_set), int(max_to_connect)))
+
+        for peer_id in connect_set:
             if int(peer_id) != self.my_id and peer_id not in exclude_peers_list:
                 self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
 

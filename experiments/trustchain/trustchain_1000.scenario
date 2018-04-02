@@ -5,7 +5,7 @@
 @0:1 isolate_ipv8_overlay TriblerChainCommunity
 @0:1 start_yappi {1}
 @0:2 start_session
-@0:10 introduce_peers
+@0:10 introduce_peers max_to_connect=10
 @0:30 start_requesting_signatures
 @0:40 stop_requesting_signatures
 @0:98 write_verified_peers
