@@ -86,7 +86,6 @@ reduce_dispersy_statistics.py . 300
 export R_SCRIPTS_TO_RUN="\
 drop.r
 total_records.r
-connections.r
 send_received.r
 send_diff.r
 cputimes.r

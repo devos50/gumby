@@ -10,6 +10,7 @@ from Tribler.community.market.wallet.tc_wallet import TrustchainWallet
 from Tribler.community.triblerchain.community import TriblerChainCommunity
 from Tribler.pyipv8.ipv8.peer import Peer
 from Tribler.pyipv8.ipv8.peerdiscovery.discovery import EdgeWalk
+from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
@@ -33,6 +34,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.tc_community = None
         self.order_id_map = {}
         self.cancelled_orders = set()
+        self.trade_lc = LoopingCall(self.trade_with_random_peer)
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
@@ -40,6 +42,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.tribler_config.set_market_community_enabled(True)
 
         self.ipv8_community_launcher.community_kwargs["working_directory"] = u":memory:"
+        self.ipv8_community_launcher.community_kwargs["is_matchmaker"] = False
 
     @experiment_callback
     def init_trustchain(self):
@@ -81,6 +84,10 @@ class MarketModule(IPv8OverlayExperimentModule):
 
         # Disable tick validation to improve performance
         self.overlay.validate_tick_signatures = False
+
+        if 'NUM_PREVIOUS_BLOCKS' in os.environ:
+            self._logger.info("Setting required blocks to %d", int(os.environ['NUM_PREVIOUS_BLOCKS']))
+            self.overlay.required_previous_blocks = int(os.environ['NUM_PREVIOUS_BLOCKS'])
 
     @experiment_callback
     def init_matchmakers(self):
@@ -129,6 +136,24 @@ class MarketModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def compute_reputation(self):
         self.overlay.compute_reputation()
+
+    @experiment_callback
+    def start_random_trades(self):
+        """
+        Start trading with random nodes
+        """
+        self.trade_lc.start(0.05)
+
+    @experiment_callback
+    def stop_random_trades(self):
+        """
+        Stop trading with random nodes
+        """
+        self.trade_lc.stop()
+
+    def trade_with_random_peer(self):
+        rand_peer = random.choice(self.overlay.network.get_peers_for_service(self.overlay.master_peer.mid))
+        self.overlay.trade(rand_peer)
 
     @experiment_callback
     def write_stats(self):

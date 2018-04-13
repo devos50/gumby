@@ -1,3 +1,4 @@
+import random
 from time import time
 
 from Tribler.pyipv8.ipv8.peer import Peer
@@ -198,7 +199,12 @@ class IPv8OverlayExperimentModule(ExperimentModule):
     @experiment_callback
     def introduce_peers(self):
         # bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
-        for peer_id in self.all_vars.iterkeys():
+        # EXPERIMENT: connect to 10% of all peers
+        total_num_peers = len(self.all_vars.keys())
+        num_pick_peers = int(total_num_peers * 0.1)
+        picked_peers = random.sample(self.all_vars.keys(), num_pick_peers)
+
+        for peer_id in picked_peers:
             if int(peer_id) != self.my_id:
                 self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
 
