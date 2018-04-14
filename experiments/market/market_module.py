@@ -176,9 +176,8 @@ class MarketModule(IPv8OverlayExperimentModule):
                     continue
                 candidates_files.write('%d\n' % (peer.address[1] - 12000))
 
-        # TODO IPv8 has no bandwidth accounting
-        #with open('bandwidth.txt', 'w', 0) as bandwidth_file:
-        #    bandwidth_file.write("%s,%f" % (self.dispersy.statistics.total_up, self.dispersy.statistics.total_down))
+        with open('bandwidth.txt', 'w', 0) as bandwidth_file:
+            bandwidth_file.write("%s,%f" % (self.overlay.endpoint.sent_bytes, self.overlay.endpoint.received_bytes))
 
         # Get statistics about the amount of fulfilled orders (asks/bids)
         fulfilled_asks = 0
