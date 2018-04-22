@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import time
 
 from Tribler.community.market.community import MarketCommunity
 from Tribler.community.market.core.assetamount import AssetAmount
@@ -11,6 +12,8 @@ from Tribler.community.market.core.transaction_manager import TransactionManager
 from Tribler.community.market.core.transaction_repository import MemoryTransactionRepository
 from Tribler.Core.Modules.wallet.dummy_wallet import DummyWallet1, DummyWallet2
 from Tribler.Core.Modules.wallet.tc_wallet import TrustchainWallet
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
@@ -29,6 +32,9 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.num_asks = 0
         self.order_id_map = {}
         self.cancelled_orders = set()
+        self.trade_lc = LoopingCall(self.create_random_order)
+
+        self.create_ask = True
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
@@ -36,6 +42,28 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.tribler_config.set_market_community_enabled(True)
 
         self.ipv8_community_launcher.community_kwargs["working_directory"] = u":memory:"
+
+    @experiment_callback
+    def start_creating_orders(self):
+        """
+        Start trading with random nodes
+        """
+        self._logger.info("Starting with random order creation on %s" % int(round(time.time() * 1000)))
+        self.trade_lc.start(1)
+
+    @experiment_callback
+    def stop_creating_orders(self):
+        """
+        Stop trading with random nodes
+        """
+        self.trade_lc.stop()
+
+    def create_random_order(self):
+        if self.create_ask:
+            self.ask("1", "DUM1", "1", "DUM2")
+        else:
+            self.bid("1", "DUM1", "1", "DUM2")
+        self.create_ask = not self.create_ask
 
     @experiment_callback
     def init_wallets(self):
@@ -69,6 +97,10 @@ class MarketModule(IPv8OverlayExperimentModule):
         if peer_num > int(os.environ['NUM_MATCHMAKERS']):
             self.overlay.disable_matchmaker()
 
+    def connect_to_matchmaker(self, peer_num):
+        self._logger.info("Connecting to matchmaker %d", peer_num)
+        self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_num))
+
     @experiment_callback
     def connect_matchmakers(self, num_to_connect):
         num_total_matchmakers = int(os.environ['NUM_MATCHMAKERS'])
@@ -79,8 +111,7 @@ class MarketModule(IPv8OverlayExperimentModule):
 
         # Send introduction request to matchmakers
         for peer_num in connect:
-            self._logger.info("Connecting to matchmaker %d", peer_num)
-            self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_num))
+            reactor.callLater(random.random() * 15, self.connect_to_matchmaker, peer_num)
 
     def on_order_created(self, order, order_id):
         if order_id and order_id not in self.cancelled_orders:
@@ -168,3 +199,23 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('reputation.log', 'w', 0) as rep_file:
             for peer_id, reputation in self.overlay.reputation_dict.iteritems():
                 rep_file.write("%s,%s\n" % (peer_id.encode('hex'), reputation))
+
+    @experiment_callback
+    def crash(self):
+        # Write created half blocks with timestamp
+        blocks = []
+        for block in self.overlay.persistence.block_cache.values():
+            if block.link_public_key == self.overlay.my_peer.public_key.key_to_bin() and block.link_sequence_number != 0:
+                blocks.append(block)
+
+        with open('full_blocks.txt', 'w', 0) as blocks_file:
+            for block in blocks:
+                blocks_file.write("%s,%s\n" % (block.transaction['type'], block.insert_time))
+
+        # Crash
+        reactor.stop()
+
+    @experiment_callback
+    def stop(self):
+        self._logger.info("Stopping...")
+        reactor.stop()

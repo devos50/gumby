@@ -1,0 +1,26 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module gumby.modules.profile_module.ProfileModule
+&module experiments.market.market_module.MarketModule
+
+@0:0 isolate_ipv8_overlay MarketCommunity
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:5 init_wallets
+@0:5 init_matchmakers
+@0:10 connect_matchmakers 10
+@0:40 annotate start-trading
+@0:40 start_creating_orders
+@0:100.000000 crash {2}
+@0:160.000000 crash {3}
+@0:220.000000 crash {4}
+@0:280.000000 crash {5}
+@0:340.000000 crash {6}
+@0:400.000000 crash {7}
+@0:460.000000 crash {8}
+@0:520.000000 crash {9}
+@0:580.000000 crash {10}
+@0:640.000000 crash {11}
+@0:640 stop_creating_orders
+@0:660 write_stats
+@0:662 stop_session
+@0:665 stop

@@ -114,10 +114,45 @@ class MarketStatisticsParser(StatisticsParser):
                           'total_bid_quantity': int(self.total_bid_quantity)}
             stats_file.write(json.dumps(stats_dict))
 
+    def analyse_blocks(self):
+        blocks = []  # List of timestamps
+        for peer_nr, filename, dir in self.yield_files(file_to_check='full_blocks.txt'):
+            with open(filename) as blocks_file:
+                for line in blocks_file.readlines():
+                    if not line:
+                        continue
+                    parts = line.split(",")
+                    blocks.append(int(parts[1]))
+
+        # Sort the blocks
+        blocks = sorted(blocks)
+
+        # Write them
+        with open("full_blocks.txt", "w") as blocks_file:
+            for block in blocks:
+                blocks_file.write("%d\n" % block)
+
+        # Find the maximum throughput
+        cur_max = -1
+        for start_index in xrange(len(blocks)):
+            start_time = blocks[start_index]
+            cnt = 1
+            cur_index = start_index + 1
+            while cur_index < len(blocks) and blocks[cur_index] - start_time < 1000:
+                cnt += 1
+                cur_index += 1
+
+            if cnt > cur_max:
+                cur_max = cnt
+
+        with open("throughput.txt", "w") as throughput_file:
+            throughput_file.write("%d" % cur_max)
+
     def run(self):
         self.aggregate_transaction_data()
         self.aggregate_order_data()
         self.aggregate_general_stats()
+        self.analyse_blocks()
 
 
 # cd to the output directory

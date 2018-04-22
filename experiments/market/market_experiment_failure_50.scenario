@@ -1,0 +1,66 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module gumby.modules.profile_module.ProfileModule
+&module experiments.market.market_module.MarketModule
+
+@0:0 isolate_ipv8_overlay MarketCommunity
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:5 init_wallets
+@0:5 init_matchmakers
+@0:10 connect_matchmakers 10
+@0:40 annotate start-trading
+@0:40 start_creating_orders
+@0:52 crash {2}
+@0:64 crash {3}
+@0:76 crash {4}
+@0:88 crash {5}
+@0:100 crash {6}
+@0:112 crash {7}
+@0:124 crash {8}
+@0:136 crash {9}
+@0:148 crash {10}
+@0:160 crash {11}
+@0:172 crash {12}
+@0:184 crash {13}
+@0:196 crash {14}
+@0:208 crash {15}
+@0:220 crash {16}
+@0:232 crash {17}
+@0:244 crash {18}
+@0:256 crash {19}
+@0:268 crash {20}
+@0:280 crash {21}
+@0:292 crash {22}
+@0:304 crash {23}
+@0:316 crash {24}
+@0:328 crash {25}
+@0:340 crash {26}
+@0:352 crash {27}
+@0:364 crash {28}
+@0:376 crash {29}
+@0:388 crash {30}
+@0:400 crash {31}
+@0:412 crash {32}
+@0:424 crash {33}
+@0:436 crash {34}
+@0:448 crash {35}
+@0:460 crash {36}
+@0:472 crash {37}
+@0:484 crash {38}
+@0:496 crash {39}
+@0:508 crash {40}
+@0:520 crash {41}
+@0:532 crash {42}
+@0:544 crash {43}
+@0:556 crash {44}
+@0:568 crash {45}
+@0:580 crash {46}
+@0:592 crash {47}
+@0:604 crash {48}
+@0:616 crash {49}
+@0:628 crash {50}
+@0:640 crash {51}
+@0:640 stop_creating_orders
+@0:660 write_stats
+@0:662 stop_session
+@0:665 stop

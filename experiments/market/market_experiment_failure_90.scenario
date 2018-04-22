@@ -1,0 +1,106 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module gumby.modules.profile_module.ProfileModule
+&module experiments.market.market_module.MarketModule
+
+@0:0 isolate_ipv8_overlay MarketCommunity
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:5 init_wallets
+@0:5 init_matchmakers
+@0:10 connect_matchmakers 10
+@0:40 annotate start-trading
+@0:40 start_creating_orders
+@0:46.666667 crash {2}
+@0:53.333333 crash {3}
+@0:60.000000 crash {4}
+@0:66.666667 crash {5}
+@0:73.333333 crash {6}
+@0:80.000000 crash {7}
+@0:86.666667 crash {8}
+@0:93.333333 crash {9}
+@0:100.000000 crash {10}
+@0:106.666667 crash {11}
+@0:113.333333 crash {12}
+@0:120.000000 crash {13}
+@0:126.666667 crash {14}
+@0:133.333333 crash {15}
+@0:140.000000 crash {16}
+@0:146.666667 crash {17}
+@0:153.333333 crash {18}
+@0:160.000000 crash {19}
+@0:166.666667 crash {20}
+@0:173.333333 crash {21}
+@0:180.000000 crash {22}
+@0:186.666667 crash {23}
+@0:193.333333 crash {24}
+@0:200.000000 crash {25}
+@0:206.666667 crash {26}
+@0:213.333333 crash {27}
+@0:220.000000 crash {28}
+@0:226.666667 crash {29}
+@0:233.333333 crash {30}
+@0:240.000000 crash {31}
+@0:246.666667 crash {32}
+@0:253.333333 crash {33}
+@0:260.000000 crash {34}
+@0:266.666667 crash {35}
+@0:273.333333 crash {36}
+@0:280.000000 crash {37}
+@0:286.666667 crash {38}
+@0:293.333333 crash {39}
+@0:300.000000 crash {40}
+@0:306.666667 crash {41}
+@0:313.333333 crash {42}
+@0:320.000000 crash {43}
+@0:326.666667 crash {44}
+@0:333.333333 crash {45}
+@0:340.000000 crash {46}
+@0:346.666667 crash {47}
+@0:353.333333 crash {48}
+@0:360.000000 crash {49}
+@0:366.666667 crash {50}
+@0:373.333333 crash {51}
+@0:380.000000 crash {52}
+@0:386.666667 crash {53}
+@0:393.333333 crash {54}
+@0:400.000000 crash {55}
+@0:406.666667 crash {56}
+@0:413.333333 crash {57}
+@0:420.000000 crash {58}
+@0:426.666667 crash {59}
+@0:433.333333 crash {60}
+@0:440.000000 crash {61}
+@0:446.666667 crash {62}
+@0:453.333333 crash {63}
+@0:460.000000 crash {64}
+@0:466.666667 crash {65}
+@0:473.333333 crash {66}
+@0:480.000000 crash {67}
+@0:486.666667 crash {68}
+@0:493.333333 crash {69}
+@0:500.000000 crash {70}
+@0:506.666667 crash {71}
+@0:513.333333 crash {72}
+@0:520.000000 crash {73}
+@0:526.666667 crash {74}
+@0:533.333333 crash {75}
+@0:540.000000 crash {76}
+@0:546.666667 crash {77}
+@0:553.333333 crash {78}
+@0:560.000000 crash {79}
+@0:566.666667 crash {80}
+@0:573.333333 crash {81}
+@0:580.000000 crash {82}
+@0:586.666667 crash {83}
+@0:593.333333 crash {84}
+@0:600.000000 crash {85}
+@0:606.666667 crash {86}
+@0:613.333333 crash {87}
+@0:620.000000 crash {88}
+@0:626.666667 crash {89}
+@0:633.333333 crash {90}
+@0:640.000000 crash {91}
+@0:640 stop_creating_orders
+@0:660 write_stats
+@0:662 stop_session
+@0:665 stop
