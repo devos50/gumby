@@ -1,0 +1,12 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.waves.waves_module.WavesModule
+
+@0:5 start_waves {1}
+@0:10 start_waves {2}
+@0:30 issue_asset DUM1 {1}
+@0:30 issue_asset DUM2 {1}
+@0:120.1 bid 10 DUM1 10 DUM2 order_id=1234 {1}
+@0:125 cancel 1234 {1}
+@0:150 write_stats
+@0:150 dump_blockchain {1}
+@0:155 stop

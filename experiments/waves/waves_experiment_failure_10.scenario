@@ -1,0 +1,24 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.waves.waves_module.WavesModule
+
+@0:5 start_waves {1}
+@0:10 start_waves {2-100}
+@0:30 issue_asset DUM1 {1}
+@0:30 issue_asset DUM2 {1}
+@0:40 transfer_asset_to_all_peers WAVES {1}
+@0:40 transfer_asset_to_all_peers DUM1 {1}
+@0:40 transfer_asset_to_all_peers DUM2 {1}
+@0:340 start_creating_orders
+@0:400 stop {2}
+@0:460 stop {3}
+@0:520 stop {4}
+@0:580 stop {5}
+@0:640 stop {6}
+@0:700 stop {7}
+@0:760 stop {8}
+@0:820 stop {9}
+@0:880 stop {10}
+@0:940 stop {11}
+@0:940 stop_creating_orders
+@0:1100 write_stats
+@0:1110 stop

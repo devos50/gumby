@@ -39,7 +39,13 @@ class WavesStatisticsParser(object):
                     if not line:
                         continue
                     block = json.loads(line)
-                    block_throughputs.append((block["timestamp"], block["transactionCount"]))
+
+                    order_blocks = 0
+                    for transaction in block["transactions"]:
+                        if transaction["type"] != 4 and transaction["type"] != 3:
+                            order_blocks += 1
+
+                    block_throughputs.append((block["timestamp"], order_blocks))
 
         # Find the maximum throughput per second
         max_throughput = 0
