@@ -249,6 +249,9 @@ class TriblerTunnelCommunityLauncher(IPv8CommunityLauncher):
 
 class TriblerChainCommunityLauncher(IPv8CommunityLauncher):
 
+    def should_launch(self, session):
+        return False
+
     def get_overlay_class(self):
         from Tribler.community.triblerchain.community import TriblerChainCommunity
         return TriblerChainCommunity
@@ -273,7 +276,7 @@ class TrustChainCommunityLauncher(IPv8CommunityLauncher):
 class MarketCommunityLauncher(IPv8CommunityLauncher):
 
     def should_launch(self, session):
-        return session.config.get_market_community_enabled()
+        return False
 
     def get_overlay_class(self):
         from Tribler.community.market.community import MarketCommunity

@@ -1,24 +1,51 @@
 #!/usr/bin/env python2
-"""
-Performs database aggregation after a trustchain experiment.
-"""
 import os
+import re
 import sys
 
-if __name__ == '__main__':
-    # Fix the path
-    sys.path.append(os.environ['PROJECT_DIR'])
-    sys.path.append(os.path.join(os.environ['PROJECT_DIR'], 'tribler'))
-    sys.path.append(os.path.join(os.environ['PROJECT_DIR'], 'gumby', 'experiments', 'trustchain'))
 
-    # Create output dir
-    aggregation_path = os.path.join(os.environ['PROJECT_DIR'], 'output', 'sqlite')
-    if not os.path.exists(aggregation_path):
-        os.makedirs(aggregation_path)
+class TrustchainStatisticsParser(object):
+    """
+    This class is responsible for parsing statistics of the trustchain community
+    """
 
-    from database_reader import GumbyDatabaseAggregator
+    def __init__(self, node_directory):
+        self.node_directory = node_directory
 
-    data = GumbyDatabaseAggregator(os.path.join(os.environ['PROJECT_DIR'], 'output'))
-    data.combine_databases()
-    data.generate_block_file()
-    data.database.close()
+    def yield_files(self, file_to_check='market_stats.log'):
+        pattern = re.compile('[0-9]+')
+        for headnode in os.listdir(self.node_directory):
+            headdir = os.path.join(self.node_directory, headnode)
+            if os.path.isdir(headdir):
+                for node in os.listdir(headdir):
+                    nodedir = os.path.join(self.node_directory, headnode, node)
+                    if os.path.isdir(nodedir):
+                        for peer in os.listdir(nodedir):
+                            peerdir = os.path.join(self.node_directory, headnode, node, peer)
+                            if os.path.isdir(peerdir) and pattern.match(peer):
+                                peer_nr = int(peer)
+
+                                filename = os.path.join(self.node_directory, headnode, node, peer, file_to_check)
+                                if os.path.exists(filename):
+                                    yield peer_nr, filename, peerdir
+
+    def parse_fraud_times(self):
+        lowest_time = 100000000
+        for peer_nr, filename, dir in self.yield_files(file_to_check='detection_time.txt'):
+            with open(filename) as detect_time_file:
+                detect_time = int(detect_time_file.read().rstrip('\n'))
+                if detect_time < lowest_time:
+                    lowest_time = detect_time
+
+        with open("detect_time.txt", "w") as detect_time_file:
+            detect_time_file.write("%d" % lowest_time)
+
+    def run(self):
+        self.parse_fraud_times()
+
+
+# cd to the output directory
+os.chdir(os.environ['OUTPUT_DIR'])
+
+parser = TrustchainStatisticsParser(sys.argv[1])
+parser.run()
