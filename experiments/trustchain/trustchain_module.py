@@ -23,6 +23,11 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.peers_to_crawl = []
         self.crawl_start_time = None
 
+        self.crawl_lc = None
+        self.transact_lc = LoopingCall(self.do_transact)
+        self.has_first_tx = False
+        self.has_attacked = False
+
     def on_id_received(self):
         super(TrustchainModule, self).on_id_received()
         self.tribler_config.set_dispersy_enabled(False)
@@ -87,34 +92,67 @@ class TrustchainModule(IPv8OverlayExperimentModule):
             next_nr = (next_nr + 1) % total_peers
         return next_nr
 
+    def do_transact(self):
+        total_peers = len(self.all_vars.keys())
+        rand_peer_id = randint(1, total_peers)
+        self._logger.info("Will do transaction with peer %d", rand_peer_id)
+        peer = self.get_peer(str(rand_peer_id))  # Since cur_peer is 0-based
+
+        # Should we double spend?
+        double_spend = False
+        if self.experiment.scenario_runner._peernumber == len(
+                self.all_vars.keys()) and self.has_first_tx and random() <= 0.2 and not self.has_attacked:
+            self._logger.info("Doing double spend!")
+            double_spend = True
+            self.has_attacked = True
+
+            # Write it away
+            with open("fraud_time.txt", "w") as out:
+                out.write("%d" % int(round(time.time() * 1000)))
+
+        self.request_signature_from_peer(peer, 10, 10, double_spend=double_spend)
+        self.has_first_tx = True
+
+    @experiment_callback
+    def start_transactions(self, tx_rate):
+        tx_rate = float(tx_rate)
+        total_peers = len(self.all_vars.keys())
+
+        def do_crawl():
+            rand_peer_id = randint(1, total_peers)
+            peer = self.get_peer(str(rand_peer_id))
+
+            # Find the lowest unknown sequence number
+            cur_seq = 1
+            while True:
+                if (peer.public_key.key_to_bin(), cur_seq) not in self.overlay.persistence.block_cache:
+                    break
+                cur_seq += 1
+
+            self._logger.info("Will requests blocks of peer %s (seq: %d)", rand_peer_id, cur_seq)
+            self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), sequence_number=cur_seq)
+
+        # Start crawling
+        self.crawl_lc = LoopingCall(do_crawl)
+        crawl_interval = int(os.environ['CRAWL_FREQ'])
+        self.crawl_lc.start(1.0 / float(crawl_interval))
+
+        # Start making transactions
+        tx_interval = float(total_peers) / tx_rate
+        self._logger.info("Tx interval: %f", tx_interval)
+
+        def start_transact():
+            self._logger.info("Starting to transact with interval %f", tx_interval)
+            self.transact_lc.start(tx_interval)
+
+        # Wait a small period to align transaction creation
+        wait_period = tx_interval / float(total_peers) * self.experiment.scenario_runner._peernumber
+        self._logger.info("Waiting for %f seconds before transacting...", wait_period)
+        deferLater(reactor, wait_period, start_transact)
+
     @experiment_callback
     def init_trustchain(self):
         self.overlay._use_main_thread = True
-
-    @experiment_callback
-    def create_blocks(self):
-        """
-        Create a number of blocks by initiating transactions with other peers in the network.
-        """
-        transactions_per_peer = int(os.environ['NUM_TX_IND'])
-
-        @inlineCallbacks
-        def create_blocks_inner():
-            yield deferLater(reactor, random(), lambda: None)  # Wait a random interval
-            total_peers = len(self.all_vars.keys())
-            cur_peer = self.experiment.scenario_runner._peernumber % total_peers  # 0-based
-            for ind in xrange(transactions_per_peer):
-                peer = self.get_peer(str(cur_peer + 1))  # Since cur_peer is 0-based
-
-                # Should we double spend?
-                double_spend = False
-                if self.experiment.scenario_runner._peernumber == len(self.all_vars.keys()) and ind == transactions_per_peer / 2:
-                    double_spend = True
-
-                yield self.request_signature_from_peer(peer, 10, 10, double_spend=double_spend)
-                cur_peer = self.get_next_peer_nr(cur_peer)
-
-        create_blocks_inner()
 
     @experiment_callback
     def crawl_blocks(self):

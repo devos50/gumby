@@ -30,15 +30,22 @@ class TrustchainStatisticsParser(object):
                                     yield peer_nr, filename, peerdir
 
     def parse_fraud_times(self):
-        lowest_time = 100000000
+        lowest_time = 2525451299248
         for peer_nr, filename, dir in self.yield_files(file_to_check='detection_time.txt'):
             with open(filename) as detect_time_file:
                 detect_time = int(detect_time_file.read().rstrip('\n'))
                 if detect_time < lowest_time:
                     lowest_time = detect_time
 
-        with open("detect_time.txt", "w") as detect_time_file:
-            detect_time_file.write("%d" % lowest_time)
+        fraud_time = -1
+        for peer_nr, filename, dir in self.yield_files(file_to_check='fraud_time.txt'):
+            with open(filename) as detect_time_file:
+                fraud_time = int(detect_time_file.read().rstrip('\n'))
+                break
+
+        if fraud_time != -1:
+            with open("detect_time.txt", "w") as detect_time_file:
+                detect_time_file.write("%d" % (lowest_time - fraud_time))
 
     def run(self):
         self.parse_fraud_times()
