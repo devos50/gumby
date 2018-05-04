@@ -39,6 +39,7 @@ class WavesModule(ExperimentModule):
         self.start_restapi_port = 27000
 
         self.order_id_map = {}
+        self.created_orders = []
         self.cancelled_orders = set()
         self.account_info = None
         self.waves_process = None
@@ -143,6 +144,10 @@ class WavesModule(ExperimentModule):
             connected_peers = requests.get("http://localhost:%d/peers/connected" % (network_port)).json()
             peers_file.write(json.dumps(connected_peers))
 
+        with open("created_orders.txt", "w") as created_orders_file:
+            for order_tup in self.created_orders:
+                created_orders_file.write("%s,%s\n" % (order_tup[0], order_tup[1]))
+
         # If we're the last node, dump the blockchain
         if len(self.experiment.get_peers()) == self.experiment.scenario_runner._peernumber:
             self.dump_blockchain()
@@ -216,46 +221,47 @@ class WavesModule(ExperimentModule):
                 receive_asset_id = balance_dict['assetId']
 
         print "Trading %s against %s" % (spend_asset_id, receive_asset_id)
-        asset1 = pywaves.Asset(str(spend_asset_id))
-        asset2 = pywaves.Asset(str(receive_asset_id))
-        pair = pywaves.AssetPair(asset1, asset2)
 
-        if order_type == "ask":
-            order = my_address.buy(assetPair=pair, amount=int(amount), price=int(price) * 100, maxLifetime=20 * 86400)
-        else:
-            order = my_address.sell(assetPair=pair, amount=int(amount), price=int(price) * 100, maxLifetime=20 * 86400)
-        return order
+        # if order_type == "ask":
+        #     order = my_address.buy(assetPair=pair, amount=int(amount), price=int(price) * 100, maxLifetime=20 * 86400)
+        # else:
+        #     order = my_address.sell(assetPair=pair, amount=int(amount), price=int(price) * 100, maxLifetime=20 * 86400)
+        # return order
 
-        # amount_asset = spend_asset_id if spend_asset_id < receive_asset_id else receive_asset_id
-        # price_asset = receive_asset_id if spend_asset_id < receive_asset_id else spend_asset_id
-        # print "Amount asset %s against price asset %s" % (amount_asset, price_asset)
-        #
-        # data = {
-        #     "senderPublicKey": self.account_info['pub_key'],
-        #     "matcherPublicKey": self.matcher_account_info['pub_key'],
-        #     "matcherFee": matcher_fee,
-        #     "expiration": max_timestamp,
-        #     "orderType": 'sell' if order_type == 'ask' else 'buy',
-        #     "amount": int(amount),
-        #     "timestamp": int(round(time.time() * 1000)),
-        #     "price": int(price) * 100000000,
-        #     "assetPair": {
-        #         "amountAsset": price_asset,
-        #         "priceAsset": amount_asset,
-        #     }
-        # }
-        #
-        # # Sign the order
-        # sign_response = requests.post("http://localhost:%d/assets/order" % network_port,
-        #                               headers={'api_key': 'test'}, json=data).json()
-        # print "Got order sign response: %s" % sign_response
-        #
-        # # Post the order
-        # matcher_peer = self.experiment.get_peer_ip_port_by_id(self.picked_matcher_num)
-        # response = requests.post("http://%s:%d/matcher/orderbook" % (matcher_peer[0], self.start_matcher_port + self.picked_matcher_num),
-        #                          json=sign_response).json()
-        # print "Got order post response: %s" % response
-        # return response
+        amount_asset = spend_asset_id if spend_asset_id < receive_asset_id else receive_asset_id
+        price_asset = receive_asset_id if spend_asset_id < receive_asset_id else spend_asset_id
+        print "Amount asset %s against price asset %s" % (amount_asset, price_asset)
+
+        data = {
+            "senderPublicKey": self.account_info['pub_key'],
+            "matcherPublicKey": self.matcher_account_info['pub_key'],
+            "matcherFee": matcher_fee,
+            "expiration": max_timestamp,
+            "orderType": 'sell' if order_type == 'ask' else 'buy',
+            "amount": int(amount),
+            "timestamp": int(round(time.time() * 1000)),
+            "price": int(price) * 100000000,
+            "assetPair": {
+                "amountAsset": price_asset,
+                "priceAsset": amount_asset,
+            }
+        }
+
+        # Sign the order
+        sign_response = requests.post("http://localhost:%d/assets/order" % network_port,
+                                      headers={'api_key': 'test'}, json=data).json()
+        print "Got order sign response: %s" % sign_response
+
+        # Post the order
+        matcher_peer = self.experiment.get_peer_ip_port_by_id(self.picked_matcher_num)
+        response = requests.post("http://%s:%d/matcher/orderbook" % (matcher_peer[0], self.start_matcher_port + self.picked_matcher_num),
+                                 json=sign_response).json()
+        print "Got order post response: %s" % response
+
+        # Store order
+        self.created_orders.append((response["message"]["timestamp"], response["message"]["signature"]))
+
+        return response
 
     @experiment_callback
     def start_creating_orders(self):
@@ -283,15 +289,15 @@ class WavesModule(ExperimentModule):
     def ask(self, price, price_type, quantity, quantity_type, order_id=None):
         response = self.post_order('ask', price_type, quantity_type, price, quantity)
 
-        if order_id and order_id not in self.cancelled_orders:
-            self.order_id_map[order_id] = response
+        #if order_id and order_id not in self.cancelled_orders:
+        #    self.order_id_map[order_id] = response
 
     @experiment_callback
     def bid(self, price, price_type, quantity, quantity_type, order_id=None):
         response = self.post_order('bid', price_type, quantity_type, price, quantity)
 
-        if order_id and order_id not in self.cancelled_orders:
-            self.order_id_map[order_id] = response
+        #if order_id and order_id not in self.cancelled_orders:
+        #    self.order_id_map[order_id] = response
 
     @experiment_callback
     def cancel(self, order_id):
