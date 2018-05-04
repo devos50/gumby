@@ -215,7 +215,7 @@ class ResourceMonitor(object):
 
 class ProcessMonitor(object):
 
-    def __init__(self, commands, timeout, interval, output_dir=None, monitor_dir=None, network=False):
+    def __init__(self, commands, timeout, interval, output_dir=None, monitor_dir=None, network=True):
         self.start_time = time()
         self.timed_out = False
         self.end_time = self.start_time + timeout if timeout else 0  # Do not time out if time_limit is 0.
@@ -401,7 +401,7 @@ if __name__ == "__main__":
                       )
     parser.add_option("-n", "--network",
                       action="store_true",
-                      default=False,
+                      default=True,
                       help="Monitor network devices."
                       )
     (options, args) = parser.parse_args()
