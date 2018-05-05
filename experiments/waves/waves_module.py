@@ -12,6 +12,7 @@ import requests
 import time
 
 import sha3
+import signal
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
 import pywaves
@@ -122,6 +123,12 @@ class WavesModule(ExperimentModule):
         matcher_url = "http://%s:%d" % (matcher_peer[0], self.start_matcher_port + self.picked_matcher_num)
         pywaves.MATCHER = matcher_url
         pywaves.MATCHER_PUBLICKEY = self.matcher_account_info['pub_key']
+
+    @experiment_callback
+    def stop_waves(self):
+        pid = self.waves_process.pid
+        print "Killing process %s..." % pid
+        os.kill(pid, signal.SIGINT)
 
     @experiment_callback
     def write_stats(self):

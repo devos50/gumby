@@ -11,4 +11,4 @@
 @0:340 start_creating_orders
 @0:640 stop_creating_orders
 @0:1000 write_stats
-@0:1010 stop
+@0:1010 stop_waves

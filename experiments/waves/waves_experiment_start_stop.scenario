@@ -1,0 +1,6 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.waves.waves_module.WavesModule
+
+@0:5 start_waves {1}
+@0:10 start_waves {2-1000}
+@0:40 stop_waves
