@@ -1,0 +1,64 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.waves.waves_module.WavesModule
+
+@0:5 start_waves {1}
+@0:10 start_waves {2-100}
+@0:30 issue_asset DUM1 {1}
+@0:30 issue_asset DUM2 {1}
+@0:40 transfer_asset_to_all_peers WAVES {1}
+@0:40 transfer_asset_to_all_peers DUM1 {1}
+@0:40 transfer_asset_to_all_peers DUM2 {1}
+@0:340 start_creating_orders
+@0:352 stop {2}
+@0:364 stop {3}
+@0:376 stop {4}
+@0:388 stop {5}
+@0:400 stop {6}
+@0:412 stop {7}
+@0:424 stop {8}
+@0:436 stop {9}
+@0:448 stop {10}
+@0:460 stop {11}
+@0:472 stop {12}
+@0:484 stop {13}
+@0:496 stop {14}
+@0:508 stop {15}
+@0:520 stop {16}
+@0:532 stop {17}
+@0:544 stop {18}
+@0:556 stop {19}
+@0:568 stop {20}
+@0:580 stop {21}
+@0:592 stop {22}
+@0:604 stop {23}
+@0:616 stop {24}
+@0:628 stop {25}
+@0:640 stop {26}
+@0:652 stop {27}
+@0:664 stop {28}
+@0:676 stop {29}
+@0:688 stop {30}
+@0:700 stop {31}
+@0:712 stop {32}
+@0:724 stop {33}
+@0:736 stop {34}
+@0:748 stop {35}
+@0:760 stop {36}
+@0:772 stop {37}
+@0:784 stop {38}
+@0:796 stop {39}
+@0:808 stop {40}
+@0:820 stop {41}
+@0:832 stop {42}
+@0:844 stop {43}
+@0:856 stop {44}
+@0:868 stop {45}
+@0:880 stop {46}
+@0:892 stop {47}
+@0:904 stop {48}
+@0:916 stop {49}
+@0:928 stop {50}
+@0:940 stop {51}
+@0:940 stop_creating_orders
+@0:1100 write_stats
+@0:1110 stop
