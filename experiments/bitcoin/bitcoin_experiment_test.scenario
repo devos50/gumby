@@ -1,0 +1,11 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.bitcoin.bitcoin_module.BitcoinModule
+
+@0:5 start_bitcoin {1}
+@0:10 setup_rpc {1}
+@0:12 generate_blocks 2000 {1}
+@0:10 start_bitcoin {2}
+@0:15 setup_rpc {2}
+@0:28 write_stats
+@0:30 stop_bitcoin
+@0:35 stop
