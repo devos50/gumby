@@ -1,0 +1,25 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.bitshares.bitshares_module.BitsharesModule
+
+@0:5 start_bitshares {1}
+@0:8 start_bitshares {2-100}
+@0:70 start_cli_wallet
+@0:75 unlock_cli_wallet
+@0:80 init_nathan {1}
+@0:150 transfer_asset_to_all_peers DUM1 {1}
+@0:150 transfer_asset_to_all_peers DUM2 {1}
+@0:150 transfer_asset_to_all_peers BTS {1}
+@0:180 start_creating_orders
+@0:240 stop {2}
+@0:300 stop {3}
+@0:360 stop {4}
+@0:420 stop {5}
+@0:480 stop {6}
+@0:540 stop {7}
+@0:600 stop {8}
+@0:660 stop {9}
+@0:720 stop {10}
+@0:780 stop {11}
+@0:780 stop_creating_orders
+@0:900 write_stats
+@0:920 stop

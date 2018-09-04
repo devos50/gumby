@@ -1,0 +1,12 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.bitshares.bitshares_module.BitsharesModule
+
+@0:5 start_bitshares {1-1000}
+@0:70 start_cli_wallet
+@0:75 unlock_cli_wallet
+@0:80 init_nathan {1}
+@0:150 transfer_asset_to_all_peers DUM1 {1}
+@0:150 transfer_asset_to_all_peers DUM2 {1}
+@0:150 transfer_asset_to_all_peers BTS {1}
+@0:200 write_stats
+@0:210 stop

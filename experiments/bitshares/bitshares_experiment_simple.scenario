@@ -1,0 +1,55 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.bitshares.bitshares_module.BitsharesModule
+
+@0:5 start_bitshares {1}
+@0:60 start_bitshares {2-40}
+@0:70 start_cli_wallet
+@0:75 unlock_cli_wallet
+@0:80 init_nathan {1}
+@0:120 create_account
+@0:150 transfer_asset_to_all_peers DUM1 {1}
+@0:150 transfer_asset_to_all_peers DUM2 {1}
+@0:150 transfer_asset_to_all_peers BTS {1}
+@0:170.1 bid 10 DUM1 10 DUM2 {1}
+@0:170.2 bid 10 DUM1 10 DUM2 {2}
+@0:170.3 bid 10 DUM1 10 DUM2 {3}
+@0:170.4 bid 10 DUM1 10 DUM2 {4}
+@0:170.5 bid 10 DUM1 10 DUM2 {5}
+@0:170.6 bid 10 DUM1 10 DUM2 {6}
+@0:170.7 bid 10 DUM1 10 DUM2 {7}
+@0:170.8 bid 10 DUM1 10 DUM2 {8}
+@0:170.9 bid 10 DUM1 10 DUM2 {9}
+@0:171.0 bid 10 DUM1 10 DUM2 {10}
+@0:171.1 bid 10 DUM1 10 DUM2 {11}
+@0:171.2 bid 10 DUM1 10 DUM2 {12}
+@0:171.3 bid 10 DUM1 10 DUM2 {13}
+@0:171.4 bid 10 DUM1 10 DUM2 {14}
+@0:171.5 bid 10 DUM1 10 DUM2 {15}
+@0:171.6 bid 10 DUM1 10 DUM2 {16}
+@0:171.7 bid 10 DUM1 10 DUM2 {17}
+@0:171.8 bid 10 DUM1 10 DUM2 {18}
+@0:171.9 bid 10 DUM1 10 DUM2 {19}
+@0:172.0 bid 10 DUM1 10 DUM2 {20}
+@0:172.1 ask 10 DUM1 10 DUM2 {21}
+@0:172.2 ask 10 DUM1 10 DUM2 {22}
+@0:172.3 ask 10 DUM1 10 DUM2 {23}
+@0:172.4 ask 10 DUM1 10 DUM2 {24}
+@0:172.5 ask 10 DUM1 10 DUM2 {25}
+@0:172.6 ask 10 DUM1 10 DUM2 {26}
+@0:172.7 ask 10 DUM1 10 DUM2 {27}
+@0:172.8 ask 10 DUM1 10 DUM2 {28}
+@0:172.9 ask 10 DUM1 10 DUM2 {29}
+@0:173.0 ask 10 DUM1 10 DUM2 {30}
+@0:173.1 ask 10 DUM1 10 DUM2 {31}
+@0:173.2 ask 10 DUM1 10 DUM2 {32}
+@0:173.3 ask 10 DUM1 10 DUM2 {33}
+@0:173.4 ask 10 DUM1 10 DUM2 {34}
+@0:173.5 ask 10 DUM1 10 DUM2 {35}
+@0:173.6 ask 10 DUM1 10 DUM2 {36}
+@0:173.7 ask 10 DUM1 10 DUM2 {37}
+@0:173.8 ask 10 DUM1 10 DUM2 {38}
+@0:173.9 ask 10 DUM1 10 DUM2 {39}
+@0:174.0 ask 10 DUM1 10 DUM2 {40}
+@0:190 write_stats
+@0:190 dump_blockchain {1}
+@0:200 stop
