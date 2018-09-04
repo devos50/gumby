@@ -169,15 +169,15 @@ def setupLogging():
 
     # Wipe out any existing handlers
     for handler in root.handlers:
-        print "WARNING! handler present before when calling setupLogging, removing handler: %s" % handler.name
+        print("WARNING! handler present before when calling setupLogging, removing handler: %s" % handler.name)
         root.removeHandler(handler)
 
     if path.exists(config_file):
-        print "Found a logger.conf, using it."
+        print("Found a logger.conf, using it.")
         stdout.flush()
         logging.config.fileConfig(config_file)
     else:
-        print "No logger.conf found."
+        print("No logger.conf found.")
         stdout.flush()
 
         root.setLevel(log_level)
