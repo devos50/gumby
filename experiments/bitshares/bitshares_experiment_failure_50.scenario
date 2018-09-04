@@ -1,0 +1,65 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.bitshares.bitshares_module.BitsharesModule
+
+@0:5 start_bitshares {1}
+@0:8 start_bitshares {2-100}
+@0:70 start_cli_wallet
+@0:75 unlock_cli_wallet
+@0:80 init_nathan {1}
+@0:150 transfer_asset_to_all_peers DUM1 {1}
+@0:150 transfer_asset_to_all_peers DUM2 {1}
+@0:150 transfer_asset_to_all_peers BTS {1}
+@0:180 start_creating_orders
+@0:192 stop {2}
+@0:204 stop {3}
+@0:216 stop {4}
+@0:228 stop {5}
+@0:240 stop {6}
+@0:252 stop {7}
+@0:264 stop {8}
+@0:276 stop {9}
+@0:288 stop {10}
+@0:300 stop {11}
+@0:312 stop {12}
+@0:324 stop {13}
+@0:336 stop {14}
+@0:348 stop {15}
+@0:360 stop {16}
+@0:372 stop {17}
+@0:384 stop {18}
+@0:396 stop {19}
+@0:408 stop {20}
+@0:420 stop {21}
+@0:432 stop {22}
+@0:444 stop {23}
+@0:456 stop {24}
+@0:468 stop {25}
+@0:480 stop {26}
+@0:492 stop {27}
+@0:504 stop {28}
+@0:516 stop {29}
+@0:528 stop {30}
+@0:540 stop {31}
+@0:552 stop {32}
+@0:564 stop {33}
+@0:576 stop {34}
+@0:588 stop {35}
+@0:600 stop {36}
+@0:612 stop {37}
+@0:624 stop {38}
+@0:636 stop {39}
+@0:648 stop {40}
+@0:660 stop {41}
+@0:672 stop {42}
+@0:684 stop {43}
+@0:696 stop {44}
+@0:708 stop {45}
+@0:720 stop {46}
+@0:732 stop {47}
+@0:744 stop {48}
+@0:756 stop {49}
+@0:768 stop {50}
+@0:780 stop {51}
+@0:780 stop_creating_orders
+@0:900 write_stats
+@0:920 stop
