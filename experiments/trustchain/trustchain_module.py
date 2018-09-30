@@ -132,3 +132,5 @@ class TrustchainModule(IPv8OverlayExperimentModule, BlockListener):
         with open('trustchain.txt', 'w', 0) as trustchain_file:
             wallet = TrustchainWallet(self.overlay)
             trustchain_file.write(json.dumps(wallet.get_statistics()))
+
+        self._logger.info("TIME SPENT IN ADD: %f", self.overlay.persistence.total_time_in_adding)
