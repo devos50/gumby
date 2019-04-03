@@ -11,13 +11,12 @@
 @0:3 enable_trustchain_memory_db
 @0:5 init_wallets
 @0:5 init_matchmakers
+@0:6 init_trader_lookup_table
 @0:10 connect_matchmakers 10
-@0:10 introduce_peers_dht
-@0:20 do_dht_announce
-@0:40 annotate start-trading
-@0:40 start_creating_orders 10 10
-@0:100 stop_creating_orders
-@0:107 stop_yappi {1}
-@0:108 write_stats
-@0:110 stop_session
-@0:120 stop
+@0:20 annotate start-trading
+@0:20 start_creating_orders 10 10
+@0:80 stop_creating_orders
+@0:87 stop_yappi {1}
+@0:88 write_stats
+@0:90 stop_session
+@0:100 stop

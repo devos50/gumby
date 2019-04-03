@@ -6,10 +6,7 @@ import time
 from Tribler.community.market.community import MarketCommunity
 from Tribler.community.market.core.assetamount import AssetAmount
 from Tribler.community.market.core.assetpair import AssetPair
-from Tribler.community.market.core.order_manager import OrderManager
-from Tribler.community.market.core.order_repository import MemoryOrderRepository
-from Tribler.community.market.core.transaction_manager import TransactionManager
-from Tribler.community.market.core.transaction_repository import MemoryTransactionRepository
+from Tribler.community.market.core.message import TraderId
 from Tribler.Core.Modules.wallet.dummy_wallet import DummyWallet1, DummyWallet2
 from Tribler.Core.Modules.wallet.tc_wallet import TrustchainWallet
 from twisted.internet.task import LoopingCall
@@ -105,6 +102,16 @@ class MarketModule(IPv8OverlayExperimentModule):
         for peer_num in connect:
             self._logger.info("Connecting to matchmaker %d", peer_num)
             self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_num))
+
+    @experiment_callback
+    def init_trader_lookup_table(self):
+        """
+        Initialize the lookup table for all traders so we do not have to use the DHT.
+        """
+        for peer_id in self.all_vars.iterkeys():
+            peer = self.get_peer(peer_id)
+            host = self.experiment.get_peer_ip_port_by_id(peer_id)
+            self.overlay.update_ip(TraderId(peer.mid), host)
 
     @experiment_callback
     def ask(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
