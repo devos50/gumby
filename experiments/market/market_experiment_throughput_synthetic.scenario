@@ -1,0 +1,23 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module gumby.modules.profile_module.ProfileModule
+&module experiments.market.market_module.MarketModule
+&module experiments.dht.dht_module.DHTModule
+
+@0:0 isolate_ipv8_overlay DHTDiscoveryCommunity
+@0:0 isolate_ipv8_overlay MarketCommunity
+@0:1 start_yappi {1}
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:3 enable_trustchain_memory_db
+@0:5 init_wallets
+@0:5 init_matchmakers
+@0:10 connect_matchmakers 10
+@0:10 introduce_peers_dht
+@0:20 do_dht_announce
+@0:40 annotate start-trading
+@0:40 start_creating_orders 10 10
+@0:100 stop_creating_orders
+@0:107 stop_yappi {1}
+@0:108 write_stats
+@0:110 stop_session
+@0:120 stop
