@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import time
 
 from Tribler.community.market.community import MarketCommunity
 from Tribler.community.market.core.assetamount import AssetAmount
@@ -11,6 +12,7 @@ from Tribler.community.market.core.transaction_manager import TransactionManager
 from Tribler.community.market.core.transaction_repository import MemoryTransactionRepository
 from Tribler.Core.Modules.wallet.dummy_wallet import DummyWallet1, DummyWallet2
 from Tribler.Core.Modules.wallet.tc_wallet import TrustchainWallet
+from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
@@ -28,6 +30,8 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.num_bids = 0
         self.num_asks = 0
         self.order_id_map = {}
+        self.trade_lc = None
+        self.create_ask = True  # Toggles between true/false when creating random orders
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
@@ -69,6 +73,29 @@ class MarketModule(IPv8OverlayExperimentModule):
         peer_num = self.experiment.scenario_runner._peernumber
         if peer_num > int(os.environ['NUM_MATCHMAKERS']):
             self.overlay.disable_matchmaker()
+
+    @experiment_callback
+    def start_creating_orders(self, asset1_amount, asset2_amount):
+        """
+        Start trading with random nodes
+        """
+        self._logger.info("Starting with random order creation on %s" % int(round(time.time() * 1000)))
+        self.trade_lc = LoopingCall(self.create_random_order, asset1_amount, asset2_amount)
+        self.trade_lc.start(1)
+
+    @experiment_callback
+    def stop_creating_orders(self):
+        """
+        Stop trading with random nodes
+        """
+        self.trade_lc.stop()
+
+    def create_random_order(self, asset1_amount, asset2_amount):
+        if self.create_ask:
+            self.ask(asset1_amount, "DUM1", asset2_amount, "DUM2")
+        else:
+            self.bid(asset1_amount, "DUM1", asset2_amount, "DUM2")
+        self.create_ask = not self.create_ask
 
     @experiment_callback
     def connect_matchmakers(self, num_to_connect):
