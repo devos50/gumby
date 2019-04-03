@@ -218,6 +218,7 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
         kwargs = super(MarketCommunityLauncher, self).get_kwargs(session)
         kwargs['trustchain'] = session.lm.trustchain_community
         kwargs['dht'] = session.lm.dht_community
+        kwargs['use_database'] = False
         return kwargs
 
 

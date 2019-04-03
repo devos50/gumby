@@ -61,10 +61,6 @@ class MarketModule(IPv8OverlayExperimentModule):
         tc_wallet.check_negative_balance = False
         self.overlay.wallets[tc_wallet.get_identifier()] = tc_wallet
 
-        # We use a memory repository in the market community
-        self.overlay.order_manager = OrderManager(MemoryOrderRepository(self.overlay.mid))
-        self.overlay.transaction_manager = TransactionManager(MemoryTransactionRepository(self.overlay.mid))
-
         # Disable incremental payments
         self.overlay.use_incremental_payments = False
 
