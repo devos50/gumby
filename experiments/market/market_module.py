@@ -199,3 +199,8 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('reputation.log', 'w', 0) as rep_file:
             for peer_id, reputation in self.overlay.reputation_dict.iteritems():
                 rep_file.write("%s,%s\n" % (peer_id.encode('hex'), reputation))
+
+        # Write mid register
+        with open('mid_register.log', 'w', 0) as mid_file:
+            for trader_id, host in self.overlay.mid_register.iteritems():
+                mid_file.write("%s,%s\n" % (trader_id.as_hex(), "%s:%d" % host))
