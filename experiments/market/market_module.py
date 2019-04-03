@@ -69,13 +69,13 @@ class MarketModule(IPv8OverlayExperimentModule):
             self.overlay.disable_matchmaker()
 
     @experiment_callback
-    def start_creating_orders(self, asset1_amount, asset2_amount):
+    def start_creating_orders(self, interval, asset1_amount, asset2_amount):
         """
         Start trading with random nodes
         """
         self._logger.info("Starting with random order creation on %s" % int(round(time.time() * 1000)))
         self.trade_lc = LoopingCall(self.create_random_order, asset1_amount, asset2_amount)
-        self.trade_lc.start(1)
+        self.trade_lc.start(int(interval))
 
     @experiment_callback
     def stop_creating_orders(self):
