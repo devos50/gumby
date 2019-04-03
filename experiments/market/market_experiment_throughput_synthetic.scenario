@@ -5,10 +5,10 @@
 
 @0:0 isolate_ipv8_overlay DHTDiscoveryCommunity
 @0:0 isolate_ipv8_overlay MarketCommunity
+@0:0 enable_trustchain_memory_db
 @0:1 start_yappi {1}
 @0:1 start_session
 @0:1 annotate start-experiment
-@0:3 enable_trustchain_memory_db
 @0:5 init_wallets
 @0:5 init_matchmakers
 @0:6 init_trader_lookup_table
