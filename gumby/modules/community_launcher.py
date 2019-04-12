@@ -1,9 +1,11 @@
+import hashlib
 from abc import ABCMeta, abstractmethod
 
 from Tribler.Core.Modules.wallet.tc_wallet import TrustchainWallet
 from Tribler.pyipv8.ipv8.dht.provider import DHTCommunityProvider
 from Tribler.pyipv8.ipv8.peer import Peer
 from Tribler.pyipv8.ipv8.peerdiscovery.discovery import RandomWalk
+from Tribler.community.market.core.tradingengine import TradingEngine
 
 
 class CommunityLauncher(object):
@@ -216,9 +218,22 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
 
     def get_kwargs(self, session):
         kwargs = super(MarketCommunityLauncher, self).get_kwargs(session)
-        kwargs['trustchain'] = session.lm.trustchain_community
+
+        class MockTradingEngine(TradingEngine):
+            """
+            Trading engine that immediately completes a trade.
+            """
+
+            def trade(self, trade, match_id):
+                self.completed_trades.append(trade)
+
+                # The trade ID must be the same on the two nodes
+                trade_id = hashlib.sha1(str(trade.proposal_id)).digest()
+                self.matching_community.on_trade_completed(trade, match_id, trade_id)
+
         kwargs['dht'] = session.lm.dht_community
         kwargs['use_database'] = False
+        kwargs['trading_engine'] = MockTradingEngine()
         return kwargs
 
 

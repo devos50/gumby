@@ -60,17 +60,6 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.num_blocks_in_db_lc = None
         self.block_stat_file = None
 
-    def on_id_received(self):
-        super(TrustchainModule, self).on_id_received()
-        # We need the trustchain key at this point. However, the configured session is not started yet. So we generate
-        # the keys here and place them in the correct place. When the session starts it will load these keys.
-        trustchain_keypair = permid.generate_keypair_trustchain()
-        trustchain_pairfilename = self.tribler_config.get_trustchain_keypair_filename()
-        permid.save_keypair_trustchain(trustchain_keypair, trustchain_pairfilename)
-        permid.save_pub_key_trustchain(trustchain_keypair, "%s.pub" % trustchain_pairfilename)
-
-        self.vars['trustchain_public_key'] = trustchain_keypair.pub().key_to_bin().encode("base64")
-
     def on_ipv8_available(self, _):
         # Disable threadpool messages
         self.overlay._use_main_thread = True

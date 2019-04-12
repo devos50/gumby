@@ -14,41 +14,41 @@ class MarketStatisticsParser(StatisticsParser):
     def __init__(self, node_directory):
         super(MarketStatisticsParser, self).__init__(node_directory)
         self.total_quantity_traded = 0
-        self.total_payment = 0
         self.total_ask_quantity = 0
         self.total_bid_quantity = 0
         self.avg_order_latency = 0
+        self.total_trades = 0
 
-    def aggregate_transaction_data(self):
+    def aggregate_trade_data(self):
         """
-        Aggregate all transaction data during the experiment
+        Aggregate all trade data during the experiment
         """
-        transactions_str = ""
-        transactions_cumulative_str = "0,0\n"
-        transactions_times = []
+        trades_str = ""
+        trades_cumulative_str = "0,0\n"
+        trades_times = []
 
-        for peer_nr, filename, dir in self.yield_files('transactions.log'):
-            transactions = [line.rstrip('\n') for line in open(filename)]
-            for transaction in transactions:
-                parts = transaction.split(',')
+        for peer_nr, filename, dir in self.yield_files('trades.log'):
+            trades = [line.rstrip('\n') for line in open(filename)]
+            for trade in trades:
+                parts = trade.split(',')
                 self.total_quantity_traded += float(parts[2])
-                self.total_payment += float(parts[1]) * float(parts[2])
-                transactions_str += transaction + '\n'
-                transactions_times.append(float(parts[0]))
+                trades_str += trade + '\n'
+                trades_times.append(float(parts[0]))
+                self.total_trades += 1
 
-        transactions_times = sorted(transactions_times)
-        total_transactions = 0
-        for transaction_time in transactions_times:
-            total_transactions += 1
-            transactions_cumulative_str += str(transaction_time) + "," + str(total_transactions) + "\n"
+        trades_times = sorted(trades_times)
+        total_trades = 0
+        for trade_time in trades_times:
+            total_trades += 1
+            trades_cumulative_str += str(trade_time) + "," + str(total_trades) + "\n"
 
-        with open('transactions.log', 'w', 0) as transactions_file:
-            transactions_file.write("time,price,quantity,payments,peer1,peer2\n")
-            transactions_file.write(transactions_str)
+        with open('trades.log', 'w', 0) as trades_file:
+            trades_file.write("time,price,quantity,peer1,peer2\n")
+            trades_file.write(trades_str)
 
-        with open('transactions_cumulative.csv', 'w') as transactions_file:
-            transactions_file.write("time,transactions\n")
-            transactions_file.write(transactions_cumulative_str)
+        with open('trades_cumulative.csv', 'w') as trades_file:
+            trades_file.write("time,trades\n")
+            trades_file.write(trades_cumulative_str)
 
     def aggregate_order_data(self):
         """
@@ -108,14 +108,14 @@ class MarketStatisticsParser(StatisticsParser):
             stats_dict = {'asks': total_asks, 'bids': total_bids,
                           'fulfilled_asks': fulfilled_asks, 'fulfilled_bids': fulfilled_bids,
                           'total_quantity_traded': self.total_quantity_traded,
-                          'total_payment': self.total_payment,
+                          'total_trades': self.total_trades,
                           'avg_order_latency': self.avg_order_latency,
                           'total_ask_quantity': int(self.total_ask_quantity),
                           'total_bid_quantity': int(self.total_bid_quantity)}
             stats_file.write(json.dumps(stats_dict))
 
     def run(self):
-        self.aggregate_transaction_data()
+        self.aggregate_trade_data()
         self.aggregate_order_data()
         self.aggregate_general_stats()
 

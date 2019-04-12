@@ -6,15 +6,16 @@
 
 @0:0 isolate_ipv8_overlay DHTDiscoveryCommunity
 @0:0 isolate_ipv8_overlay MarketCommunity
-@0:0 enable_trustchain_memory_db
 @0:1 start_yappi {1}
 @0:1 start_session
 @0:1 annotate start-experiment
-@0:5 init_wallets
 @0:5 init_matchmakers
-@0:5 set_validation_range 0
+@0:5 set_ttl 2
+@0:5 set_fanout 5
 @0:6 init_trader_lookup_table
+@0:9 disable_max_peers
 @0:10 connect_matchmakers 10
+@0:15 fix_broadcast_set
 @0:20 annotate start-trading
 @0:20 start_creating_orders 1 10 10
 @0:80 stop_creating_orders

@@ -8,8 +8,7 @@ from Tribler.community.market.core.assetamount import AssetAmount
 from Tribler.community.market.core.assetpair import AssetPair
 from Tribler.community.market.core.message import TraderId
 from Tribler.pyipv8.ipv8.peer import Peer
-from Tribler.Core.Modules.wallet.dummy_wallet import DummyWallet1, DummyWallet2
-from Tribler.Core.Modules.wallet.tc_wallet import TrustchainWallet
+from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
@@ -39,28 +38,6 @@ class MarketModule(IPv8OverlayExperimentModule):
     def on_ipv8_available(self, _):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
-
-    @experiment_callback
-    def init_wallets(self):
-        dummy1_wallet = DummyWallet1()
-        dummy2_wallet = DummyWallet2()
-        self.overlay.use_local_address = True
-        self.overlay.wallets = {
-            dummy1_wallet.get_identifier(): dummy1_wallet,
-            dummy2_wallet.get_identifier(): dummy2_wallet
-        }
-
-        dummy1_wallet.balance = 1000000000
-        dummy2_wallet.balance = 1000000000
-        dummy1_wallet.MONITOR_DELAY = 0
-        dummy2_wallet.MONITOR_DELAY = 0
-
-        tc_wallet = TrustchainWallet(self.session.lm.trustchain_community)
-        tc_wallet.check_negative_balance = False
-        self.overlay.wallets[tc_wallet.get_identifier()] = tc_wallet
-
-        # Disable incremental payments
-        self.overlay.use_incremental_payments = False
 
     @experiment_callback
     def init_matchmakers(self):
@@ -102,7 +79,25 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Send introduction request to matchmakers
         for peer_num in connect:
             self._logger.info("Connecting to matchmaker %d", peer_num)
-            self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_num))
+            reactor.callLater(random.random() * 9, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_num))
+
+    @experiment_callback
+    def disable_max_peers(self):
+        self.overlay.max_peers = -1
+
+    @experiment_callback
+    def set_ttl(self, ttl):
+        self.overlay.settings.ttl = int(ttl)
+
+    @experiment_callback
+    def set_fanout(self, fanout):
+        self.overlay.settings.fanout = int(fanout)
+
+    @experiment_callback
+    def fix_broadcast_set(self):
+        rand_peers = random.sample(self.overlay.network.verified_peers,
+                                   min(len(self.overlay.network.verified_peers), self.overlay.settings.fanout))
+        self.overlay.fixed_broadcast_set = rand_peers
 
     @experiment_callback
     def init_trader_lookup_table(self):
@@ -112,7 +107,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         for peer_id in self.all_vars.iterkeys():
             target = self.all_vars[peer_id]
             address = (str(target['host']), target['port'])
-            peer = Peer(self.all_vars[peer_id]['trustchain_public_key'].decode("base64"), address=address)
+            peer = Peer(self.all_vars[peer_id]['public_key'].decode("base64"), address=address)
             self.overlay.update_ip(TraderId(peer.mid), address)
 
     @experiment_callback
@@ -140,27 +135,23 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.overlay.cancel_order(self.order_id_map[order_id])
 
     @experiment_callback
-    def compute_reputation(self):
-        self.overlay.compute_reputation()
-
-    @experiment_callback
     def write_stats(self):
         scenario_runner = self.experiment.scenario_runner
-        transactions = []
+        trades = []
 
-        # Parse transactions
-        for transaction in self.overlay.transaction_manager.find_all():
-            partner_peer_id = self.overlay.lookup_ip(transaction.partner_order_id.trader_id)[1] - 12000
+        # Parse trades
+        for trade in self.overlay.trading_engine.completed_trades:
+            partner_peer_id = self.overlay.lookup_ip(trade.order_id.trader_id)[1] - 12000
             if partner_peer_id < scenario_runner._peernumber:  # Only one peer writes the transaction
-                transactions.append((int(transaction.timestamp) / 1000.0 - scenario_runner.exp_start_time,
-                                     transaction.transferred_assets.first.amount,
-                                     transaction.transferred_assets.second.amount,
-                                     len(transaction.payments), scenario_runner._peernumber, partner_peer_id))
+                trades.append((int(trade.timestamp) / 1000.0 - scenario_runner.exp_start_time,
+                                     trade.assets.first.amount,
+                                     trade.assets.second.amount,
+                                     scenario_runner._peernumber, partner_peer_id))
 
-        # Write transactions
-        with open('transactions.log', 'w', 0) as transactions_file:
-            for transaction in transactions:
-                transactions_file.write("%s,%s,%s,%s,%s,%s\n" % transaction)
+        # Write trades
+        with open('trades.log', 'w', 0) as trades_file:
+            for transaction in trades:
+                trades_file.write("%s,%s,%s,%s,%s\n" % transaction)
 
         # Write orders
         with open('orders.log', 'w', 0) as orders_file:
@@ -196,11 +187,6 @@ class MarketModule(IPv8OverlayExperimentModule):
             stats_dict = {'asks': self.num_asks, 'bids': self.num_bids,
                           'fulfilled_asks': fulfilled_asks, 'fulfilled_bids': fulfilled_bids}
             stats_file.write(json.dumps(stats_dict))
-
-        # Write reputation
-        with open('reputation.log', 'w', 0) as rep_file:
-            for peer_id, reputation in self.overlay.reputation_dict.iteritems():
-                rep_file.write("%s,%s\n" % (peer_id.encode('hex'), reputation))
 
         # Write mid register
         with open('mid_register.log', 'w', 0) as mid_file:
