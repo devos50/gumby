@@ -166,6 +166,9 @@ class ExperimentClient(object, LineReceiver):
     def proto_all_vars(self, line):
         self._logger.debug("Got experiment variables")
 
+        with open("all_vars.txt", "w") as output_file:
+            output_file.write(line)
+
         all_vars = json.loads(line)
         self.all_vars = all_vars["clients"]
         self.server_vars = all_vars["server"]
