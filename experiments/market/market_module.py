@@ -69,7 +69,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.create_ask = not self.create_ask
 
     @experiment_callback
-    def connect_matchmakers(self, num_to_connect):
+    def connect_matchmakers(self, num_to_connect, connect_time=9):
         num_total_matchmakers = int(os.environ['NUM_MATCHMAKERS'])
         if int(num_to_connect) > num_total_matchmakers:
             connect = range(1, num_total_matchmakers + 1)
@@ -79,7 +79,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Send introduction request to matchmakers
         for peer_num in connect:
             self._logger.info("Connecting to matchmaker %d", peer_num)
-            reactor.callLater(random.random() * 9, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_num))
+            reactor.callLater(random.random() * int(connect_time), self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_num))
 
     @experiment_callback
     def disable_max_peers(self):
@@ -99,9 +99,12 @@ class MarketModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def fix_broadcast_set(self):
-        rand_peers = random.sample(self.overlay.network.verified_peers,
-                                   min(len(self.overlay.network.verified_peers), self.overlay.settings.fanout))
+        rand_peers = random.sample(self.overlay.matchmakers,
+                                   min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
         self.overlay.fixed_broadcast_set = rand_peers
+        self._logger.info("Fixed broadcast set to %d peers:", len(rand_peers))
+        for peer in rand_peers:
+            self._logger.info("Will broadcast to peer: %s", str(peer))
 
     @experiment_callback
     def init_trader_lookup_table(self):
@@ -111,8 +114,12 @@ class MarketModule(IPv8OverlayExperimentModule):
         for peer_id in self.all_vars.iterkeys():
             target = self.all_vars[peer_id]
             address = (str(target['host']), target['port'])
-            peer = Peer(self.all_vars[peer_id]['public_key'].decode("base64"), address=address)
-            self.overlay.update_ip(TraderId(peer.mid), address)
+
+            if 'public_key' not in self.all_vars[peer_id]:
+                self._logger.error("Could not find public key of peer %s!", peer_id)
+            else:
+                peer = Peer(self.all_vars[peer_id]['public_key'].decode("base64"), address=address)
+                self.overlay.update_ip(TraderId(peer.mid), address)
 
     @experiment_callback
     def ask(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
