@@ -2,6 +2,7 @@
 import json
 import os
 import sys
+from math import radians, sin, cos, asin, sqrt
 
 from gumby.statsparser import StatisticsParser
 
@@ -23,9 +24,6 @@ class MarketStatisticsParser(StatisticsParser):
 
     def __init__(self, node_directory):
         super(MarketStatisticsParser, self).__init__(node_directory)
-        self.total_quantity_traded = 0
-        self.total_ask_quantity = 0
-        self.total_bid_quantity = 0
         self.avg_order_latency = 0
         self.total_trades = 0
 
@@ -41,7 +39,6 @@ class MarketStatisticsParser(StatisticsParser):
             trades = [line.rstrip('\n') for line in open(filename)]
             for trade in trades:
                 parts = trade.split(',')
-                self.total_quantity_traded += float(parts[2])
                 trades_str += trade + '\n'
                 trades_times.append(int(parts[0]))
                 self.total_trades += 1
@@ -53,7 +50,7 @@ class MarketStatisticsParser(StatisticsParser):
             trades_cumulative_str += str(trade_time) + "," + str(total_trades) + "\n"
 
         with open('trades.log', 'w', 0) as trades_file:
-            trades_file.write("time,price,quantity,peer1,peer2\n")
+            trades_file.write("time,my_lat,my_long,other_lat,other_long,peer1,peer2\n")
             trades_file.write(trades_str)
 
         with open('num_trades.txt', 'w', 0) as num_trades_file:
@@ -67,7 +64,7 @@ class MarketStatisticsParser(StatisticsParser):
         """
         Aggregate all data of the orders
         """
-        orders_str = "time,id,peer,type,status,asset1_amount,asset1_type,asset2_amount,asset2_type,reserved_quantity,traded_quantity,completed_time\n"
+        orders_str = "time,id,peer,type,status,lat,long,reserved_quantity,traded_quantity,completed_time\n"
         orders_data_all = ""
 
         for peer_nr, filename, dir in self.yield_files('orders.log'):
@@ -88,14 +85,9 @@ class MarketStatisticsParser(StatisticsParser):
                 continue
 
             parts = line.split(',')
-            if parts[4] == "completed":
-                sum += float(parts[11]) - float(parts[0])
+            if parts[3] == 'bid':  # Only count bids
+                sum += float(parts[9]) - float(parts[0])
                 amount += 1
-
-            if parts[3] == "ask":
-                self.total_ask_quantity += float(parts[5])
-            else:
-                self.total_bid_quantity += float(parts[5])
 
         if amount > 0:
             self.avg_order_latency = float(sum) / float(amount)
@@ -120,11 +112,8 @@ class MarketStatisticsParser(StatisticsParser):
         with open('aggregated_market_stats.log', 'w', 0) as stats_file:
             stats_dict = {'asks': total_asks, 'bids': total_bids,
                           'fulfilled_asks': fulfilled_asks, 'fulfilled_bids': fulfilled_bids,
-                          'total_quantity_traded': self.total_quantity_traded,
                           'total_trades': self.total_trades,
-                          'avg_order_latency': self.avg_order_latency,
-                          'total_ask_quantity': int(self.total_ask_quantity),
-                          'total_bid_quantity': int(self.total_bid_quantity)}
+                          'avg_order_latency': self.avg_order_latency}
             stats_file.write(json.dumps(stats_dict))
 
         with open('avg_latency.txt', 'w', 0) as latency_file:
@@ -181,6 +170,48 @@ class MarketStatisticsParser(StatisticsParser):
         with open("num_missed.txt", "w", 0) as missed_file:
             missed_file.write("%d" % missed)
 
+    def haversine(self, lon1, lat1, lon2, lat2):
+        """
+        Calculate the great circle distance between two points
+        on the earth (specified in decimal degrees)
+        """
+        # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a))
+        r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+        return c * r
+
+    def compute_avg_distance(self):
+        distances = []
+        total_dist = 0
+        count = 0
+        with open("trades.log", "r") as trades_file:
+            for line in trades_file.readlines()[1:]:
+                parts = line.split(",")
+                distance = self.haversine(float(parts[2]), float(parts[1]), float(parts[4]), float(parts[3]))
+                distances.append(distance)
+                total_dist += distance
+                count += 1
+
+        avg_dist = float(total_dist) / float(count)
+        with open("avg_dist.txt", "w") as distance_file:
+            distance_file.write("%f" % avg_dist)
+
+        if distances:
+            distances = sorted(distances)
+            if len(distances) % 2 == 0:
+                median = (distances[len(distances) / 2] + distances[len(distances) / 2 + 1]) / 2
+            else:
+                median = distances[len(distances) / 2]
+
+            with open("median_dist.txt", "w") as distance_file:
+                distance_file.write("%f" % median)
+
     def parse_messages(self):
         messages_dict = {}
         num_messages_dict = {}
@@ -211,8 +242,7 @@ class MarketStatisticsParser(StatisticsParser):
         self.aggregate_order_data()
         self.aggregate_general_stats()
         self.parse_messages()
-        self.check_missed_matches()
-
+        self.compute_avg_distance()
 
 # cd to the output directory
 os.chdir(os.environ['OUTPUT_DIR'])

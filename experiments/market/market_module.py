@@ -164,6 +164,16 @@ class MarketModule(IPv8OverlayExperimentModule):
             self.order_id_map[order_id] = order.order_id
 
     @experiment_callback
+    def ride_offer(self, latitude, longitude):
+        self.num_asks += 1
+        self.overlay.create_ride_offer(float(latitude), float(longitude), 1800)
+
+    @experiment_callback
+    def ride_request(self, latitude, longitude):
+        self.num_bids += 1
+        self.overlay.create_ride_request(float(latitude), float(longitude), 1800)
+
+    @experiment_callback
     def cancel(self, order_id):
         if order_id not in self.order_id_map:
             self._logger.warning("Want to cancel order but order id %s not found!", order_id)
@@ -177,18 +187,17 @@ class MarketModule(IPv8OverlayExperimentModule):
         trades = []
 
         # Parse trades
-        for trade in self.overlay.trading_engine.completed_trades:
+        for trade, my_location, other_location in self.overlay.trading_engine.completed_trades:
             partner_peer_id = self.overlay.lookup_ip(trade.order_id.trader_id)[1] - 12000
             if partner_peer_id < scenario_runner._peernumber:  # Only one peer writes the transaction
                 trades.append((int(trade.timestamp) - int(scenario_runner.exp_start_time * 1000),
-                                     trade.assets.first.amount,
-                                     trade.assets.second.amount,
+                               my_location[0], my_location[1], other_location[0], other_location[1],
                                      scenario_runner._peernumber, partner_peer_id))
 
         # Write trades
         with open('trades.log', 'w', 0) as trades_file:
             for trade in trades:
-                trades_file.write("%s,%s,%s,%s,%s\n" % trade)
+                trades_file.write("%s,%s,%s,%s,%s,%s,%s\n" % trade)
 
         # Write orders
         with open('orders.log', 'w', 0) as orders_file:
@@ -196,10 +205,10 @@ class MarketModule(IPv8OverlayExperimentModule):
                 order_data = (int(order.timestamp), order.order_id, scenario_runner._peernumber,
                               'ask' if order.is_ask() else 'bid',
                               order.status,
-                              order.assets.first.amount, order.assets.first.asset_id, order.assets.second.amount, order.assets.second.asset_id, order.reserved_quantity,
+                              order.latitude, order.longitude, order.reserved_quantity,
                               order.traded_quantity,
                               int(order.completed_timestamp) if order.is_complete() else '-1')
-                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
+                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
 
         # Write ticks in order book
         with open('orderbook.txt', 'w', 0) as orderbook_file:

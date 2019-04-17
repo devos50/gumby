@@ -224,8 +224,8 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
             Trading engine that immediately completes a trade.
             """
 
-            def trade(self, trade):
-                self.completed_trades.append(trade)
+            def trade(self, trade, my_location, other_location):
+                self.completed_trades.append((trade, my_location, other_location))
 
                 # The trade ID must be the same on the two nodes
                 trade_id = hashlib.sha1(str(trade.proposal_id)).digest()
