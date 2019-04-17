@@ -94,6 +94,10 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.overlay.settings.fanout = int(fanout)
 
     @experiment_callback
+    def set_match_window(self, window_size):
+        self.overlay.settings.match_window = int(window_size)
+
+    @experiment_callback
     def fix_broadcast_set(self):
         rand_peers = random.sample(self.overlay.network.verified_peers,
                                    min(len(self.overlay.network.verified_peers), self.overlay.settings.fanout))
