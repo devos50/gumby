@@ -1,17 +1,13 @@
 &module gumby.modules.tribler_module.TriblerModule
-&module gumby.modules.profile_module.ProfileModule
 &module experiments.market.market_module.MarketModule
 &module experiments.dht.dht_module.DHTModule
 &module experiments.trustchain.trustchain_module.TrustchainModule
 
 @0:0 isolate_ipv8_overlay DHTDiscoveryCommunity
 @0:0 isolate_ipv8_overlay MarketCommunity
-@0:1 start_yappi {1}
 @0:1 start_session
 @0:1 annotate start-experiment
 @0:5 init_matchmakers
-@0:5 set_ttl 2
-@0:5 set_fanout 5
 @0:6 init_trader_lookup_table
 @0:9 disable_max_peers
 @0:10 connect_matchmakers 10 19

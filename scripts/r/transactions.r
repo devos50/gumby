@@ -11,6 +11,7 @@ df2 <- load_annotations()
 
 if(file.exists("trades_cumulative.csv")){
 	df <- read.csv("trades_cumulative.csv", sep=",")
+	df$time <- df$time / 1000.0
     print(df)
 	
 	p <- ggplot(df) + theme_bw()

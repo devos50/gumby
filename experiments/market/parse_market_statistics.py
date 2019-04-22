@@ -33,7 +33,7 @@ class MarketStatisticsParser(StatisticsParser):
                 parts = trade.split(',')
                 self.total_quantity_traded += float(parts[2])
                 trades_str += trade + '\n'
-                trades_times.append(float(parts[0]))
+                trades_times.append(int(parts[0]))
                 self.total_trades += 1
 
         trades_times = sorted(trades_times)
@@ -54,7 +54,7 @@ class MarketStatisticsParser(StatisticsParser):
         """
         Aggregate all data of the orders
         """
-        orders_str = "time,id,peer,is_ask,completed,price,quantity,reserved_quantity,traded_quantity,completed_time\n"
+        orders_str = "time,id,peer,type,status,asset1_amount,asset1_type,asset2_amount,asset2_type,reserved_quantity,traded_quantity,completed_time\n"
         orders_data_all = ""
 
         for peer_nr, filename, dir in self.yield_files('orders.log'):
@@ -75,14 +75,14 @@ class MarketStatisticsParser(StatisticsParser):
                 continue
 
             parts = line.split(',')
-            if parts[4] == "complete":
-                sum += float(parts[9]) - float(parts[0])
+            if parts[4] == "completed":
+                sum += float(parts[11]) - float(parts[0])
                 amount += 1
 
             if parts[3] == "ask":
-                self.total_ask_quantity += float(parts[6])
+                self.total_ask_quantity += float(parts[5])
             else:
-                self.total_bid_quantity += float(parts[6])
+                self.total_bid_quantity += float(parts[5])
 
         if amount > 0:
             self.avg_order_latency = float(sum) / float(amount)

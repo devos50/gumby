@@ -39,6 +39,26 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
+        # Init settings according to the env variables
+        if 'FANOUT' in os.environ:
+            self._logger.info("Setting fanout to %d", int(os.environ['FANOUT']))
+            self.overlay.settings.fanout = int(os.environ['FANOUT'])
+        if 'TTL' in os.environ:
+            self.overlay.settings.ttl = int(os.environ['TTL'])
+            self._logger.info("Setting TTL to %d", int(os.environ['TTL']))
+        if 'MATCH_WINDOW' in os.environ:
+            self.overlay.settings.match_window = float(os.environ['MATCH_WINDOW'])
+            self._logger.info("Setting match window to %f", float(os.environ['MATCH_WINDOW']))
+        if 'MATCH_SEND_INTERVAL' in os.environ:
+            self.overlay.settings.match_send_interval = float(os.environ['MATCH_SEND_INTERVAL'])
+            self._logger.info("Setting match send interval to %f", float(os.environ['MATCH_SEND_INTERVAL']))
+        if 'SYNC_POLICY' in os.environ:
+            self.overlay.set_sync_policy(int(os.environ['SYNC_POLICY']))
+            self._logger.info("Setting sync policy to %d", int(os.environ['SYNC_POLICY']))
+        if 'DISSEMINATION_POLICY' in os.environ:
+            self.overlay.settings.dissemination_policy = int(os.environ['SYNC_POLICY'])
+            self._logger.info("Setting dissemination policy to %d", int(os.environ['DISSEMINATION_POLICY']))
+
     @experiment_callback
     def init_matchmakers(self):
         peer_num = self.experiment.scenario_runner._peernumber
@@ -111,6 +131,7 @@ class MarketModule(IPv8OverlayExperimentModule):
         """
         Initialize the lookup table for all traders so we do not have to use the DHT.
         """
+        num_total_matchmakers = int(os.environ['NUM_MATCHMAKERS'])
         for peer_id in self.all_vars.iterkeys():
             target = self.all_vars[peer_id]
             address = (str(target['host']), target['port'])
@@ -120,6 +141,9 @@ class MarketModule(IPv8OverlayExperimentModule):
             else:
                 peer = Peer(self.all_vars[peer_id]['public_key'].decode("base64"), address=address)
                 self.overlay.update_ip(TraderId(peer.mid), address)
+
+                if peer_id <= num_total_matchmakers:
+                    self.overlay.matchmakers.add(peer)
 
     @experiment_callback
     def ask(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
@@ -154,26 +178,26 @@ class MarketModule(IPv8OverlayExperimentModule):
         for trade in self.overlay.trading_engine.completed_trades:
             partner_peer_id = self.overlay.lookup_ip(trade.order_id.trader_id)[1] - 12000
             if partner_peer_id < scenario_runner._peernumber:  # Only one peer writes the transaction
-                trades.append((int(trade.timestamp) / 1000.0 - scenario_runner.exp_start_time,
+                trades.append((int(trade.timestamp) - int(scenario_runner.exp_start_time * 1000),
                                      trade.assets.first.amount,
                                      trade.assets.second.amount,
                                      scenario_runner._peernumber, partner_peer_id))
 
         # Write trades
         with open('trades.log', 'w', 0) as trades_file:
-            for transaction in trades:
-                trades_file.write("%s,%s,%s,%s,%s\n" % transaction)
+            for trade in trades:
+                trades_file.write("%s,%s,%s,%s,%s\n" % trade)
 
         # Write orders
         with open('orders.log', 'w', 0) as orders_file:
             for order in self.overlay.order_manager.order_repository.find_all():
-                order_data = (int(order.timestamp) / 1000.0, order.order_id, scenario_runner._peernumber,
+                order_data = (int(order.timestamp), order.order_id, scenario_runner._peernumber,
                               'ask' if order.is_ask() else 'bid',
-                              'complete' if order.is_complete() else 'incomplete',
-                              order.assets.first.amount, order.assets.second.amount, order.reserved_quantity,
+                              order.status,
+                              order.assets.first.amount, order.assets.first.asset_id, order.assets.second.amount, order.assets.second.asset_id, order.reserved_quantity,
                               order.traded_quantity,
-                              (int(order.completed_timestamp) / 1000.0) if order.is_complete() else '-1')
-                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
+                              int(order.completed_timestamp) if order.is_complete() else '-1')
+                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
 
         # Write ticks in order book
         with open('orderbook.txt', 'w', 0) as orderbook_file:

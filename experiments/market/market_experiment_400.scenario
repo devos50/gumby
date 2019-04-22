@@ -10,8 +10,6 @@
 @0:1 annotate start-experiment
 @0:3 start_ipv8_statistics_monitor
 @0:5 init_matchmakers
-@0:5 set_ttl 2
-@0:5 set_fanout 5
 @0:6 init_trader_lookup_table
 @0:9 disable_max_peers
 @0:10 connect_matchmakers 10
