@@ -30,7 +30,7 @@ pdf(NULL)
 library("igraph")
 
 data = read.csv("trades.log", sep=",")
-data_matrix = data.matrix(data[,5:6])
+data_matrix = data.matrix(data[,4:5])
 
 g <- graph_from_edgelist(data_matrix, directed=F)
 
