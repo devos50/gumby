@@ -208,6 +208,12 @@ class MarketModule(IPv8OverlayExperimentModule):
             for matchmaker in self.overlay.matchmakers:
                 matchmakers_file.write("%s,%d\n" % (matchmaker.address[0], matchmaker.address[1]))
 
+        # Write items in the matching queue
+        with open('match_queue.txt', 'w', 0) as queue_file:
+            for match_cache in self.overlay.get_match_caches():
+                for retries, price, other_order_id in match_cache.queue.queue:
+                    queue_file.write("%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
+
         # Get statistics about the amount of fulfilled orders (asks/bids)
         fulfilled_asks = 0
         fulfilled_bids = 0
