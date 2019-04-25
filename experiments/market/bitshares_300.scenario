@@ -16550,7 +16550,7 @@
 @0:332.752000 ask 69840000 1.3.0 5656893 1.3.113 order_id=1.7.167327525 {112}
 @0:332.757000 ask 1470 1.3.0 707058140418832 1.3.114 order_id=1.7.167327574 {148}
 @0:332.763000 ask 1565 1.3.0 947092267121261 1.3.105 order_id=1.7.167327565 {148}
-@0:350 write_stats
-@0:350 write_overlay_statistics
-@0:352 stop_session
-@0:362 stop
+@0:382 write_stats
+@0:382 write_overlay_statistics
+@0:384 stop_session
+@0:390 stop
