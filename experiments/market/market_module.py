@@ -58,6 +58,9 @@ class MarketModule(IPv8OverlayExperimentModule):
         if 'DISSEMINATION_POLICY' in os.environ:
             self.overlay.settings.dissemination_policy = int(os.environ['SYNC_POLICY'])
             self._logger.info("Setting dissemination policy to %d", int(os.environ['DISSEMINATION_POLICY']))
+        if 'NUM_ORDER_SYNC' in os.environ:
+            self.overlay.settings.num_order_sync = int(os.environ['NUM_ORDER_SYNC'])
+            self._logger.info("Setting num order sync to %d", int(os.environ['NUM_ORDER_SYNC']))
 
     @experiment_callback
     def init_matchmakers(self):
