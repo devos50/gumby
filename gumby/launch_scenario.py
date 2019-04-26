@@ -93,7 +93,7 @@ def main(self_service=False):
         reactor.listenTCP(int(environ['SYNC_PORT']), fact)
 
     debug("Connecting to: %s:%s", environ['SYNC_HOST'], int(environ['SYNC_PORT']))
-    reactor.callLater(random.randint(1, 5), reactor.connectTCP,
+    reactor.callLater(random.randint(1, 10), reactor.connectTCP,
                       environ['SYNC_HOST'], int(environ['SYNC_PORT']), ExperimentClientFactory())
     reactor.run()
     exit(reactor.exitCode)
