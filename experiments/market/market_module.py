@@ -217,6 +217,17 @@ class MarketModule(IPv8OverlayExperimentModule):
                 for retries, price, other_order_id in match_cache.queue.queue:
                     queue_file.write("%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
 
+        # Write away the different messages
+        with open('messages.txt', 'w', 0) as messages_file:
+            messages_file.write("cancel_orders,%d\n" % self.overlay.num_received_cancel_orders)
+            messages_file.write("orders,%d\n" % self.overlay.num_received_orders)
+            messages_file.write("match,%d\n" % self.overlay.num_received_match)
+            messages_file.write("match_decline,%d\n" % self.overlay.num_received_match_decline)
+            messages_file.write("propose_trade,%d\n" % self.overlay.num_received_proposed_trade)
+            messages_file.write("decline_trade,%d\n" % self.overlay.num_received_declined_trade)
+            messages_file.write("counter_trade,%d\n" % self.overlay.num_received_counter_trade)
+            messages_file.write("complete_trade,%d\n" % self.overlay.num_received_complete_trade)
+
         # Get statistics about the amount of fulfilled orders (asks/bids)
         fulfilled_asks = 0
         fulfilled_bids = 0

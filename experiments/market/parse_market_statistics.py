@@ -175,10 +175,28 @@ class MarketStatisticsParser(StatisticsParser):
         with open("num_missed.txt", "w", 0) as missed_file:
             missed_file.write("%d" % missed)
 
+    def parse_messages(self):
+        messages_dict = {}
+        for peer_nr, filename, dir in self.yield_files('messages.txt'):
+            with open(filename) as messages_file:
+                for line in messages_file.readlines():
+                    line_stripped = line.rstrip()
+                    parts = line_stripped.split(",")
+                    msg_name = parts[0]
+                    msg_count = int(parts[1])
+                    if msg_name not in messages_dict:
+                        messages_dict[msg_name] = 0
+                    messages_dict[msg_name] += msg_count
+
+        with open("messages_received.txt", "w", 0) as messages_out_file:
+            for msg_name, msg_count in messages_dict.items():
+                messages_out_file.write("%s,%d\n" % (msg_name, msg_count))
+
     def run(self):
         self.aggregate_trade_data()
         self.aggregate_order_data()
         self.aggregate_general_stats()
+        self.parse_messages()
         self.check_missed_matches()
 
 
