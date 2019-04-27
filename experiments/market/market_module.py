@@ -148,7 +148,7 @@ class MarketModule(IPv8OverlayExperimentModule):
                 peer = Peer(self.all_vars[peer_id]['public_key'].decode("base64"), address=address)
                 self.overlay.update_ip(TraderId(peer.mid), address)
 
-                if peer_id <= num_total_matchmakers:
+                if int(peer_id) <= num_total_matchmakers:
                     self.overlay.matchmakers.add(peer)
 
     @experiment_callback
