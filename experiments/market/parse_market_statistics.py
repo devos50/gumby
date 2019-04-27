@@ -177,20 +177,28 @@ class MarketStatisticsParser(StatisticsParser):
 
     def parse_messages(self):
         messages_dict = {}
+        num_messages_dict = {}
         for peer_nr, filename, dir in self.yield_files('messages.txt'):
+            total_messages = 0
             with open(filename) as messages_file:
                 for line in messages_file.readlines():
                     line_stripped = line.rstrip()
                     parts = line_stripped.split(",")
                     msg_name = parts[0]
                     msg_count = int(parts[1])
+                    total_messages += msg_count
                     if msg_name not in messages_dict:
                         messages_dict[msg_name] = 0
                     messages_dict[msg_name] += msg_count
+            num_messages_dict[peer_nr] = total_messages
 
         with open("messages_received.txt", "w", 0) as messages_out_file:
             for msg_name, msg_count in messages_dict.items():
                 messages_out_file.write("%s,%d\n" % (msg_name, msg_count))
+
+        with open("msg_received_per_peer.txt", "w", 0) as msg_file:
+            for peer_nr, num_messages in num_messages_dict.iteritems():
+                msg_file.write("%s,%d\n" % (peer_nr, num_messages))
 
     def run(self):
         self.aggregate_trade_data()
