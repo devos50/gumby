@@ -56,7 +56,7 @@ class MarketModule(IPv8OverlayExperimentModule):
             self.overlay.set_sync_policy(int(os.environ['SYNC_POLICY']))
             self._logger.info("Setting sync policy to %d", int(os.environ['SYNC_POLICY']))
         if 'DISSEMINATION_POLICY' in os.environ:
-            self.overlay.settings.dissemination_policy = int(os.environ['SYNC_POLICY'])
+            self.overlay.settings.dissemination_policy = int(os.environ['DISSEMINATION_POLICY'])
             self._logger.info("Setting dissemination policy to %d", int(os.environ['DISSEMINATION_POLICY']))
         if 'NUM_ORDER_SYNC' in os.environ:
             self.overlay.settings.num_order_sync = int(os.environ['NUM_ORDER_SYNC'])
