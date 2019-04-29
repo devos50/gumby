@@ -124,6 +124,9 @@ class MarketStatisticsParser(StatisticsParser):
                           'total_bid_quantity': int(self.total_bid_quantity)}
             stats_file.write(json.dumps(stats_dict))
 
+        with open('avg_latency.txt', 'w', 0) as latency_file:
+            latency_file.write("%f" % self.avg_order_latency)
+
     def check_missed_matches(self):
         orders = []
 
