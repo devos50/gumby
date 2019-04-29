@@ -64,6 +64,9 @@ class MarketModule(IPv8OverlayExperimentModule):
         if 'SEND_FAIL_RATE' in os.environ:
             self.overlay.settings.send_fail_rate = float(os.environ['SEND_FAIL_RATE'])
             self._logger.info("Setting send fail rate to %f", float(os.environ['SEND_FAIL_RATE']))
+        if 'MATCHMAKER_MALICIOUS_RATE' in os.environ:
+            self.overlay.settings.matchmaker_malicious_rate = float(os.environ['MATCHMAKER_MALICIOUS_RATE'])
+            self._logger.info("Setting matchmaker malicious rate to %f", float(os.environ['MATCHMAKER_MALICIOUS_RATE']))
 
     @experiment_callback
     def init_matchmakers(self):
