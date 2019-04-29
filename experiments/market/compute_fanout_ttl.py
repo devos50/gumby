@@ -34,7 +34,7 @@ def determine_combination(network_size, error_prob):
     return best_combination
 
 
-fanout, ttl = determine_combination(int(sys.argv[1]), 0.05)
+fanout, ttl = determine_combination(int(sys.argv[1]), 0.1)
 
 if sys.argv[2] == 'ttl':
     print ttl
