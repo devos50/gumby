@@ -2,7 +2,6 @@ import json
 import os
 import random
 import time
-from random import Random
 
 from Tribler.community.market.community import MarketCommunity
 from Tribler.community.market.core.assetamount import AssetAmount
@@ -30,7 +29,6 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.order_id_map = {}
         self.trade_lc = None
         self.create_ask = True  # Toggles between true/false when creating random orders
-        self.fixed_rand = Random(1)
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
@@ -102,12 +100,12 @@ class MarketModule(IPv8OverlayExperimentModule):
         if int(num_to_connect) > num_total_matchmakers:
             connect = range(1, num_total_matchmakers + 1)
         else:
-            connect = self.fixed_rand.sample(range(1, num_total_matchmakers + 1), int(num_to_connect))
+            connect = random.sample(range(1, num_total_matchmakers + 1), int(num_to_connect))
 
         # Send introduction request to matchmakers
         for peer_num in connect:
             self._logger.info("Connecting to matchmaker %d", peer_num)
-            reactor.callLater(self.fixed_rand.random() * int(connect_time), self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_num))
+            reactor.callLater(random.random() * int(connect_time), self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_num))
 
     @experiment_callback
     def disable_max_peers(self):
@@ -127,8 +125,8 @@ class MarketModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def fix_broadcast_set(self):
-        rand_peers = self.fixed_rand.sample(self.overlay.matchmakers,
-                                            min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
+        rand_peers = random.sample(self.overlay.matchmakers,
+                                   min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
         self.overlay.fixed_broadcast_set = rand_peers
         self._logger.info("Fixed broadcast set to %d peers:", len(rand_peers))
         for peer in rand_peers:
