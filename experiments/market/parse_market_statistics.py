@@ -137,7 +137,7 @@ class MarketStatisticsParser(StatisticsParser):
                 order_status = parts[4]
                 order_cls = Ask if order_type == "ask" else Bid
 
-                if order_status == "cancelled" or order_status == "expired":
+                if order_status == "cancelled" or order_status == "expired" or order_status == "completed":
                     continue
 
                 order_id_str = parts[1]
