@@ -56,6 +56,9 @@ class MarketStatisticsParser(StatisticsParser):
             trades_file.write("time,price,quantity,peer1,peer2\n")
             trades_file.write(trades_str)
 
+        with open('num_trades.txt', 'w', 0) as num_trades_file:
+            num_trades_file.write("%d" % total_trades)
+
         with open('trades_cumulative.csv', 'w') as trades_file:
             trades_file.write("time,trades\n")
             trades_file.write(trades_cumulative_str)
