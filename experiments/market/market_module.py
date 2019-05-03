@@ -43,9 +43,6 @@ class MarketModule(IPv8OverlayExperimentModule):
         if 'FANOUT' in os.environ:
             self._logger.info("Setting fanout to %d", int(os.environ['FANOUT']))
             self.overlay.settings.fanout = int(os.environ['FANOUT'])
-        if 'TTL' in os.environ:
-            self.overlay.settings.ttl = int(os.environ['TTL'])
-            self._logger.info("Setting TTL to %d", int(os.environ['TTL']))
         if 'MATCH_WINDOW' in os.environ:
             self.overlay.settings.match_window = float(os.environ['MATCH_WINDOW'])
             self._logger.info("Setting match window to %f", float(os.environ['MATCH_WINDOW']))
@@ -113,10 +110,6 @@ class MarketModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def disable_max_peers(self):
         self.overlay.max_peers = -1
-
-    @experiment_callback
-    def set_ttl(self, ttl):
-        self.overlay.settings.ttl = int(ttl)
 
     @experiment_callback
     def set_fanout(self, fanout):
