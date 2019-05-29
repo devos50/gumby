@@ -1,10 +1,12 @@
 &module gumby.modules.anydex_module.AnyDexModule
+&module gumby.modules.profile_module.ProfileModule
 &module experiments.market.market_module.MarketModule
 &module experiments.trustchain.trustchain_module.TrustchainModule
 
 @0:0 isolate_ipv8_overlay MarketCommunity
 @0:0 isolate_ipv8_overlay TrustChainCommunity
 @0:0 enable_trustchain_memory_db
+@0:1 start_yappi {1}
 @0:1 start_session
 @0:1 annotate start-experiment
 @0:5 init_wallets
@@ -19,4 +21,5 @@
 @0:58 write_stats
 @0:58 write_overlay_statistics
 @0:60 stop_session
+@0:60 stop_yappi {1}
 @0:65 stop
