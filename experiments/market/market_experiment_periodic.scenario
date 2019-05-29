@@ -1,0 +1,22 @@
+&module gumby.modules.anydex_module.AnyDexModule
+&module experiments.market.market_module.MarketModule
+&module experiments.trustchain.trustchain_module.TrustchainModule
+
+@0:0 isolate_ipv8_overlay MarketCommunity
+@0:0 isolate_ipv8_overlay TrustChainCommunity
+@0:0 enable_trustchain_memory_db
+@0:1 start_session
+@0:1 annotate start-experiment
+@0:5 init_wallets
+@0:5 init_matchmakers
+@0:5 set_validation_range 0
+@0:6 init_trader_lookup_table
+@0:10 connect_matchmakers 10
+@0:24 fix_broadcast_set
+@0:25 annotate start-trading
+@0:25 start_trading_lc 1
+@0:55 stop_trading_lc
+@0:58 write_stats
+@0:58 write_overlay_statistics
+@0:60 stop_session
+@0:65 stop

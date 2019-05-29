@@ -9,6 +9,7 @@ from anydex.core.assetpair import AssetPair
 from anydex.core.message import TraderId
 from anydex.wallet.dummy_wallet import DummyWallet1, DummyWallet2
 from anydex.wallet.tc_wallet import TrustchainWallet
+from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
@@ -29,9 +30,16 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.num_asks = 0
         self.order_id_map = {}
 
+        self.order_create_lc = None
+        self.create_ask = True
+
     def on_ipv8_available(self, _):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
+
+    def on_id_received(self):
+        super(MarketModule, self).on_id_received()
+        self.create_ask = self.experiment.scenario_runner._peernumber % 2 == 0
 
     @experiment_callback
     def init_wallets(self):
@@ -51,6 +59,32 @@ class MarketModule(IPv8OverlayExperimentModule):
         tc_wallet = TrustchainWallet(self.session.lm.trustchain_community)
         tc_wallet.check_negative_balance = False
         self.overlay.wallets[tc_wallet.get_identifier()] = tc_wallet
+
+    @experiment_callback
+    def fix_broadcast_set(self):
+        rand_peers = random.sample(self.overlay.matchmakers,
+                                   min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
+        self.overlay.fixed_broadcast_set = rand_peers
+        self._logger.info("Fixed broadcast set to %d peers:", len(rand_peers))
+        for peer in rand_peers:
+            self._logger.info("Will broadcast to peer: %s", str(peer))
+
+    @experiment_callback
+    def start_trading_lc(self, interval):
+        self.order_create_lc = LoopingCall(self.create_order)
+        self.order_create_lc.start(int(interval))
+
+    def create_order(self):
+        if self.create_ask:
+            self.ask(10, 'DUM1', 10, 'DUM2')
+        else:
+            self.bid(10, 'DUM1', 10, 'DUM2')
+        self.create_ask = not self.create_ask
+
+    @experiment_callback
+    def stop_trading_lc(self):
+        self.order_create_lc.stop()
+        self.order_create_lc = None
 
     @experiment_callback
     def init_matchmakers(self):
