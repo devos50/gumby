@@ -3,6 +3,7 @@ import os
 import random
 from base64 import b64decode
 
+from anydex.core.clearing_policy import SingleTradeClearingPolicy
 from anydex.core.community import MarketCommunity
 from anydex.core.assetamount import AssetAmount
 from anydex.core.assetpair import AssetPair
@@ -36,6 +37,11 @@ class MarketModule(IPv8OverlayExperimentModule):
     def on_ipv8_available(self, _):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
+
+        if 'SINGLE_TRADE' in os.environ:
+            self._logger.info("Setting single trade clearing policy")
+            single_trade_policy = SingleTradeClearingPolicy(self.overlay)
+            self.overlay.clearing_policies.append(single_trade_policy)
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
