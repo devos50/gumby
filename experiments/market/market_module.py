@@ -228,3 +228,19 @@ class MarketModule(IPv8OverlayExperimentModule):
                 for retries, price, other_order_id in match_cache.queue.queue:
                     queue_file.write(
                         "%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
+
+    @experiment_callback
+    def write_overlay_statistics(self):
+        """
+        Write information about the IPv8 overlay networks to a file.
+        """
+
+        # Write verified peers
+        with open('verified_peers.txt', 'w') as peers_file:
+            for peer in self.overlay.network.verified_peers:
+                peers_file.write('%d\n' % (peer.address[1] - 12000))
+
+        # Write bandwidth statistics
+        with open('bandwidth.txt', 'w') as bandwidth_file:
+            bandwidth_file.write("%d,%d" % (self.overlay.endpoint.bytes_up,
+                                            self.overlay.endpoint.bytes_down))
