@@ -3,6 +3,8 @@ import os
 import random
 from base64 import b64decode
 
+from twisted.internet import reactor
+
 from anydex.core.clearing_policy import SingleTradeClearingPolicy
 from anydex.core.community import MarketCommunity
 from anydex.core.assetamount import AssetAmount
@@ -78,7 +80,11 @@ class MarketModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def start_trading_lc(self, interval):
         self.order_create_lc = LoopingCall(self.create_order)
-        self.order_create_lc.start(int(interval))
+
+        if self.experiment.scenario_runner._peernumber % 2 == 0:
+            reactor.callLater(int(interval) / 2, self.order_create_lc.start, int(interval))
+        else:
+            self.order_create_lc.start(int(interval))
 
     def create_order(self):
         if self.create_ask:
