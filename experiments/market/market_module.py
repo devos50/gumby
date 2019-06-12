@@ -70,8 +70,8 @@ class MarketModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def fix_broadcast_set(self):
-        rand_peers = random.sample(self.overlay.matchmakers,
-                                   min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
+        rand = random.Random(1)
+        rand_peers = rand.sample(self.overlay.matchmakers, min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
         self.overlay.fixed_broadcast_set = rand_peers
         self._logger.info("Fixed broadcast set to %d peers:", len(rand_peers))
         for peer in rand_peers:
@@ -113,7 +113,8 @@ class MarketModule(IPv8OverlayExperimentModule):
         if int(num_to_connect) > num_total_matchmakers:
             connect = range(1, num_total_matchmakers + 1)
         else:
-            connect = random.sample(range(1, num_total_matchmakers + 1), int(num_to_connect))
+            rand = random.Random(self.experiment.scenario_runner._peernumber * 2)
+            connect = rand.sample(range(1, num_total_matchmakers + 1), int(num_to_connect))
 
         # Send introduction request to matchmakers
         for peer_num in connect:
