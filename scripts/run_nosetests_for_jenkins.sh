@@ -69,7 +69,7 @@ shopt -u nocasematch
 
 echo Nose will run from $PWD
 
-if [ ${PYTHON_VERSION} == "py2" ]; then
+if [ "${PYTHON_VERSION}" == "py2" ]; then
     NOSETESTS_CMD="nosetests"
 else
     NOSETESTS_CMD="nosetests3"
