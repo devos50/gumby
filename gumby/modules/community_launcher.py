@@ -199,6 +199,27 @@ class TrustChainCommunityLauncher(IPv8CommunityLauncher):
             community.persistence.original_db = orig_db
 
 
+class NoodleCommunityLauncher(IPv8CommunityLauncher):
+
+    def should_launch(self, session):
+        return session.config.get_noodle_enabled()
+
+    def get_overlay_class(self):
+        from ipv8.attestation.noodle.community import NoodleCommunity
+        return NoodleCommunity
+
+    def get_my_peer(self, ipv8, session):
+        return Peer(session.trustchain_keypair)
+
+    def get_kwargs(self, session):
+        return {'working_directory': session.config.get_state_dir()}
+
+    def finalize(self, ipv8, session, community):
+        super(NoodleCommunityLauncher, self).finalize(ipv8, session, community)
+        session.lm.noodle_community = community
+        community.ipv8 = ipv8
+
+
 class MarketCommunityLauncher(IPv8CommunityLauncher):
 
     def not_before(self):

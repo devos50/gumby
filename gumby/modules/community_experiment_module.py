@@ -1,12 +1,13 @@
 from base64 import b64encode, b64decode
 from os import environ
-from random import sample
+from random import random
 from socket import gethostbyname
+
+from twisted.internet import reactor
 
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import ExperimentModule
 from gumby.util import generate_keypair_trustchain, save_keypair_trustchain, save_pub_key_trustchain
-
 from ipv8.peer import Peer
 from ipv8.peerdiscovery.churn import RandomChurn
 from ipv8.peerdiscovery.discovery import EdgeWalk, RandomWalk
@@ -20,7 +21,6 @@ class IPv8OverlayExperimentModule(ExperimentModule):
     def __init__(self, experiment, community_class):
         super(IPv8OverlayExperimentModule, self).__init__(experiment)
         self.community_class = community_class
-
         # To be sure that the module loading happens in the right order, this next line serves the dual purpose of
         # triggering the check for a loaded IPv8 provider
         self.ipv8_provider.ipv8_available.add_done_callback(lambda f: self.on_ipv8_available(f.result()))
@@ -29,6 +29,8 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             'EdgeWalk': EdgeWalk,
             'RandomChurn': RandomChurn
         }
+
+        self.inverted_map = None
 
     @property
     def ipv8_provider(self):
@@ -92,8 +94,20 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         return None
 
     @experiment_callback
+    def set_max_peers(self):
+        self.overlay.max_peers = 30
+
+    @experiment_callback
     def introduce_one_peer(self, peer_id):
         self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
+
+    @experiment_callback
+    def introduce_all_peers(self):
+        """
+        Introduce to all peers
+        """
+        for peer in self.all_vars.keys():
+            self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer))
 
     @experiment_callback
     def introduce_peers(self, max_peers=None, excluded_peers=None):
@@ -114,14 +128,16 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             # bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
             for peer_id in self.all_vars.keys():
                 if int(peer_id) != self.my_id and int(peer_id) not in excluded_peers_list:
-                    self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
+                    delta = 5 * random()
+                    reactor.callLater(delta, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_id))
         else:
             # Walk to a number of peers
             eligible_peers = [peer_id for peer_id in self.all_vars.keys()
                               if int(peer_id) not in excluded_peers_list and int(peer_id) != self.my_id]
             rand_peer_ids = sample(eligible_peers, int(max_peers))
             for rand_peer_id in rand_peer_ids:
-                self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(rand_peer_id))
+                delta = 5 * random()
+                reactor.callLater(delta, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(rand_peer_id))
 
     @experiment_callback
     def add_walking_strategy(self, name, max_peers, **kwargs):
@@ -139,7 +155,7 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         return Peer(b64decode(self.get_peer_public_key(peer_id)), address=address)
 
     def get_peer_public_key(self, peer_id):
-        return self.all_vars[peer_id][b'public_key']
+        return self.all_vars[peer_id]['public_key']
 
     def on_id_received(self):
         # Since the IPv8 source module is loaded before any community module, the IPv8 on_id_received has
