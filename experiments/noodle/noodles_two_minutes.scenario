@@ -1,0 +1,20 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module experiments.noodle.noodle_module.NoodleModule
+
+@0:0 isolate_ipv8_overlay NoodleCommunity
+@0:2 start_session
+@0:5 init_block_writer
+@0:6 init_noodle_settings
+@0:9 disable_max_peers
+@0:10 introduce_peers
+@0:10 set_validation_range 5
+@0:18 mint
+@0:20 minter_send_to_all
+@0:30 start_creating_transactions
+@0:31 start_periodic_mem_flush
+@0:150 stop_creating_transactions
+@0:155 commit_block_times
+@0:155 write_overlay_statistics
+@0:155 write_noodle_stats
+@0:160 stop_session
+@0:170 stop

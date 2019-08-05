@@ -75,7 +75,7 @@ class TriblerModule(BaseIPv8Module):
 
     @experiment_callback
     def setup_initial_bootstrap_seeder(self):
-        bootstrap_dir = os.path.join(self.tribler_config.get_state_dir(), 'bootstrap')
+        bootstrap_dir = os.path.join(self.tribler_config.get_state_dir(),'bootstrap')
         if not os.path.exists(bootstrap_dir):
             os.mkdir(bootstrap_dir)
         file_name = os.path.join(bootstrap_dir, 'bootstrap.block')
@@ -248,6 +248,7 @@ class TriblerModule(BaseIPv8Module):
         """
         Write information about the IPv8 overlay networks to a file.
         """
+        self._logger.info("Writing overlay statistics")
         with open('overlays.txt', 'w') as overlays_file:
             overlays_file.write("name,pub_key,peers\n")
             for overlay in self.session.ipv8.overlays:
