@@ -1,0 +1,11 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.lightning.lightning_module.LightningModule
+
+@0:1 init_btc_config
+@0:2 start_btc_client
+@0:9 init_lnd_config
+@0:10 start_lnd_client
+@0:15 create_wallet
+@0:24 print_info
+@0:25 print_peers
+@0:30 stop
