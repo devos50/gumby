@@ -1,0 +1,15 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.stellar.stellar_module.StellarModule
+
+@0:1 init_db
+@0:5 start_db
+@0:7 setup_db
+@0:8 create_db
+@0:8 init_config
+@0:9 init_validators
+@0:12 start_validators
+@0:20 start_horizon
+@0:30 create_accounts {1}
+@0:40 start_creating_transactions
+@0:100 stop_creating_transactions
+@0:110 stop
