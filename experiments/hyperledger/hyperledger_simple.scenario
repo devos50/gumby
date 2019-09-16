@@ -1,0 +1,5 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.hyperledger.hyperledger_module.HyperledgerModule
+
+@0:1 generate_config {1}
+@0:30 stop
