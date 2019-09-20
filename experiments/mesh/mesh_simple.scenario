@@ -1,0 +1,6 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.mesh.mesh_module.MeshModule
+
+@0:5 start_mesh_client {1}
+@0:10 open_rpc_connection {1}
+@0:20 stop
