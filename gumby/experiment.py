@@ -96,8 +96,8 @@ class ExperimentClient(LineReceiver):
             reactor.stop()
         else:
             self.state = state_handler(line)
-            if self.state == 'done':
-                self.transport.loseConnection()
+            #if self.state == 'done':
+            #    self.transport.loseConnection()
 
     def on_id_received(self):
         self.scenario_runner.set_peernumber(self.my_id)
@@ -189,7 +189,7 @@ class ExperimentClient(LineReceiver):
             self._logger.info("Starting the experiment in %f secs.", start_delay)
             reactor.callLater(start_delay, self.start_experiment)
             self.factory.stopTrying()
-            self.transport.loseConnection()
+            #self.transport.loseConnection()
 
     def register(self, target):
         """

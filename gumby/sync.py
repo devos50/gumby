@@ -101,8 +101,8 @@ class ExperimentServiceProto(LineReceiver):
             stop_reactor()
         else:
             self.state = statehandler(line)
-            if self.state == 'done':
-                self.transport.loseConnection()
+            #if self.state == 'done':
+            #    self.transport.loseConnection()
 
     def sendAndWaitForReady(self):
         self.ready_d = Deferred()
@@ -285,9 +285,9 @@ class ExperimentServiceFactory(Factory):
             # Sync the experiment start time among instances
             subscriber.sendLine(b"go:%f" % (start_time + subscriber.vars['time_offset']))
 
-        d = deferLater(reactor, 5, lambda: self._logger.info("Done, disconnecting all clients."))
-        d.addCallback(lambda _: self.disconnectAll())
-        d.addCallbacks(self.onExperimentStarted, self.onExperimentStartError)
+        #d = deferLater(reactor, 5, lambda: self._logger.info("Done, disconnecting all clients."))
+        #d.addCallback(lambda _: self.disconnectAll())
+        #d.addCallbacks(self.onExperimentStarted, self.onExperimentStartError)
 
     def disconnectAll(self):
         reactor.runUntilCurrent()
