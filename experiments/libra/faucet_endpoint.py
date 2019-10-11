@@ -1,4 +1,5 @@
 import decimal
+import logging
 import re
 
 import pexpect
@@ -13,6 +14,7 @@ class FaucetEndpoint(resource.Resource):
     def __init__(self, client):
         resource.Resource.__init__(self)
         self.client = client
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def getChild(self, path, request):
         if not path:
@@ -20,6 +22,7 @@ class FaucetEndpoint(resource.Resource):
 
     def render_POST(self, request):
         address = request.args[b'address'][0].decode()
+        self._logger.info("Received mint request for address %s", address)
         if re.match('^[a-f0-9]{64}$', address) is None:
             request.setResponseCode(http.BAD_REQUEST)
             return b"Malformed address"
@@ -37,11 +40,8 @@ class FaucetEndpoint(resource.Resource):
         try:
             self.client.sendline("a m {} {}".format(address, amount / (10 ** 6)))
             self.client.expect("Mint request submitted", timeout=2)
-
-            self.client.sendline("a la")
-            self.client.expect(r"sequence_number: ([0-9]+)", timeout=1)
         except pexpect.exceptions.ExceptionPexpect:
             self.client.terminate(True)
             raise
 
-        return self.client.match.groups()[0]
+        return b"done"
