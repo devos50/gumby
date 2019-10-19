@@ -1,8 +1,10 @@
 import os
+import subprocess
 
 from ruamel.yaml import YAML, RoundTripDumper, round_trip_dump
 from ruamel.yaml.comments import CommentedMap
 from twisted.internet import reactor
+from twisted.internet.task import deferLater, LoopingCall
 
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module, ExperimentModule
@@ -15,12 +17,22 @@ class HyperledgerModule(ExperimentModule):
         super(HyperledgerModule, self).__init__(experiment)
         self.config_path = "/home/pouwelse/hyperledger-network-template"
         self.num_validators = int(os.environ["NUM_VALIDATORS"])
+        self.num_clients = int(os.environ["NUM_CLIENTS"])
+        self.tx_rate = int(os.environ["TX_RATE"])
+        self.tx_lc = None
+        self.monitor_process = None
+
+    def is_client(self):
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        return my_peer_id > self.num_validators
 
     @experiment_callback
     def generate_config(self):
         """
         Generate the initial configuration files.
         """
+        if self.is_client():
+            return
 
         # Change crypto-config.yaml and add organizations
         yaml = YAML()
@@ -73,7 +85,7 @@ class HyperledgerModule(ExperimentModule):
                     },
                     "Writers": {
                         "Type": "Signature",
-                        "Rule": "OR('%s', '%s')" % (org_admin, org_client)
+                        "Rule": "OR('%s', '%s')" % (org_admin, org_peer)
                     },
                     "Admins": {
                         "Type": "Signature",
@@ -169,12 +181,13 @@ class HyperledgerModule(ExperimentModule):
                     "CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb%d:5984" % (organization_index - 1),
                     "CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=",
                     "CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD="
-
                 ],
                 "volumes": [
                     "/var/run/:/host/var/run/",
                     "./crypto-config/peerOrganizations/org%d.example.com/peers/peer0.org%d.example.com/msp:/etc/hyperledger/fabric/msp" % (organization_index, organization_index),
                     "./crypto-config/peerOrganizations/org%d.example.com/peers/peer0.org%d.example.com/tls:/etc/hyperledger/fabric/tls" % (organization_index, organization_index),
+                    "./crypto-config/ordererOrganizations/example.com/orderers:/etc/hyperledger/orderers",
+                    "./scripts:/etc/hyperledger/scripts",
                     "peer0.org%d.example.com:/var/hyperledger/production" % organization_index
                 ],
                 "ports": ["%d:%d" % (6051 + 1000 * organization_index, 6051 + 1000 * organization_index)],
@@ -211,8 +224,94 @@ class HyperledgerModule(ExperimentModule):
         with open(os.path.join(self.config_path, "docker-compose-couch.yaml"), "w") as composer_file:
             yaml.dump(config, composer_file)
 
-        # Generate the configuration
-        os.system(os.path.join(self.config_path, "generate.sh") + " %d" % self.num_validators)
+    @experiment_callback
+    def start_network(self):
+        if self.is_client():
+            return
+
+        self._logger.info("Starting network...")
+        os.system("/home/pouwelse/hyperledger-network-template/start_all.sh")
+
+        def deploy():
+            self._logger.info("Deploying chaincode...")
+            os.system("/home/pouwelse/hyperledger-network-template/deploy.sh %d" % self.num_validators)
+            self._logger.info("Chaincode deployed and instantiated!")
+
+        deferLater(reactor, 5, deploy)
+
+    @experiment_callback
+    def stop_network(self):
+        if self.is_client():
+            return
+
+        self._logger.info("Stopping network...")
+        os.system("/home/pouwelse/hyperledger-network-template/stop_all.sh")
+
+    @experiment_callback
+    def start_monitor(self):
+        """
+        Start monitoring the blocks
+        """
+        self._logger.info("Starting monitor...")
+        cmd = "cd /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/ && /home/pouwelse/go/bin/go run /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/fabric-cli.go event listenblock --cid mychannel --peer localhost:7051 --config /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/config.yaml > %s" % os.path.join(os.getcwd(), "transactions.txt")
+        my_env = os.environ.copy()
+        my_env["GOPATH"] = "/home/pouwelse/gocode"
+        self.monitor_process = subprocess.Popen(cmd, env=my_env, shell=True)
+
+    @experiment_callback
+    def stop_monitor(self):
+        """
+        Stop monitoring the blocks.
+        """
+        self._logger.info("Stopping monitor...")
+        if self.monitor_process:
+            self.monitor_process.kill()
+
+    @experiment_callback
+    def start_creating_transactions(self):
+        """
+        Start with submitting transactions.
+        """
+        if not self.is_client():
+            return
+
+        self._logger.info("Starting transactions...")
+        self.tx_lc = LoopingCall(self.transfer)
+
+        # Depending on the tx rate and number of clients, wait a bit
+        individual_tx_rate = self.tx_rate / self.num_clients
+        self._logger.info("Individual tx rate: %f" % individual_tx_rate)
+
+        def start_lc():
+            self._logger.info("Starting tx lc...")
+            self.tx_lc.start(1.0 / individual_tx_rate)
+
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        deferLater(reactor, (1.0 / self.num_clients) * (my_peer_id - 1), start_lc)
+
+    @experiment_callback
+    def transfer(self):
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        target_organization_id = ((my_peer_id - 1) % self.num_validators) + 1
+        cmd = 'docker exec peer0.org%d.example.com peer chaincode invoke -n sacc -c \'{"Args":["set", "a", "20"]}\' -C mychannel -o orderer%d.example.com:7050 --tls true --cafile /etc/hyperledger/orderers/orderer%d.example.com/tls/ca.crt' % (target_organization_id, target_organization_id, target_organization_id)
+        subprocess.Popen(cmd, shell=True)
+
+    @experiment_callback
+    def stop_creating_transactions(self):
+        """
+        Stop with submitting transactions.
+        """
+        if not self.is_client():
+            return
+
+        self._logger.info("Stopping transactions...")
+        self.tx_lc.stop()
+
+    @experiment_callback
+    def write_logs(self):
+        for validator_index in range(1, self.num_validators + 1):
+            cmd = "docker logs peer0.org%d.example.com > validator%d.log" % (validator_index, validator_index)
+            subprocess.Popen(cmd, shell=True)
 
     @experiment_callback
     def stop(self):
