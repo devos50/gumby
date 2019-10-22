@@ -17,23 +17,15 @@ class HyperledgerModule(ExperimentModule):
         super(HyperledgerModule, self).__init__(experiment)
         self.config_path = "/home/pouwelse/hyperledger-network-template"
         self.num_validators = int(os.environ["NUM_VALIDATORS"])
-        self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
         self.tx_lc = None
         self.monitor_process = None
-
-    def is_client(self):
-        my_peer_id = self.experiment.scenario_runner._peernumber
-        return my_peer_id > self.num_validators
 
     @experiment_callback
     def generate_config(self):
         """
         Generate the initial configuration files.
         """
-        if self.is_client():
-            return
-
         # Change crypto-config.yaml and add organizations
         yaml = YAML()
         with open(os.path.join(self.config_path, "crypto-config-template.yaml"), "r") as crypto_config_file:
@@ -108,17 +100,25 @@ class HyperledgerModule(ExperimentModule):
         config["Profiles"]["SampleMultiNodeEtcdRaft"]["Orderer"]["Addresses"] = []
 
         for organization_index in range(1, self.num_validators + 1):
+            consenter_port = 7050 + (organization_index - 1) * 1000
             consenter_info = {
                 "Host": "orderer%d.example.com" % organization_index,
-                "Port": 7050,
+                "Port": consenter_port,
                 "ClientTLSCert": "crypto-config/ordererOrganizations/example.com/orderers/orderer%d.example.com/tls/server.crt" % organization_index,
                 "ServerTLSCert": "crypto-config/ordererOrganizations/example.com/orderers/orderer%d.example.com/tls/server.crt" % organization_index
             }
             config["Profiles"]["SampleMultiNodeEtcdRaft"]["Orderer"]["EtcdRaft"]["Consenters"].append(consenter_info)
-            config["Profiles"]["SampleMultiNodeEtcdRaft"]["Orderer"]["Addresses"].append("orderer%d.example.com:7050" % organization_index)
+            config["Profiles"]["SampleMultiNodeEtcdRaft"]["Orderer"]["Addresses"].append("orderer%d.example.com:%d" % (organization_index, consenter_port))
 
         with open(os.path.join(self.config_path, "configtx.yaml"), "w") as configtx_file:
             round_trip_dump(config, configtx_file, Dumper=RoundTripDumper)
+
+        # Determine DNS entries
+        extra_hosts = []
+        for organization_index in range(1, self.num_validators + 1):
+            host, _ = self.experiment.get_peer_ip_port_by_id(organization_index)
+            extra_hosts.append("peer0.org%d.example.com:%s" % (organization_index, host))
+            extra_hosts.append("orderer%d.example.com:%s" % (organization_index, host))
 
         # Change docker-composer for orderers
         yaml = YAML()
@@ -144,7 +144,8 @@ class HyperledgerModule(ExperimentModule):
                     "./crypto-config/ordererOrganizations/example.com/orderers/orderer%d.example.com/tls/:/var/hyperledger/orderer/tls" % orderer_index,
                     "orderer%d.example.com:/var/hyperledger/production/orderer" % orderer_index
                 ],
-                "ports": ["%d:7050" % (7050 + 1000 * (orderer_index - 1))]
+                "ports": ["%d:7050" % (7050 + 1000 * (orderer_index - 1))],
+                "extra_hosts": list(extra_hosts)
             }
 
             config["services"][name] = orderer_info
@@ -154,10 +155,11 @@ class HyperledgerModule(ExperimentModule):
 
         # Change docker-composer for peers
         yaml = YAML()
-        with open(os.path.join(self.config_path, "docker-compose-cli-template.yaml"), "r") as composer_file:
+        with open(os.path.join(self.config_path, "docker-compose-peers-template.yaml"), "r") as composer_file:
             config = yaml.load(composer_file)
 
         config["volumes"] = {}
+        config["services"] = {}
         for organization_index in range(1, self.num_validators + 1):
             name = "peer0.org%d.example.com" % organization_index
             config["volumes"][name] = None
@@ -178,7 +180,7 @@ class HyperledgerModule(ExperimentModule):
                     "CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.example.com:7051",
                     "CORE_PEER_LOCALMSPID=Org%dMSP" % organization_index,
                     "CORE_LEDGER_STATE_STATEDATABASE=CouchDB",
-                    "CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb%d:5984" % (organization_index - 1),
+                    "CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb%d:5984" % organization_index,
                     "CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=",
                     "CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD="
                 ],
@@ -192,10 +194,21 @@ class HyperledgerModule(ExperimentModule):
                 ],
                 "ports": ["%d:%d" % (6051 + 1000 * organization_index, 6051 + 1000 * organization_index)],
                 "networks": ["byfn"],
-                "depends_on": ["couchdb%d" % (organization_index - 1)]
+                "extra_hosts": list(extra_hosts),
+                "depends_on": ["couchdb%d" % organization_index]
             }
 
             config["services"][name] = peer_info
+
+        with open(os.path.join(self.config_path, "docker-compose-peers.yaml"), "w") as composer_file:
+            yaml.dump(config, composer_file)
+
+        # Add extra_hosts to docker-composer for cli
+        yaml = YAML()
+        with open(os.path.join(self.config_path, "docker-compose-cli-template.yaml"), "r") as composer_file:
+            config = yaml.load(composer_file)
+
+        config["services"]["cli"]["extra_hosts"] = list(extra_hosts)
 
         with open(os.path.join(self.config_path, "docker-compose-cli.yaml"), "w") as composer_file:
             yaml.dump(config, composer_file)
@@ -207,7 +220,7 @@ class HyperledgerModule(ExperimentModule):
 
         config["services"] = {}
         for organization_index in range(1, self.num_validators + 1):
-            couch_name = "couchdb%d" % (organization_index - 1)
+            couch_name = "couchdb%d" % organization_index
             couchdb_info = {
                 "container_name": couch_name,
                 "image": "hyperledger/fabric-couchdb",
@@ -225,25 +238,27 @@ class HyperledgerModule(ExperimentModule):
             yaml.dump(config, composer_file)
 
     @experiment_callback
+    def generate_artifacts(self):
+        self._logger.info("Generating artifacts...")
+        os.system("/home/pouwelse/hyperledger-network-template/generate.sh")
+
+    @experiment_callback
     def start_network(self):
-        if self.is_client():
-            return
-
         self._logger.info("Starting network...")
-        os.system("/home/pouwelse/hyperledger-network-template/start_all.sh")
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        os.system("/home/pouwelse/hyperledger-network-template/start_containers.sh %d" % my_peer_id)
 
-        def deploy():
-            self._logger.info("Deploying chaincode...")
-            os.system("/home/pouwelse/hyperledger-network-template/deploy.sh %d" % self.num_validators)
-            self._logger.info("Chaincode deployed and instantiated!")
-
-        deferLater(reactor, 5, deploy)
+    @experiment_callback
+    def deploy_chaincode(self):
+        """
+        Create the channel, add peers and instantiate chaincode.
+        """
+        self._logger.info("Deploying chaincode...")
+        os.system("/home/pouwelse/hyperledger-network-template/deploy.sh %d" % self.num_validators)
+        self._logger.info("Chaincode deployed and instantiated!")
 
     @experiment_callback
     def stop_network(self):
-        if self.is_client():
-            return
-
         self._logger.info("Stopping network...")
         os.system("/home/pouwelse/hyperledger-network-template/stop_all.sh")
 
@@ -270,24 +285,14 @@ class HyperledgerModule(ExperimentModule):
     @experiment_callback
     def start_creating_transactions(self):
         """
-        Start with submitting transactions.
+        Start with submitting transactions to the peer running on the same server.
         """
-        if not self.is_client():
-            return
-
-        self._logger.info("Starting transactions...")
-        self.tx_lc = LoopingCall(self.transfer)
-
-        # Depending on the tx rate and number of clients, wait a bit
-        individual_tx_rate = self.tx_rate / self.num_clients
-        self._logger.info("Individual tx rate: %f" % individual_tx_rate)
-
-        def start_lc():
-            self._logger.info("Starting tx lc...")
-            self.tx_lc.start(1.0 / individual_tx_rate)
-
         my_peer_id = self.experiment.scenario_runner._peernumber
-        deferLater(reactor, (1.0 / self.num_clients) * (my_peer_id - 1), start_lc)
+        tx_rate_client = self.tx_rate / self.num_validators
+        sleep_time = 1.0 / tx_rate_client
+        self._logger.info("Starting transactions (tx rate: %f, sleep time: %f..." % (tx_rate_client, sleep_time))
+        cmd = 'docker exec peer0.org%d.example.com bash /etc/hyperledger/scripts/transact.sh %f &' % (my_peer_id, sleep_time)
+        subprocess.Popen(cmd, shell=True)
 
     @experiment_callback
     def transfer(self):
@@ -301,17 +306,10 @@ class HyperledgerModule(ExperimentModule):
         """
         Stop with submitting transactions.
         """
-        if not self.is_client():
-            return
-
         self._logger.info("Stopping transactions...")
-        self.tx_lc.stop()
-
-    @experiment_callback
-    def write_logs(self):
-        for validator_index in range(1, self.num_validators + 1):
-            cmd = "docker logs peer0.org%d.example.com > validator%d.log" % (validator_index, validator_index)
-            subprocess.Popen(cmd, shell=True)
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        cmd = 'docker exec peer0.org%d.example.com pkill -f transact' % my_peer_id
+        subprocess.Popen(cmd, shell=True)
 
     @experiment_callback
     def stop(self):
