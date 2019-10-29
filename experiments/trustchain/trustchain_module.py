@@ -62,6 +62,8 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
+        self.overlay.settings.max_crawl_batch = 1000
+
         if "VALIDATION_RANGE" in os.environ:
             self.overlay.settings.validation_range = int(os.environ["VALIDATION_RANGE"])
 
