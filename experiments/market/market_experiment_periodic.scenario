@@ -16,7 +16,7 @@
 @0:10 connect_matchmakers 10
 @0:24 fix_broadcast_set
 @0:25 annotate start-trading
-@0:25 start_trading_lc 5
+@0:25 start_trading_lc 1
 @0:55 stop_trading_lc
 @0:58 write_stats
 @0:58 write_overlay_statistics
