@@ -11,7 +11,6 @@
 @0:1 annotate start-experiment
 @0:5 init_wallets
 @0:5 init_matchmakers
-@0:5 set_validation_range 0
 @0:6 init_trader_lookup_table
 @0:10 connect_matchmakers 10
 @0:24 fix_broadcast_set

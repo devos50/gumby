@@ -62,6 +62,9 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
+        if "VALIDATION_RANGE" in os.environ:
+            self.overlay.settings.validation_range = int(os.environ["VALIDATION_RANGE"])
+
     def get_peer_public_key(self, peer_id):
         # override the default implementation since we use the trustchain key here.
         return self.all_vars[peer_id]['trustchain_public_key']
