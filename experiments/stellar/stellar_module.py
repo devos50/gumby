@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+
+from twisted.web.client import HTTPConnectionPool
 from urllib.parse import urljoin
 
 import treq
@@ -29,18 +31,21 @@ class StellarModule(ExperimentModule):
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
 
-        self.sender_keypair = None
+        self.sender_keypairs = [None] * 10
         self.receiver_keypair = None
         self.tx_lc = None
-        self.sequence_number = 25769803776
+        self.sequence_numbers = [25769803776] * 10
+        self.current_tx_num = 0
+        self.request_pool = HTTPConnectionPool(reactor)
 
         # Make sure our postgres can be found
         sys.path.append("/home/pouwelse/postgres/bin")
 
     def on_message(self, from_id, msg_type, msg):
         self._logger.info("Received message with type %s from peer %d", msg_type, from_id)
-        if msg_type == b"send_account_seed":
-            self.sender_keypair = Keypair.from_seed(msg)
+        if msg_type.startswith(b"send_account_seed"):
+            account_nr = int(msg_type.split(b"_")[-1])
+            self.sender_keypairs[account_nr] = Keypair.from_seed(msg)
         elif msg_type == b"receive_account_seed":
             self.receiver_keypair = Keypair.from_seed(msg)
 
@@ -215,7 +220,7 @@ class StellarModule(ExperimentModule):
     @experiment_callback
     def create_accounts(self):
         """
-        Create two accounts for every client. Send the secret seed to the clients.
+        Create accounts for every client. Send the secret seeds to the clients.
         """
         self._logger.info("Creating accounts...")
 
@@ -228,18 +233,17 @@ class StellarModule(ExperimentModule):
                           network="Standalone Pramati Network ; Oct 2018")
 
         for client_index in range(self.num_validators + 1, self.num_validators + self.num_clients + 1):
-            sender_keypair = Keypair.random()
             receiver_keypair = Keypair.random()
-            sender_pub_key = sender_keypair.address().decode()
             receiver_pub_key = receiver_keypair.address().decode()
-
-            builder.append_create_account_op(sender_pub_key, "100000000")
             builder.append_create_account_op(receiver_pub_key, "100000000")
-
-            # Send the account seeds to the client
-            self._logger.info("Sending seeds to client %d" % client_index)
-            self.experiment.send_message(client_index, b"send_account_seed", sender_keypair.seed())
             self.experiment.send_message(client_index, b"receive_account_seed", receiver_keypair.seed())
+
+            # Create the sender accounts
+            for account_ind in range(10):
+                sender_keypair = Keypair.random()
+                sender_pub_key = sender_keypair.address().decode()
+                builder.append_create_account_op(sender_pub_key, "100000000")
+                self.experiment.send_message(client_index, b"send_account_seed_%d" % account_ind, sender_keypair.seed())
 
         builder.sign()
         builder.submit()
@@ -275,10 +279,12 @@ class StellarModule(ExperimentModule):
         validator_peer_id = ((my_peer_id - 1) % self.num_validators) + 1
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
 
-        builder = Builder(secret=self.sender_keypair.seed(),
+        source_account_nr = self.current_tx_num % 10
+
+        builder = Builder(secret=self.sender_keypairs[source_account_nr].seed(),
                           horizon_uri="http://%s:%d" % (host, 19000 + validator_peer_id),
                           network="Standalone Pramati Network ; Oct 2018",
-                          sequence=self.sequence_number,
+                          sequence=self.sequence_numbers[source_account_nr],
                           fee=100)
 
         builder.append_payment_op(self.receiver_keypair.address(), '100', 'XLM')
@@ -295,11 +301,12 @@ class StellarModule(ExperimentModule):
             else:
                 self._logger.info("Success tx with id %d", seq_num)
 
-        self._logger.info("Submitting transaction with id %d", self.sequence_number)
+        self._logger.info("Submitting transaction with id %d", self.sequence_numbers[source_account_nr])
         url = urljoin("http://%s:%d" % (host, 19000 + validator_peer_id), 'transactions/')
-        treq.post(url, data={"tx": builder.gen_xdr()}).addCallback(
-            lambda content, seq_num=self.sequence_number: on_response(seq_num, content))
-        self.sequence_number += 1
+        treq.post(url, data={"tx": builder.gen_xdr()}, pool=self.request_pool).addCallback(
+            lambda content, seq_num=self.sequence_numbers[source_account_nr]: on_response(seq_num, content))
+        self.sequence_numbers[source_account_nr] += 1
+        self.current_tx_num += 1
 
     @experiment_callback
     def stop_creating_transactions(self):
