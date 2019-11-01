@@ -1,12 +1,14 @@
 import os
 import subprocess
 import sys
+from threading import Thread
+from urllib.parse import quote_plus
 
-from twisted.web.client import HTTPConnectionPool
-from urllib.parse import urljoin
+import requests
 
 import treq
-from stellar_base import Keypair
+
+from stellar_base import Keypair, Horizon
 from stellar_base.builder import Builder
 
 from twisted.internet import reactor
@@ -31,12 +33,13 @@ class StellarModule(ExperimentModule):
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
 
-        self.sender_keypairs = [None] * 10
+        self.num_accounts_per_client = 10
+
+        self.sender_keypairs = [None] * self.num_accounts_per_client
         self.receiver_keypair = None
         self.tx_lc = None
-        self.sequence_numbers = [25769803776] * 10
+        self.sequence_numbers = [25769803776] * self.num_accounts_per_client
         self.current_tx_num = 0
-        self.request_pool = HTTPConnectionPool(reactor)
 
         # Make sure our postgres can be found
         sys.path.append("/home/pouwelse/postgres/bin")
@@ -192,8 +195,8 @@ class StellarModule(ExperimentModule):
         if self.is_client():
             return
 
-        cmd = "/home/pouwelse/stellar-core/stellar-core run > validator.out 2>&1"
-        self.validator_process = subprocess.Popen([cmd], shell=True)
+        cmd = "/home/pouwelse/stellar-core/stellar-core run 2>&1"
+        self.validator_process = subprocess.Popen([cmd], shell=True, stdout=subprocess.DEVNULL)
 
     @experiment_callback
     def start_horizon(self):
@@ -213,9 +216,21 @@ class StellarModule(ExperimentModule):
               '--stellar-core-url "http://127.0.0.1:%d" ' \
               '--network-passphrase="Standalone Pramati Network ; Oct 2018" ' \
               '--apply-migrations > horizon.out ' \
+              '--log-level=info ' \
               '--per-hour-rate-limit 0 2>&1' % (19000 + my_peer_id, horizon_db_name, db_name, 11000 + my_peer_id)
 
         self.horizon_process = subprocess.Popen([cmd], shell=True)
+
+    @experiment_callback
+    def upgrade_tx_set_size(self):
+        if self.is_client():
+            return
+
+        self._logger.info("Upgrading tx size limit")
+
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        response = requests.get("http://127.0.0.1:%d/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&maxtxsize=10000" % (11000 + my_peer_id,))
+        self._logger.info("Response: %s", response.text)
 
     @experiment_callback
     def create_accounts(self):
@@ -227,26 +242,40 @@ class StellarModule(ExperimentModule):
         my_peer_id = self.experiment.scenario_runner._peernumber
         validator_peer_id = ((my_peer_id - 1) % self.num_validators) + 1
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
+        horizon_uri = "http://%s:%d" % (host, 19000 + validator_peer_id)
+
+        def append_create_account_op(builder, receiver_pub_key, amount):
+            builder.append_create_account_op(receiver_pub_key, amount)
+            if len(builder.ops) == 100:
+                self._logger.info("Sending create transaction ops...")
+                builder.sign()
+                treq.post(horizon_uri + "/transactions/", data={"tx": builder.gen_xdr()})
+                builder = builder.next_builder()
+
+            return builder
 
         builder = Builder(secret="SDJ5AQWLIAYT22TCYSKOQALI3SNUMPAR63SEL73ASALDP6PYDN54FARM",
-                          horizon_uri="http://%s:%d" % (host, 19000 + validator_peer_id),
+                          horizon_uri=horizon_uri,
                           network="Standalone Pramati Network ; Oct 2018")
 
         for client_index in range(self.num_validators + 1, self.num_validators + self.num_clients + 1):
             receiver_keypair = Keypair.random()
             receiver_pub_key = receiver_keypair.address().decode()
-            builder.append_create_account_op(receiver_pub_key, "100000000")
+            builder = append_create_account_op(builder, receiver_pub_key, "100000000")
             self.experiment.send_message(client_index, b"receive_account_seed", receiver_keypair.seed())
 
             # Create the sender accounts
-            for account_ind in range(10):
+            for account_ind in range(self.num_accounts_per_client):
                 sender_keypair = Keypair.random()
                 sender_pub_key = sender_keypair.address().decode()
-                builder.append_create_account_op(sender_pub_key, "100000000")
+                builder = append_create_account_op(builder, sender_pub_key, "100000000")
                 self.experiment.send_message(client_index, b"send_account_seed_%d" % account_ind, sender_keypair.seed())
 
-        builder.sign()
-        builder.submit()
+        if len(builder.ops):
+            self._logger.info("Sending create transaction ops...")
+            builder.sign()
+            treq.post(horizon_uri + "/transactions/", data={"tx": builder.gen_xdr()})
+
 
     @experiment_callback
     def start_creating_transactions(self):
@@ -279,32 +308,34 @@ class StellarModule(ExperimentModule):
         validator_peer_id = ((my_peer_id - 1) % self.num_validators) + 1
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
 
-        source_account_nr = self.current_tx_num % 10
+        source_account_nr = self.current_tx_num % self.num_accounts_per_client
+        self._logger.info("Will transfer from account %d, sq num: %d", source_account_nr, self.sequence_numbers[source_account_nr])
 
         builder = Builder(secret=self.sender_keypairs[source_account_nr].seed(),
                           horizon_uri="http://%s:%d" % (host, 19000 + validator_peer_id),
                           network="Standalone Pramati Network ; Oct 2018",
                           sequence=self.sequence_numbers[source_account_nr],
                           fee=100)
+        builder.horizon.request_timeout = 60
 
         builder.append_payment_op(self.receiver_keypair.address(), '100', 'XLM')
         builder.sign()
 
-        def on_content(content):
-            print(content)
-            self._logger.info(content)
-
-        def on_response(seq_num, response):
-            if response.code != 200:
-                self._logger.info("Failed tx with id %d", seq_num)
-                treq.text_content(response).addCallback(on_content)
-            else:
-                self._logger.info("Success tx with id %d", seq_num)
-
         self._logger.info("Submitting transaction with id %d", self.sequence_numbers[source_account_nr])
-        url = urljoin("http://%s:%d" % (host, 19000 + validator_peer_id), 'transactions/')
-        treq.post(url, data={"tx": builder.gen_xdr()}, pool=self.request_pool).addCallback(
-            lambda content, seq_num=self.sequence_numbers[source_account_nr]: on_response(seq_num, content))
+
+        def send_transaction(tx, seq_num, account_nr):
+            response = requests.get("http://%s:%d/tx?blob=%s" % (host, 11000 + validator_peer_id, quote_plus(tx.decode())))
+            self._logger.info("Received response for transaction with id %d: %s", seq_num, response.text)
+            if response.status_code != 200 or response.json()["status"] != "PENDING":
+                # Restore seq num
+                new_seq_num = builder.get_sequence()
+                self.sequence_numbers[account_nr] = new_seq_num
+                self._logger.info("Reset sequence number of account %d from %d to %d", account_nr, seq_num, new_seq_num)
+
+        t = Thread(target=send_transaction, args=(builder.gen_xdr(), self.sequence_numbers[source_account_nr], source_account_nr))
+        t.daemon = True
+        t.start()
+
         self.sequence_numbers[source_account_nr] += 1
         self.current_tx_num += 1
 
@@ -318,6 +349,26 @@ class StellarModule(ExperimentModule):
 
         self._logger.info("Stopping transactions...")
         self.tx_lc.stop()
+
+    @experiment_callback
+    def print_metrics(self):
+        if self.is_client():
+            return
+
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        horizon = Horizon("http://127.0.0.1:%d" % (19000 + my_peer_id),)
+        metrics = horizon.metrics()
+        print("Horizon metrics: %s" % metrics)
+
+    @experiment_callback
+    def print_ledgers(self):
+        if self.is_client():
+            return
+
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        horizon = Horizon("http://127.0.0.1:%d" % (19000 + my_peer_id), )
+        ledgers = horizon.ledgers(limit=100)
+        print("Ledgers: %s" % ledgers)
 
     @experiment_callback
     def stop(self):
