@@ -33,7 +33,7 @@ class StellarModule(ExperimentModule):
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
 
-        self.num_accounts_per_client = 10
+        self.num_accounts_per_client = int(os.environ["ACCOUNTS_PER_CLIENT"])
 
         self.sender_keypairs = [None] * self.num_accounts_per_client
         self.receiver_keypair = None
@@ -139,36 +139,40 @@ class StellarModule(ExperimentModule):
         if self.is_client():
             return
 
-        cmd = "/home/pouwelse/stellar-core/stellar-core gen-seed"
-        proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
-        out, _ = proc.communicate()
-        out = out.decode()
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        node_name = "valnode%d" % my_peer_id
 
-        lines = out.split("\n")
-        seed = lines[0].split(" ")[-1]
+        # Read the keys
+        keys = []
+        with open("/home/pouwelse/stellar-core/keys.txt", "r") as keys_file:
+            for line in keys_file.readlines():
+                line = line.strip()
+                seed, pub_key = line.split(" ")
+                keys.append((seed, pub_key))
+
+        # Make the validators info
+        validators_string = ""
+        for validator_index in range(self.num_validators):
+            if validator_index + 1 == my_peer_id:
+                continue
+            validator_host, _ = self.experiment.get_peer_ip_port_by_id(validator_index + 1)
+            validators_string += """[[VALIDATORS]]
+NAME="valnode%d"
+HOME_DOMAIN="dev"
+PUBLIC_KEY="%s"
+ADDRESS="%s:%d"
+
+""" % (validator_index + 1, keys[validator_index][1], validator_host, 14000 + validator_index + 1)
 
         with open("/home/pouwelse/stellar-core/stellar-core-template.cfg", "r") as template_file:
             template_content = template_file.read()
 
-        my_peer_id = self.experiment.scenario_runner._peernumber
         template_content = template_content.replace("<HTTP_PORT>", str(11000 + my_peer_id))
-        template_content = template_content.replace("<NODE_SEED>", seed)
+        template_content = template_content.replace("<NODE_SEED>", keys[my_peer_id - 1][0])
+        template_content = template_content.replace("<NODE_NAME>", node_name)
         template_content = template_content.replace("<DB_NAME>", "stellar_%d_db" % my_peer_id)
         template_content = template_content.replace("<PEER_PORT>", str(14000 + my_peer_id))
-
-        # Fill in the known peers
-        other_peers = []
-        for other_peer_id in range(1, self.num_validators + 1):
-            int_peer_id = int(other_peer_id)
-            if int_peer_id == my_peer_id:
-                continue
-
-            ip, _ = self.experiment.get_peer_ip_port_by_id(int_peer_id)
-            other_peers.append('"%s:%d"' % (ip, 14000 + int_peer_id))
-
-        peers_str = ",".join(other_peers)
-
-        template_content = template_content.replace("<KNOWN_PEERS>", '[%s]' % peers_str)
+        template_content = template_content.replace("<VALIDATORS>", validators_string)
 
         with open("stellar-core.cfg", "w") as config_file:
             config_file.write(template_content)
@@ -244,12 +248,21 @@ class StellarModule(ExperimentModule):
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
         horizon_uri = "http://%s:%d" % (host, 19000 + validator_peer_id)
 
+        def on_content(content):
+            self._logger.info("Create accounts request failed with response: %s", content)
+
+        def on_response(response):
+            if response.code != 200:
+                treq.text_content(response).addCallback(on_content)
+            else:
+                self._logger.error("Create accounts request successful!")
+
         def append_create_account_op(builder, receiver_pub_key, amount):
             builder.append_create_account_op(receiver_pub_key, amount)
             if len(builder.ops) == 100:
                 self._logger.info("Sending create transaction ops...")
                 builder.sign()
-                treq.post(horizon_uri + "/transactions/", data={"tx": builder.gen_xdr()})
+                treq.post(horizon_uri + "/transactions/", data={"tx": builder.gen_xdr()}).addCallback(on_response)
                 builder = builder.next_builder()
 
             return builder
@@ -261,14 +274,14 @@ class StellarModule(ExperimentModule):
         for client_index in range(self.num_validators + 1, self.num_validators + self.num_clients + 1):
             receiver_keypair = Keypair.random()
             receiver_pub_key = receiver_keypair.address().decode()
-            builder = append_create_account_op(builder, receiver_pub_key, "100000000")
+            builder = append_create_account_op(builder, receiver_pub_key, "10000000")
             self.experiment.send_message(client_index, b"receive_account_seed", receiver_keypair.seed())
 
             # Create the sender accounts
             for account_ind in range(self.num_accounts_per_client):
                 sender_keypair = Keypair.random()
                 sender_pub_key = sender_keypair.address().decode()
-                builder = append_create_account_op(builder, sender_pub_key, "100000000")
+                builder = append_create_account_op(builder, sender_pub_key, "10000000")
                 self.experiment.send_message(client_index, b"send_account_seed_%d" % account_ind, sender_keypair.seed())
 
         if len(builder.ops):
@@ -325,7 +338,7 @@ class StellarModule(ExperimentModule):
 
         def send_transaction(tx, seq_num, account_nr):
             response = requests.get("http://%s:%d/tx?blob=%s" % (host, 11000 + validator_peer_id, quote_plus(tx.decode())))
-            self._logger.info("Received response for transaction with id %d: %s", seq_num, response.text)
+            self._logger.info("Received response for transaction with account %d and id %d: %s", account_nr, seq_num, response.text)
             if response.status_code != 200 or response.json()["status"] != "PENDING":
                 # Restore seq num
                 new_seq_num = builder.get_sequence()
