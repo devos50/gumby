@@ -13,6 +13,6 @@
 @0:30 create_accounts {1}
 @0:50 start_creating_transactions
 @0:110 stop_creating_transactions
-@0:112 print_metrics
-@0:114 print_ledgers
-@0:120 stop
+@0:172 print_metrics
+@0:174 print_ledgers
+@0:180 stop

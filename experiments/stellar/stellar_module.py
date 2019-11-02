@@ -18,6 +18,11 @@ from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module, ExperimentModule
 
 
+class AccountStatus(object):
+    IDLE = 0
+    REQ_PENDING = 1
+
+
 @static_module
 class StellarModule(ExperimentModule):
 
@@ -39,6 +44,7 @@ class StellarModule(ExperimentModule):
         self.receiver_keypair = None
         self.tx_lc = None
         self.sequence_numbers = [25769803776] * self.num_accounts_per_client
+        self.account_status = [AccountStatus.IDLE] * self.num_accounts_per_client
         self.current_tx_num = 0
 
         # Make sure our postgres can be found
@@ -321,7 +327,18 @@ ADDRESS="%s:%d"
         validator_peer_id = ((my_peer_id - 1) % self.num_validators) + 1
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
 
-        source_account_nr = self.current_tx_num % self.num_accounts_per_client
+        # Get an idle account
+        source_account_nr = None
+        for account_ind in range(self.num_accounts_per_client):
+            if self.account_status[account_ind] == AccountStatus.IDLE:
+                source_account_nr = account_ind
+                self.account_status[account_ind] = AccountStatus.REQ_PENDING
+                break
+
+        if source_account_nr is None:
+            self._logger.info("Could not find an idle account for transfer!")
+            return
+
         self._logger.info("Will transfer from account %d, sq num: %d", source_account_nr, self.sequence_numbers[source_account_nr])
 
         builder = Builder(secret=self.sender_keypairs[source_account_nr].seed(),
@@ -338,6 +355,7 @@ ADDRESS="%s:%d"
 
         def send_transaction(tx, seq_num, account_nr):
             response = requests.get("http://%s:%d/tx?blob=%s" % (host, 11000 + validator_peer_id, quote_plus(tx.decode())))
+            self.account_status[account_nr] = AccountStatus.IDLE
             self._logger.info("Received response for transaction with account %d and id %d: %s", account_nr, seq_num, response.text)
             if response.status_code != 200 or response.json()["status"] != "PENDING":
                 # Restore seq num
