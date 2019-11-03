@@ -1,8 +1,13 @@
 import os
 import subprocess
 import sys
+import time
 from threading import Thread
+
+from stellar_base.transaction_envelope import TransactionEnvelope
 from urllib.parse import quote_plus
+
+from datetime import datetime
 
 import requests
 
@@ -46,6 +51,7 @@ class StellarModule(ExperimentModule):
         self.sequence_numbers = [25769803776] * self.num_accounts_per_client
         self.account_status = [AccountStatus.IDLE] * self.num_accounts_per_client
         self.current_tx_num = 0
+        self.tx_submit_times = {}
 
         # Make sure our postgres can be found
         sys.path.append("/home/pouwelse/postgres/bin")
@@ -55,6 +61,7 @@ class StellarModule(ExperimentModule):
         if msg_type.startswith(b"send_account_seed"):
             account_nr = int(msg_type.split(b"_")[-1])
             self.sender_keypairs[account_nr] = Keypair.from_seed(msg)
+            self._logger.info("Address of account %d: %s" % (account_nr, self.sender_keypairs[account_nr].address().decode()))
         elif msg_type == b"receive_account_seed":
             self.receiver_keypair = Keypair.from_seed(msg)
 
@@ -226,6 +233,7 @@ ADDRESS="%s:%d"
               '--stellar-core-url "http://127.0.0.1:%d" ' \
               '--network-passphrase="Standalone Pramati Network ; Oct 2018" ' \
               '--apply-migrations > horizon.out ' \
+              '--ingest-failed-transactions=true ' \
               '--log-level=info ' \
               '--per-hour-rate-limit 0 2>&1' % (19000 + my_peer_id, horizon_db_name, db_name, 11000 + my_peer_id)
 
@@ -319,6 +327,24 @@ ADDRESS="%s:%d"
         deferLater(reactor, (1.0 / self.num_clients) * (my_peer_id - 1), start_lc)
 
     @experiment_callback
+    def get_initial_sq_num(self):
+        if not self.is_client():
+            return
+
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        validator_peer_id = ((my_peer_id - 1) % self.num_validators) + 1
+        host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id)
+
+        builder = Builder(secret=self.sender_keypairs[0].seed(),
+                          horizon_uri="http://%s:%d" % (host, 19000 + validator_peer_id),
+                          network="Standalone Pramati Network ; Oct 2018",
+                          fee=100)
+
+        # Set the sequence number for all accounts
+        for account_ind in range(self.num_accounts_per_client):
+            self.sequence_numbers[account_ind] = builder.sequence
+
+    @experiment_callback
     def transfer(self):
         if not self.is_client():
             return
@@ -354,6 +380,8 @@ ADDRESS="%s:%d"
         self._logger.info("Submitting transaction with id %d", self.sequence_numbers[source_account_nr])
 
         def send_transaction(tx, seq_num, account_nr):
+            tx_id = self.sender_keypairs[source_account_nr].address().decode() + "." + "%d" % seq_num
+            submit_time = int(round(time.time() * 1000))
             response = requests.get("http://%s:%d/tx?blob=%s" % (host, 11000 + validator_peer_id, quote_plus(tx.decode())))
             self.account_status[account_nr] = AccountStatus.IDLE
             self._logger.info("Received response for transaction with account %d and id %d: %s", account_nr, seq_num, response.text)
@@ -362,6 +390,8 @@ ADDRESS="%s:%d"
                 new_seq_num = builder.get_sequence()
                 self.sequence_numbers[account_nr] = new_seq_num
                 self._logger.info("Reset sequence number of account %d from %d to %d", account_nr, seq_num, new_seq_num)
+            elif response.json()["status"] == "PENDING":
+                self.tx_submit_times[tx_id] = submit_time
 
         t = Thread(target=send_transaction, args=(builder.gen_xdr(), self.sequence_numbers[source_account_nr], source_account_nr))
         t.daemon = True
@@ -382,6 +412,15 @@ ADDRESS="%s:%d"
         self.tx_lc.stop()
 
     @experiment_callback
+    def write_submit_times(self):
+        if not self.is_client():
+            return
+
+        with open("tx_submit_times.txt", "w") as tx_submit_times_file:
+            for tx_id, submit_time in self.tx_submit_times.items():
+                tx_submit_times_file.write("%s,%d\n" % (tx_id, submit_time))
+
+    @experiment_callback
     def print_metrics(self):
         if self.is_client():
             return
@@ -400,6 +439,37 @@ ADDRESS="%s:%d"
         horizon = Horizon("http://127.0.0.1:%d" % (19000 + my_peer_id), )
         ledgers = horizon.ledgers(limit=100)
         print("Ledgers: %s" % ledgers)
+
+    @experiment_callback
+    def parse_ledgers(self):
+        self._logger.info("Parsing ledgers...")
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        horizon_url = "http://127.0.0.1:%d" % (19000 + my_peer_id)
+        horizon = Horizon(horizon_url)
+        ledgers = horizon.ledgers(limit=100)
+        tx_times = {}
+        for ledger_info in ledgers["_embedded"]["records"]:
+            ledger_sq = ledger_info["sequence"]
+            self._logger.info("Parsing ledger %d...", ledger_sq)
+            close_time = datetime.fromisoformat(ledger_info["closed_at"].replace("Z", "+00:00")).timestamp() * 1000
+
+            # Get the transactions in this ledger
+            transactions = horizon.ledger_transactions(ledger_sq, limit=200, include_failed=True)  # TODO chain requests
+            while True:
+                if not transactions["_embedded"]["records"]:
+                    break
+
+                for transaction in transactions["_embedded"]["records"]:
+                    te = TransactionEnvelope.from_xdr(transaction["envelope_xdr"])
+                    tx_id = te.tx.source.decode() + "." + "%d" % (te.tx.sequence - 1)
+                    tx_times[tx_id] = close_time
+
+                response = requests.get(transactions["_links"]["next"]["href"])
+                transactions = response.json()
+
+        with open("tx_finalized_times.txt", "w") as tx_finalized_times_file:
+            for tx_id, close_time in tx_times.items():
+                tx_finalized_times_file.write("%s,%d\n" % (tx_id, close_time))
 
     @experiment_callback
     def stop(self):
