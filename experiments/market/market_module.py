@@ -81,7 +81,7 @@ class MarketModule(IPv8OverlayExperimentModule):
 
         total_peers = len(self.all_vars.keys())
         wait_period = float(interval) / float(total_peers) * float(self.experiment.scenario_runner._peernumber)
-        reactor.callLater(wait_period, self.order_create_lc.start, int(interval))
+        reactor.callLater(wait_period, self.order_create_lc.start, interval)
 
     def create_order(self):
         if self.create_ask:
