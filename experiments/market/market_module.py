@@ -39,11 +39,6 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
-        if 'MAX_CONCURRENT_TRADES' in os.environ:
-            max_concurrent_trades = int(os.environ['MAX_CONCURRENT_TRADES'])
-            self._logger.info("Setting max concurrent trades to %d", max_concurrent_trades)
-            self.overlay.settings.max_concurrent_trades = max_concurrent_trades
-
     def on_id_received(self):
         super(MarketModule, self).on_id_received()
         self.create_ask = self.experiment.scenario_runner._peernumber % 2 == 0
@@ -77,8 +72,12 @@ class MarketModule(IPv8OverlayExperimentModule):
             self._logger.info("Will broadcast to peer: %s", str(peer))
 
     @experiment_callback
-    def start_trading_lc(self, interval):
+    def start_trading_lc(self):
         self.order_create_lc = LoopingCall(self.create_order)
+
+        interval = 1
+        if "ORDER_INTERVAL" in os.environ:
+            interval = float(os.environ["ORDER_INTERVAL"])
 
         total_peers = len(self.all_vars.keys())
         wait_period = float(interval) / float(total_peers) * float(self.experiment.scenario_runner._peernumber)
@@ -243,3 +242,21 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('bandwidth.txt', 'w') as bandwidth_file:
             bandwidth_file.write("%d,%d" % (self.overlay.endpoint.bytes_up,
                                             self.overlay.endpoint.bytes_down))
+
+    @experiment_callback
+    def write_responsibilities(self):
+        """
+        Write responsibilities in the chain with trades.
+        """
+        peer_pk = self.overlay.trustchain.my_peer.public_key.key_to_bin()
+        blocks = self.overlay.trustchain.persistence.get_latest_blocks(peer_pk, limit=10000)
+        blocks = sorted(blocks, key=lambda block: block.sequence_number)
+        with open("responsibilities.txt", 'w') as responsibilities_file:
+            responsibilities_file.write("seq_num;type;responsibilities;tx\n")
+            for block in blocks:
+                responsibilities = 0
+                if "responsibilities" in block.transaction:
+                    responsibilities = block.transaction["responsibilities"]
+                tx_json = json.dumps(block.transaction)
+                responsibilities_file.write("%d;%s;%d;%s\n"
+                                            % (block.sequence_number, block.type.decode(), responsibilities, tx_json))
