@@ -217,7 +217,14 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
         return Peer(session.trustchain_keypair)
 
     def get_kwargs(self, session):
-        return {'trustchain': session.lm.trustchain_community, 'dht': session.lm.dht_community, 'use_database': False}
+        from anydex.core.settings import MarketSettings
+
+        settings = MarketSettings()
+        if 'MAX_CONCURRENT_TRADES' in os.environ:
+            max_concurrent_trades = int(os.environ['MAX_CONCURRENT_TRADES'])
+            settings.max_concurrent_trades = max_concurrent_trades
+
+        return {'trustchain': session.lm.trustchain_community, 'dht': session.lm.dht_community, 'use_database': False, 'settings': settings}
 
 
 class GigaChannelCommunityLauncher(IPv8CommunityLauncher):
