@@ -5,7 +5,6 @@ from base64 import b64decode
 
 from twisted.internet import reactor
 
-from anydex.core.clearing_policy import SingleTradeClearingPolicy
 from anydex.core.community import MarketCommunity
 from anydex.core.assetamount import AssetAmount
 from anydex.core.assetpair import AssetPair
@@ -40,10 +39,10 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
-        if 'SINGLE_TRADE' in os.environ:
-            self._logger.info("Setting single trade clearing policy")
-            single_trade_policy = SingleTradeClearingPolicy(self.overlay)
-            self.overlay.clearing_policies.append(single_trade_policy)
+        if 'MAX_CONCURRENT_TRADES' in os.environ:
+            max_concurrent_trades = int(os.environ['MAX_CONCURRENT_TRADES'])
+            self._logger.info("Setting max concurrent trades to %d", max_concurrent_trades)
+            self.overlay.settings.max_concurrent_trades = max_concurrent_trades
 
     def on_id_received(self):
         super(MarketModule, self).on_id_received()

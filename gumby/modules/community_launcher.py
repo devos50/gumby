@@ -217,14 +217,7 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
         return Peer(session.trustchain_keypair)
 
     def get_kwargs(self, session):
-        from anydex.core.settings import MarketSettings, ExperimentClearingPolicy
-
-        if 'POLICY' in os.environ:
-            policy = int(os.environ['POLICY'])
-            settings = MarketSettings()
-            settings.policy = policy
-
-        return {'trustchain': session.lm.trustchain_community, 'dht': session.lm.dht_community, 'use_database': False, 'settings': settings}
+        return {'trustchain': session.lm.trustchain_community, 'dht': session.lm.dht_community, 'use_database': False}
 
 
 class GigaChannelCommunityLauncher(IPv8CommunityLauncher):
