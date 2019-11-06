@@ -130,10 +130,22 @@ class MarketStatisticsParser(StatisticsParser):
                           'total_bid_quantity': int(self.total_bid_quantity)}
             stats_file.write(json.dumps(stats_dict))
 
+    def aggregate_fraud(self):
+        """
+        Aggregate fraud statistics.
+        """
+        with open("frauds.txt", "w") as all_frauds_file:
+            all_frauds_file.write("time\n")
+            for peer_nr, filename, dir in self.yield_files('frauds.txt'):
+                with open(filename) as frauds_file:
+                    content = frauds_file.read()
+                    all_frauds_file.write(content)
+
     def run(self):
         self.aggregate_transaction_data()
         self.aggregate_order_data()
         self.aggregate_general_stats()
+        self.aggregate_fraud()
 
 
 # cd to the output directory

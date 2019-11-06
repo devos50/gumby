@@ -139,19 +139,43 @@ class MarketModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def ask(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
+        if asset1_type not in self.overlay.wallets:
+            new_wallet = DummyWallet1()
+            new_wallet.balance = 1000000000000
+            self.overlay.wallets[asset1_type] = new_wallet
+        if asset2_type not in self.overlay.wallets:
+            new_wallet = DummyWallet1()
+            new_wallet.balance = 1000000000000
+            self.overlay.wallets[asset2_type] = new_wallet
+
         self.num_asks += 1
         pair = AssetPair(AssetAmount(int(asset1_amount), asset1_type), AssetAmount(int(asset2_amount), asset2_type))
-        order = self.overlay.create_ask(pair, 3600)
-        if order_id:
-            self.order_id_map[order_id] = order.order_id
+
+        def on_created(order):
+            if order_id:
+                self.order_id_map[order_id] = order.order_id
+
+        self.overlay.create_ask(pair, 3600).addCallback(on_created)
 
     @experiment_callback
     def bid(self, asset1_amount, asset1_type, asset2_amount, asset2_type, order_id=None):
+        if asset1_type not in self.overlay.wallets:
+            new_wallet = DummyWallet1()
+            new_wallet.balance = 1000000000000
+            self.overlay.wallets[asset1_type] = new_wallet
+        if asset2_type not in self.overlay.wallets:
+            new_wallet = DummyWallet1()
+            new_wallet.balance = 1000000000000
+            self.overlay.wallets[asset2_type] = new_wallet
+
         self.num_bids += 1
         pair = AssetPair(AssetAmount(int(asset1_amount), asset1_type), AssetAmount(int(asset2_amount), asset2_type))
-        order = self.overlay.create_bid(pair, 3600)
-        if order_id:
-            self.order_id_map[order_id] = order.order_id
+
+        def on_created(order):
+            if order_id:
+                self.order_id_map[order_id] = order.order_id
+
+        self.overlay.create_bid(pair, 3600).addCallback(on_created)
 
     @experiment_callback
     def cancel(self, order_id):
@@ -199,6 +223,12 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('matchmakers.txt', 'w') as matchmakers_file:
             for matchmaker in self.overlay.matchmakers:
                 matchmakers_file.write("%s,%d\n" % (matchmaker.address[0], matchmaker.address[1]))
+
+        # Write frauds
+        with open('frauds.txt', 'w') as frauds_file:
+            for fraud_time in self.overlay.frauds:
+                fraud_time = int(fraud_time - scenario_runner.exp_start_time * 1000)
+                frauds_file.write("%d,%d\n" % (scenario_runner._peernumber, fraud_time))
 
         # Get statistics about the amount of fulfilled orders (asks/bids)
         fulfilled_asks = 0
