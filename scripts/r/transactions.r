@@ -25,18 +25,18 @@ if(file.exists("transactions_cumulative.csv")){
 }
 
 # Draw the transaction graph
-pdf(NULL)
+#pdf(NULL)
 
-library("igraph")
+#library("igraph")
 
-data = read.csv("transactions.log", sep=",")
-data_matrix = data.matrix(data[,5:6])
+#data = read.csv("transactions.log", sep=",")
+#data_matrix = data.matrix(data[,5:6])
 
-g <- graph_from_edgelist(data_matrix, directed=F)
+#g <- graph_from_edgelist(data_matrix, directed=F)
 
-png(filename = "transaction_graph.png", width=1000, height=1000)
+#png(filename = "transaction_graph.png", width=1000, height=1000)
 
-plot(g, layout=layout.fruchterman.reingold(g, niter=10000), vertex.size=8, edge.width=5)
-title("Transactions", cex.main=3)
+#plot(g, layout=layout.fruchterman.reingold(g, niter=10000), vertex.size=8, edge.width=5)
+#title("Transactions", cex.main=3)
 
 dev.off()
