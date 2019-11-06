@@ -50,6 +50,22 @@ class MarketStatisticsParser(StatisticsParser):
             transactions_file.write("time,transactions\n")
             transactions_file.write(transactions_cumulative_str)
 
+        # Compute the peak throughput
+        max_throughput = 0
+        for start_ind in range(len(transactions_times)):
+            cur_throughput = 1
+            start_time = transactions_times[start_ind]
+            cur_ind = start_ind + 1
+            while cur_ind < len(transactions_times) and (transactions_times[cur_ind] - start_time <= 1):
+                cur_ind += 1
+                cur_throughput += 1
+
+            if cur_throughput > max_throughput:
+                max_throughput = cur_throughput
+
+        with open("throughput.txt", "w") as throughput_file:
+            throughput_file.write("%d" % max_throughput)
+
     def aggregate_order_data(self):
         """
         Aggregate all data of the orders
