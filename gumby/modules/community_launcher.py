@@ -223,6 +223,9 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
         if 'MAX_CONCURRENT_TRADES' in os.environ:
             max_concurrent_trades = int(os.environ['MAX_CONCURRENT_TRADES'])
             settings.max_concurrent_trades = max_concurrent_trades
+        if 'TRANSFERS_PER_TRADE' in os.environ:
+            transfers_per_trade = int(os.environ['TRANSFERS_PER_TRADE'])
+            settings.transfers_per_trade = transfers_per_trade
 
         return {'trustchain': session.lm.trustchain_community, 'dht': session.lm.dht_community, 'use_database': False, 'settings': settings}
 
