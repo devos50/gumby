@@ -16,9 +16,10 @@
 @0:24 fix_broadcast_set
 @0:25 annotate start-trading
 @0:25 start_trading_lc
-@0:55 stop_trading_lc
-@0:58 write_stats
-@0:58 write_overlay_statistics
-@0:60 stop_session
-@0:60 stop_yappi {1}
-@0:65 stop
+@0:85 stop_trading_lc
+@0:88 write_stats
+@0:88 write_overlay_statistics
+@0:88 write_blocks
+@0:90 stop_session
+@0:90 stop_yappi {1}
+@0:95 stop

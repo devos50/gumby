@@ -244,19 +244,13 @@ class MarketModule(IPv8OverlayExperimentModule):
                                             self.overlay.endpoint.bytes_down))
 
     @experiment_callback
-    def write_responsibilities(self):
+    def write_blocks(self):
         """
-        Write responsibilities in the chain with trades.
+        Write blocks.
         """
         peer_pk = self.overlay.trustchain.my_peer.public_key.key_to_bin()
-        blocks = self.overlay.trustchain.persistence.get_latest_blocks(peer_pk, limit=10000)
+        blocks = self.overlay.trustchain.persistence.get_latest_blocks(peer_pk, limit=100000)
         blocks = sorted(blocks, key=lambda block: block.sequence_number)
-        with open("responsibilities.txt", 'w') as responsibilities_file:
-            responsibilities_file.write("seq_num;type;responsibilities;tx\n")
+        with open("blocks.txt", 'w') as responsibilities_file:
             for block in blocks:
-                responsibilities = 0
-                if "responsibilities" in block.transaction:
-                    responsibilities = block.transaction["responsibilities"]
-                tx_json = json.dumps(block.transaction)
-                responsibilities_file.write("%d;%s;%d;%s\n"
-                                            % (block.sequence_number, block.type.decode(), responsibilities, tx_json))
+                responsibilities_file.write("%d,%d\n" % (block.sequence_number, block.timestamp))
