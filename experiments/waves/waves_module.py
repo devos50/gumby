@@ -267,6 +267,35 @@ class WavesModule(ExperimentModule):
                                  json=sign_response).json()
         print("Got order post response: %s" % response)
 
+        if "error" in response and response["error"] == 9440771:
+            # Try everything again........
+            data = {
+                "senderPublicKey": self.account_info['pub_key'],
+                "matcherPublicKey": self.matcher_account_info['pub_key'],
+                "matcherFee": matcher_fee,
+                "expiration": max_timestamp,
+                "orderType": 'sell' if order_type == 'ask' else 'buy',
+                "amount": int(amount),
+                "timestamp": int(round(time.time() * 1000)),
+                "price": int(price) * 100000000,
+                "assetPair": {
+                    "amountAsset": price_asset,
+                    "priceAsset": amount_asset,
+                }
+            }
+
+            # Sign the order
+            sign_response = requests.post("http://localhost:%d/assets/order" % network_port,
+                                          headers={'api_key': 'test'}, json=data).json()
+            print("Got order sign response: %s" % sign_response)
+
+            # Post the order
+            matcher_peer = self.experiment.get_peer_ip_port_by_id(self.picked_matcher_num)
+            response = requests.post(
+                "http://%s:%d/matcher/orderbook" % (matcher_peer[0], self.start_matcher_port + self.picked_matcher_num),
+                json=sign_response).json()
+            print("Got order post response: %s" % response)
+
         # Store order
         self.created_orders.append((response["message"]["timestamp"], response["message"]["signature"]))
 

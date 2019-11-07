@@ -15,6 +15,8 @@ class WavesStatisticsParser(StatisticsParser):
         super(WavesStatisticsParser, self).__init__(node_directory)
 
     def analyse_blocks(self):
+        avg_latency = 0
+        avg_latency_count = 0
         order_latencies = []
         block_throughputs = []  # List of (time, num_transactions)
         for peer_nr, filename, dir in self.yield_files(file_to_check='blockchain.txt'):
@@ -32,6 +34,8 @@ class WavesStatisticsParser(StatisticsParser):
                             order_latency = block["timestamp"] - transaction["timestamp"]
                             if order_latency > 0:
                                 order_latencies.append(order_latency)
+                                avg_latency += order_latency
+                                avg_latency_count += 1
 
                     block_throughputs.append((block["timestamp"], order_blocks))
 
@@ -39,6 +43,10 @@ class WavesStatisticsParser(StatisticsParser):
             order_latencies_file.write("time\n")
             for latency in order_latencies:
                 order_latencies_file.write("%s\n" % latency)
+
+        if avg_latency_count > 0:
+            with open("latency.txt", "w") as latency_file:
+                latency_file.write("%f" % (avg_latency / avg_latency_count))
 
         # Find the maximum throughput per second
         max_throughput = 0
