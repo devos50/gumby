@@ -1,11 +1,7 @@
 import os
 import random
-import shutil
-import subprocess
-import sys
 import time
 
-import pexpect as pexpect
 import six
 import toml
 
@@ -20,7 +16,6 @@ from twisted.web import server, http
 from twisted.web.client import readBody, WebClientContextFactory, Agent
 from twisted.web.http_headers import Headers
 
-from experiments.libra.faucet_endpoint import FaucetEndpoint
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module, ExperimentModule
 
@@ -61,8 +56,7 @@ class LibraModule(ExperimentModule):
         self.faucet_process = None
         self.libra_client = None
         self.faucet_client = None
-        self.faucet_service = None
-        self.libra_path = "/home/pouwelse/libra"
+        self.host_config_dir = "/home/pouwelse/libra_config"
         self.num_validators = int(os.environ["NUM_VALIDATORS"])
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
@@ -79,17 +73,40 @@ class LibraModule(ExperimentModule):
         self.current_seq_num = 0
 
     @experiment_callback
+    def generate_docker_config(self):
+        """
+        Generate the docker configuration files.
+        """
+        pass
+
+    @experiment_callback
+    def start_containers(self):
+        """
+        Start all Docker containers.
+        """
+        self._logger.info("Starting containers...")
+        cmd = "docker-compose -f /home/pouwelse/libra_docker/libra-compose.yml up -d"
+        os.system(cmd)
+
+    @experiment_callback
     def generate_config(self):
         """
         Generate the initial configuration files.
         """
+        self._logger.info("Removing old config...")
 
         # Step 1: remove configuration from previous run
-        shutil.rmtree("%s/das_config" % self.libra_path)
+        cmd = "docker exec peer1.libra.com rm -rf /etc/libra/config/*"
+        os.system(cmd)
+
+        self._logger.info("Generating new configuration...")
 
         # Step 2: generate new configuration
-        cmd = "%s/target/release/libra-config -b %s/config/data/configs/node.config.toml -m %s/terraform/validator-sets/dev/mint.key -o %s/das_config -n %d" % \
-              (self.libra_path, self.libra_path, self.libra_path, self.libra_path, self.num_validators)
+        cmd = "docker exec peer1.libra.com /opt/libra/bin/libra-config -b /libra/config/data/configs/node.config.toml -m /libra/terraform/validator-sets/dev/mint.key -o /etc/libra/config -n %d" % self.num_validators
+        os.system(cmd)
+
+        # Make sure we can edit these files
+        cmd = "docker exec peer1.libra.com chmod -R 777 /etc/libra/config"
         os.system(cmd)
 
     @experiment_callback
@@ -100,34 +117,32 @@ class LibraModule(ExperimentModule):
         my_peer_id = self.experiment.scenario_runner._peernumber
         self.validator_id = my_peer_id - 1
         if not self.is_client():
-            with open(os.path.join(self.libra_path, "das_config", "%d" % self.validator_id, "node.config.toml"), "r") as node_config_file:
+            with open(os.path.join(self.host_config_dir, "%d" % self.validator_id, "node.config.toml"), "r") as node_config_file:
                 content = node_config_file.read()
                 node_config = toml.loads(content)
                 self.validator_peer_id = node_config["networks"][0]["peer_id"]
 
-                listen_address = node_config["networks"][0]["listen_address"]
-                listen_address = listen_address.replace("ip6", "ip4")
-                listen_address = listen_address.replace("::1", "0.0.0.0")
-                node_config["networks"][0]["listen_address"] = listen_address
-
-                advertised_address = node_config["networks"][0]["advertised_address"]
-                advertised_address = advertised_address.replace("ip6", "ip4")
-                advertised_address = advertised_address.replace("::1", "0.0.0.0")
-                node_config["networks"][0]["advertised_address"] = advertised_address
+                parts = node_config["networks"][0]["listen_address"].split("/")
+                parts[1] = parts[1].replace("ip6", "ip4")
+                parts[2] = parts[2].replace("::1", "0.0.0.0")
+                parts[4] = "%d" % (12000 + my_peer_id)
+                node_config["networks"][0]["listen_address"] = "/".join(parts)
+                node_config["networks"][0]["advertised_address"] = "/".join(parts)
 
                 node_config["admission_control"]["address"] = "0.0.0.0"
                 node_config["mempool"]["capacity_per_user"] = 10000
+                node_config["execution"]["genesis_file_location"] = "/libra/terraform/validator-sets/dev/genesis.blob"
 
                 # Fix data directories
                 node_config["base"]["data_dir_path"] = os.getcwd()
                 node_config["storage"]["dir"] = os.path.join(os.getcwd(), "libradb", "db")
 
             # Write the updated node configuration
-            with open(os.path.join(self.libra_path, "das_config", "%d" % self.validator_id, "node.config.toml"), "w") as node_config_file:
+            with open(os.path.join(self.host_config_dir, "%d" % self.validator_id, "node.config.toml"), "w") as node_config_file:
                 node_config_file.write(toml.dumps(node_config))
 
             # Update the seed configuration
-            with open(os.path.join(self.libra_path, "das_config", "%d" % self.validator_id, "%s.seed_peers.config.toml" % self.validator_peer_id), "r") as seed_peers_file:
+            with open(os.path.join(self.host_config_dir, "%d" % self.validator_id, "%s.seed_peers.config.toml" % self.validator_peer_id), "r") as seed_peers_file:
                 content = seed_peers_file.read()
                 seed_peers_config = toml.loads(content)
                 self.validator_ids = sorted(list(seed_peers_config["seed_peers"].keys()))
@@ -137,14 +152,11 @@ class LibraModule(ExperimentModule):
                 ip, _ = self.experiment.get_peer_ip_port_by_id(validator_index + 1)
                 validator_id = self.validator_ids[validator_index]
 
-                current_host = seed_peers_config["seed_peers"][validator_id][0]
-                parts = current_host.split("/")
-                listen_port = parts[4]
-
+                listen_port = "%d" % (12000 + validator_index + 1)
                 seed_peers_config["seed_peers"][validator_id][0] = "/ip4/%s/tcp/%s" % (ip, listen_port)
 
             # Write
-            with open(os.path.join(self.libra_path, "das_config", "%d" % self.validator_id, "%s.seed_peers.config.toml" % self.validator_peer_id), "w") as seed_peers_file:
+            with open(os.path.join(self.host_config_dir, "%d" % self.validator_id, "%s.seed_peers.config.toml" % self.validator_peer_id), "w") as seed_peers_file:
                 seed_peers_file.write(toml.dumps(seed_peers_config))
 
     @experiment_callback
@@ -158,46 +170,50 @@ class LibraModule(ExperimentModule):
         my_libra_id = self.validator_ids[my_peer_id - 1]
 
         self._logger.info("Starting libra validator with id %s...", my_libra_id)
-        self.libra_validator_process = subprocess.Popen(['/home/pouwelse/libra/target/release/libra_node -f %s > %s 2>&1' %
-                                                         ('/home/pouwelse/libra/das_config/%d/node.config.toml' % (my_peer_id - 1),
-                                                          os.path.join(os.getcwd(), 'libra_output.log'))], shell=True)
+        cmd = "docker exec -d peer%d.libra.com /opt/libra/bin/libra-node -f /etc/libra/config/%d/node.config.toml" % (my_peer_id, my_peer_id - 1)
+        os.system(cmd)
+
+    @experiment_callback
+    def get_validator_config(self, validator_id):
+        with open(os.path.join(self.host_config_dir, "%d" % validator_id, "node.config.toml"), "r") as validator_config_file:
+            content = validator_config_file.read()
+            validator_config = toml.loads(content)
+
+        return validator_config
+
+    @experiment_callback
+    def start_minter(self):
+        """
+        Start the minting service.
+        """
+        self._logger.info("Starting minting")
+        validator_config = self.get_validator_config(0)
+        port = validator_config["admission_control"]["admission_control_service_port"]
+
+        # First, copy the required files to /opt/libra/etc
+        cmd = "docker exec peer1.libra.com cp /libra/terraform/validator-sets/dev/mint.key /opt/libra/etc"
+        os.system(cmd)
+        cmd = "docker exec peer1.libra.com cp /etc/libra/config/0/consensus_peers.config.toml /opt/libra/etc"
+        os.system(cmd)
+
+        # Start the minter
+        cmd = "docker exec -d -e AC_HOST=127.0.0.1 -e AC_PORT=%d peer1.libra.com bash -c \"cd /opt/libra/bin && gunicorn --bind 0.0.0.0:8000 server\"" % port
+        os.system(cmd)
 
     @experiment_callback
     def start_libra_client(self):
         my_peer_id = self.experiment.scenario_runner._peernumber
         validator_peer_id = (my_peer_id - 1) % self.num_validators
-
-        with open(os.path.join(self.libra_path, "das_config", "%d" % validator_peer_id, "node.config.toml"), "r") as validator_config_file:
-            content = validator_config_file.read()
-            validator_config = toml.loads(content)
-
+        validator_config = self.get_validator_config(validator_peer_id)
         port = validator_config["admission_control"]["admission_control_service_port"]
         host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id + 1)
 
         # Get the faucet host
         faucet_host, _ = self.experiment.get_peer_ip_port_by_id(1)
 
-        if my_peer_id == 1:
-            # Start the minting service
-            cmd = "/home/pouwelse/libra/target/release/client " \
-                  "--host %s " \
-                  "--port %s " \
-                  "--validator_set_file /home/pouwelse/libra/das_config/%d/consensus_peers.config.toml " \
-                  "-m /home/pouwelse/libra/single_config/mint.key" % (host, port, validator_peer_id)
-
-            self.faucet_client = pexpect.spawn(cmd)
-            self.faucet_client.logfile = sys.stdout.buffer
-            self.faucet_client.expect("Please, input commands", timeout=3)
-
-            # Also start the HTTP API for the faucet service
-            self._logger.info("Starting faucet HTTP API...")
-            faucet_endpoint = FaucetEndpoint(self.faucet_client)
-            site = server.Site(resource=faucet_endpoint)
-            self.faucet_service = reactor.listenTCP(8000, site, interface="0.0.0.0")
-
         if self.is_client():
             self._logger.info("Spawning client that connects to validator %s (host: %s, port %s)", validator_peer_id, host, port)
-            self.libra_client = Client.new(host, port, os.path.join(self.libra_path, "das_config", "%d" % validator_peer_id,"consensus_peers.config.toml"))
+            self.libra_client = Client.new(host, port, os.path.join(self.host_config_dir, "%d" % validator_peer_id, "consensus_peers.config.toml"))
             self.libra_client.faucet_host = faucet_host + ":8000"
 
     @experiment_callback
@@ -331,10 +347,15 @@ class LibraModule(ExperimentModule):
                 tx_file.write("%d,%d,%d\n" % (tx_num, tx_info[0], tx_info[1]))
 
     @experiment_callback
+    def stop_containers(self):
+        """
+        Stop the started Docker containers.
+        """
+        self._logger.info("Stopping containers...")
+        cmd = "docker-compose -f /home/pouwelse/libra_docker/libra-compose.yml down"
+        os.system(cmd)
+
+    @experiment_callback
     def stop(self):
         print("Stopping Libra...")
-        if self.libra_validator_process:
-            self.libra_validator_process.kill()
-        if self.faucet_process:
-            self.faucet_process.kill()
         reactor.stop()
