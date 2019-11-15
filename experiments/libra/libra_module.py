@@ -299,13 +299,12 @@ class LibraModule(ExperimentModule):
         """
         request_time = int(round(time.time() * 1000))
 
-        try:
-            ledger_seq_num = self.libra_client.get_sequence_number(self.wallet.accounts[0].address)
-        except AccountError:
+        ledger_seq_num = self.libra_client.get_sequence_number(self.wallet.accounts[0].address)
+        if ledger_seq_num == 0:
             self._logger.warning("Empty account blob!")
             return
 
-        for seq_num in range(self.last_tx_confirmed, ledger_seq_num):
+        for seq_num in range(self.last_tx_confirmed + 1, ledger_seq_num):
             if seq_num == -1:
                 continue
             self.tx_info[seq_num] = (self.tx_info[seq_num][0], request_time)
