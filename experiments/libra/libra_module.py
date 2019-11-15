@@ -279,7 +279,8 @@ class LibraModule(ExperimentModule):
             self.tx_lc.start(1.0 / individual_tx_rate)
 
         my_peer_id = self.experiment.scenario_runner._peernumber
-        deferLater(reactor, (1.0 / self.num_clients) * (my_peer_id - 1), start_lc)
+        my_client_id = my_peer_id - self.num_validators
+        deferLater(reactor, (1.0 / self.num_clients) * (my_client_id - 1), start_lc)
 
     def is_client(self):
         my_peer_id = self.experiment.scenario_runner._peernumber
