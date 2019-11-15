@@ -303,7 +303,6 @@ ADDRESS="%s:%d"
             builder.sign()
             treq.post(horizon_uri + "/transactions/", data={"tx": builder.gen_xdr()})
 
-
     @experiment_callback
     def start_creating_transactions(self):
         """
@@ -316,6 +315,8 @@ ADDRESS="%s:%d"
         self.tx_lc = LoopingCall(self.transfer)
 
         # Depending on the tx rate and number of clients, wait a bit
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        my_client_id = my_peer_id - self.num_validators
         individual_tx_rate = self.tx_rate / self.num_clients
         self._logger.info("Individual tx rate: %f" % individual_tx_rate)
 
@@ -323,8 +324,7 @@ ADDRESS="%s:%d"
             self._logger.info("Starting tx lc...")
             self.tx_lc.start(1.0 / individual_tx_rate)
 
-        my_peer_id = self.experiment.scenario_runner._peernumber
-        deferLater(reactor, (1.0 / self.num_clients) * (my_peer_id - 1), start_lc)
+        deferLater(reactor, (1.0 / self.num_clients) * (my_client_id - 1), start_lc)
 
     @experiment_callback
     def get_initial_sq_num(self):

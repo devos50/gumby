@@ -93,7 +93,7 @@ class StellarStatisticsParser(StatisticsParser):
                 max_throughput = tx_sec
 
         with open("throughput.txt", "w") as throughput_file:
-            throughput_file.write("%d" % max_throughput)
+            throughput_file.write("%d,%f" % (max_throughput, total_transactions / 150))
 
     def run(self):
         self.aggregate_transactions()

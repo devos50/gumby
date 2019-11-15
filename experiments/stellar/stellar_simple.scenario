@@ -13,8 +13,8 @@
 @0:30 create_accounts {1}
 @0:58 get_initial_sq_num
 @0:60 start_creating_transactions
-@0:120 stop_creating_transactions
-@0:180 parse_ledgers {1}
-@0:180 write_submit_times
-@0:180 print_ledgers
-@0:190 stop
+@0:180 stop_creating_transactions
+@0:210 parse_ledgers {1}
+@0:210 write_submit_times
+@0:210 print_ledgers {2}
+@0:240 stop
