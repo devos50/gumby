@@ -119,6 +119,7 @@ class LibraModule(ExperimentModule):
 
                 node_config["admission_control"]["address"] = "0.0.0.0"
                 node_config["mempool"]["capacity_per_user"] = 10000
+                node_config["consensus"]["max_block_size"] = 10000
                 node_config["execution"]["genesis_file_location"] = os.path.join(self.libra_path, "terraform", "validator-sets", "dev", "genesis.blob")
 
                 # Fix data directories
