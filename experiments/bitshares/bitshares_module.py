@@ -42,6 +42,7 @@ class BitsharesModule(ExperimentModule):
         self.num_validators = int(os.environ["NUM_VALIDATORS"])
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
+        self.did_write_start_time = False
 
     def load_keys(self):
         account_number = self.experiment.scenario_runner._peernumber - 1
@@ -238,17 +239,32 @@ class BitsharesModule(ExperimentModule):
 
     @experiment_callback
     def start_creating_transactions(self):
+        self.start_creating_transactions(self.tx_rate)
+
+    @experiment_callback
+    def start_creating_transactions_with_rate(self, tx_rate):
         """
         Start with submitting transactions.
         """
         if not self.is_client():
             return
 
+        if self.tx_lc:
+            self.tx_lc.stop()
+            self.tx_lc = None
+
+        if not self.did_write_start_time:
+            # Write the start time to a file
+            submit_tx_start_time = int(round(time.time() * 1000))
+            with open("submit_tx_start_time.txt", "w") as out_file:
+                out_file.write("%d" % submit_tx_start_time)
+            self.did_write_start_time = True
+
         self._logger.info("Starting transactions...")
         self.tx_lc = LoopingCall(self.transfer)
 
         # Depending on the tx rate and number of clients, wait a bit
-        individual_tx_rate = self.tx_rate / self.num_clients
+        individual_tx_rate = int(tx_rate) / self.num_clients
         self._logger.info("Individual tx rate: %f" % individual_tx_rate)
 
         def start_lc():
@@ -282,11 +298,13 @@ class BitsharesModule(ExperimentModule):
 
         self._logger.info("Stopping transactions...")
         self.tx_lc.stop()
+        self.tx_lc = None
 
     @experiment_callback
     def dump_blockchain(self):
         dynamic_settings = self.wallet_rpc.get_dynamic_global_properties()
         head_block_nr = dynamic_settings["head_block_number"]
+        self._logger.info("Blocks in blockchain: %d", head_block_nr)
         with open("blockchain.txt", "w") as blockchain_file:
             for ind in range(1, head_block_nr + 1):
                 blockchain_file.write(json.dumps(self.wallet_rpc.get_block(ind)) + "\n")

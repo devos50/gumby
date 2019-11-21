@@ -150,9 +150,22 @@ class BitsharesStatisticsParser(StatisticsParser):
 
             break  # We only need one blockchain.txt file
 
+        # Get the average experiment start time
+        avg_start_time = 0
+        num_files = 0
+        for peer_nr, filename, dir in self.yield_files('submit_tx_start_time.txt'):
+            with open(filename) as submit_tx_start_time_file:
+                start_time = int(submit_tx_start_time_file.read())
+                avg_start_time += start_time
+                num_files += 1
+
+        avg_start_time = int(avg_start_time / num_files)
+
         # We go over all transactions created by client, check if the signature is included in the blockchain and compute the latency
         avg_latency = 0
         num_confirmed = 0
+        submit_times = []
+        confirm_times = []
         with open("transactions.txt", "w") as transactions_file:
             transactions_file.write("peer_id,tx_id,submit_time,confirm_time,latency\n")
 
@@ -165,12 +178,14 @@ class BitsharesStatisticsParser(StatisticsParser):
                         stripped_line = line.rstrip('\n')
                         parts = stripped_line.split(',')
 
-                        creation_time = int(parts[0])
+                        creation_time = int(parts[0]) - avg_start_time
+                        submit_times.append(creation_time)
                         tx_signature = parts[1]
                         latency = -1
                         confirm_time = -1
                         if tx_signature in signature_map:
-                            confirm_time = signature_map[tx_signature]
+                            confirm_time = signature_map[tx_signature] - avg_start_time
+                            confirm_times.append(confirm_time)
                             latency = confirm_time - creation_time
                             avg_latency += latency
                             num_confirmed += 1
@@ -180,6 +195,37 @@ class BitsharesStatisticsParser(StatisticsParser):
         if num_confirmed > 0:
             with open("latency.txt", "w") as latency_file:
                 latency_file.write("%f" % (avg_latency / num_confirmed))
+
+        submit_times = sorted(submit_times)
+        confirm_times = sorted(confirm_times)
+
+        # Compute cumulative tx statistics
+        cumulative_window = 100  # milliseconds
+        cur_time = 0
+        submitted_tx_index = 0
+        confirmed_tx_index = 0
+
+        submitted_count = 0
+        confirmed_count = 0
+        results = [(0, 0, 0)]
+
+        while cur_time < max(submit_times[-1], confirm_times[-1]):
+            # Increase counters
+            while submitted_tx_index < len(submit_times) and submit_times[submitted_tx_index] <= cur_time + cumulative_window:
+                submitted_tx_index += 1
+                submitted_count += 1
+
+            while confirmed_tx_index < len(confirm_times) and confirm_times[confirmed_tx_index] <= cur_time + cumulative_window:
+                confirmed_tx_index += 1
+                confirmed_count += 1
+
+            cur_time += cumulative_window
+            results.append((cur_time, submitted_count, confirmed_count))
+
+        with open("tx_cumulative.csv", "w") as out_file:
+            out_file.write("time,submitted,confirmed\n")
+            for result in results:
+                out_file.write("%d,%d,%d\n" % result)
 
     def run(self):
         self.aggregate_bandwidth()
