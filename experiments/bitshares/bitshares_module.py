@@ -43,6 +43,8 @@ class BitsharesModule(ExperimentModule):
         self.num_clients = int(os.environ["NUM_CLIENTS"])
         self.tx_rate = int(os.environ["TX_RATE"])
         self.did_write_start_time = False
+        self.dump_blockchain_lc = None
+        self.last_block_written = 0
 
     def load_keys(self):
         account_number = self.experiment.scenario_runner._peernumber - 1
@@ -246,6 +248,10 @@ class BitsharesModule(ExperimentModule):
         """
         Start with submitting transactions.
         """
+        if self.experiment.scenario_runner._peernumber == 1 and not self.dump_blockchain_lc:
+            self.dump_blockchain_lc = LoopingCall(self.dump_blockchain)
+            self.dump_blockchain_lc.start(10)
+
         if not self.is_client():
             return
 
@@ -302,12 +308,23 @@ class BitsharesModule(ExperimentModule):
 
     @experiment_callback
     def dump_blockchain(self):
+        """
+        Dump the blockchain up to the latest block we have written
+        """
         dynamic_settings = self.wallet_rpc.get_dynamic_global_properties()
         head_block_nr = dynamic_settings["head_block_number"]
-        self._logger.info("Blocks in blockchain: %d", head_block_nr)
-        with open("blockchain.txt", "w") as blockchain_file:
-            for ind in range(1, head_block_nr + 1):
-                blockchain_file.write(json.dumps(self.wallet_rpc.get_block(ind)) + "\n")
+        self._logger.info("Last block in blockchain: %d", head_block_nr)
+
+        def write_blocks_async(last_block):
+            with open("blockchain.txt", "a") as blockchain_file:
+                for ind in range(self.last_block_written + 1, last_block + 1):
+                    blockchain_file.write(json.dumps(self.wallet_rpc.get_block(ind)) + "\n")
+                    self._logger.info("Written block %d...", ind)
+                self.last_block_written = last_block
+
+        t = Thread(target=write_blocks_async, args=(head_block_nr,))
+        t.daemon = True
+        t.start()
 
     @experiment_callback
     def write_stats(self):
@@ -347,12 +364,11 @@ class BitsharesModule(ExperimentModule):
         with open("bandwidth.txt", "w") as bandwidth_file:
             bandwidth_file.write("%d,%d,%d" % (total_up, total_down, total_up + total_down))
 
-        if self.experiment.scenario_runner._peernumber == 1:
-            self.dump_blockchain()
-
     @experiment_callback
     def stop(self):
         print("Stopping...")
         if self.bs_process:
             self.bs_process.kill()
+        if self.dump_blockchain_lc:
+            self.dump_blockchain_lc.stop()
         reactor.stop()
