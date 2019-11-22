@@ -107,6 +107,15 @@ class BitsharesModule(ExperimentModule):
         super(BitsharesModule, self).on_id_received()
         self.create_ask = (self.experiment.scenario_runner._peernumber % 2 == 0)
 
+    def on_all_vars_received(self):
+        super(BitsharesModule, self).on_all_vars_received()
+
+        # Make sure that the number of validators + the number of clients is the number of total instances
+        if self.num_validators + self.num_clients != len(self.all_vars.keys()):
+            self._logger.error("Number of validators (%d) + number of clients (%d) unequal to num instances (%d)!",
+                               self.num_validators, self.num_clients, len(self.all_vars.keys()))
+            self.stop()
+
     def check_bs_process(self):
         """
         Check whether the main Bitshares process is alive. If it's not, restart it
@@ -149,12 +158,9 @@ class BitsharesModule(ExperimentModule):
         self._logger.info("Unlocking CLI wallet...")
 
         my_peer_id = self.experiment.scenario_runner._peernumber
-        validator_peer_id = (my_peer_id - 1) % self.num_validators
-        validator_host, _ = self.experiment.get_peer_ip_port_by_id(validator_peer_id + 1)
-        validator_port = 13000 + validator_peer_id + 1
 
-        self._logger.info("Connecting to wallet on host %s and port %d...", validator_host, validator_port)
-        self.wallet_rpc = GrapheneAPI(validator_host, validator_port, "", "")
+        self._logger.info("Connecting to localhost wallet on port %d...", 13000 + my_peer_id)
+        self.wallet_rpc = GrapheneAPI("127.0.0.1", 13000 + my_peer_id, "", "")
         self.wallet_rpc.set_password("secret")
         self.wallet_rpc.unlock("secret")
 
@@ -241,7 +247,7 @@ class BitsharesModule(ExperimentModule):
 
     @experiment_callback
     def start_creating_transactions(self):
-        self.start_creating_transactions(self.tx_rate)
+        self.start_creating_transactions_with_rate(self.tx_rate)
 
     @experiment_callback
     def start_creating_transactions_with_rate(self, tx_rate):

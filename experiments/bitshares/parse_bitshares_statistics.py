@@ -9,7 +9,101 @@ from dateutil import parser as dateparser
 from gumby.statsparser import StatisticsParser
 
 
-class BitsharesStatisticsParser(StatisticsParser):
+class BlockchainTransactionsParser(StatisticsParser):
+    """
+    This class parsers blockchain transactions.
+    """
+
+    def __init__(self, node_directory):
+        super(BlockchainTransactionsParser, self).__init__(node_directory)
+        self.transactions = []
+        self.cumulative_stats = []
+        self.avg_latency = -1
+
+    def parse(self):
+        """
+        Parse all blockchain statistics.
+        """
+        self.parse_transactions()
+        self.compute_avg_latency()
+        self.compute_tx_cumulative_stats()
+        self.write_all()
+
+    def parse_transactions(self):
+        """
+        This method should be implemented by the sub-class since it depends on the individual blockchain
+        implementations. The execution of this method should fill the self.transactions array with information.
+        """
+        pass
+
+    def compute_avg_latency(self):
+        """
+        Compute the average transaction latency.
+        """
+        avg_latency = 0
+        num_comfirmed = 0
+        for transaction in self.transactions:
+            if transaction[4] != -1:
+                avg_latency += transaction[4]
+                num_comfirmed += 1
+
+        self.avg_latency = avg_latency / num_comfirmed
+
+    def compute_tx_cumulative_stats(self):
+        """
+        Compute cumulative transaction statistics.
+        """
+        submit_times = []
+        confirm_times = []
+        for transaction in self.transactions:
+            submit_times.append(transaction[2])
+            if transaction[3] != -1:
+                confirm_times.append(transaction[3])
+
+        submit_times = sorted(submit_times)
+        confirm_times = sorted(confirm_times)
+
+        cumulative_window = 100  # milliseconds
+        cur_time = 0
+        submitted_tx_index = 0
+        confirmed_tx_index = 0
+
+        submitted_count = 0
+        confirmed_count = 0
+        self.cumulative_stats = [(0, 0, 0)]
+
+        while cur_time < max(submit_times[-1], confirm_times[-1]):
+            # Increase counters
+            while submitted_tx_index < len(submit_times) and submit_times[submitted_tx_index] <= cur_time + cumulative_window:
+                submitted_tx_index += 1
+                submitted_count += 1
+
+            while confirmed_tx_index < len(confirm_times) and confirm_times[confirmed_tx_index] <= cur_time + cumulative_window:
+                confirmed_tx_index += 1
+                confirmed_count += 1
+
+            cur_time += cumulative_window
+            self.cumulative_stats.append((cur_time, submitted_count, confirmed_count))
+
+    def write_all(self):
+        """
+        Write all information to disk.
+        """
+        with open("transactions.txt", "w") as transactions_file:
+            transactions_file.write("peer_id,tx_id,submit_time,confirm_time,latency\n")
+            for transaction in self.transactions:
+                transactions_file.write("%d,%s,%d,%d,%d\n" % transaction)
+
+        with open("tx_cumulative.csv", "w") as out_file:
+            out_file.write("time,submitted,confirmed\n")
+            for result in self.cumulative_stats:
+                out_file.write("%d,%d,%d\n" % result)
+
+        with open("latency.txt", "w") as latency_file:
+            latency_file.write("%f" % self.avg_latency)
+
+
+class BitsharesStatisticsParser(BlockchainTransactionsParser):
     """
     This class is responsible for parsing statistics of Bitshares experiment
     """
@@ -126,7 +220,7 @@ class BitsharesStatisticsParser(StatisticsParser):
             with open("latency.txt", "w") as latency_file:
                 latency_file.write("%f" % (avg_latency / avg_latency_count))
 
-    def analyse_tx_on_blockchain(self):
+    def parse_transactions(self):
         """
         Analyze all transactions on the BitShares blockchain.
         """
@@ -162,75 +256,29 @@ class BitsharesStatisticsParser(StatisticsParser):
         avg_start_time = int(avg_start_time / num_files)
 
         # We go over all transactions created by client, check if the signature is included in the blockchain and compute the latency
-        avg_latency = 0
-        num_confirmed = 0
-        submit_times = []
-        confirm_times = []
-        with open("transactions.txt", "w") as transactions_file:
-            transactions_file.write("peer_id,tx_id,submit_time,confirm_time,latency\n")
+        for peer_nr, filename, dir in self.yield_files('tx_submit_times.txt'):
+            with open(filename) as tx_submit_times_file:
+                lines = tx_submit_times_file.readlines()
+                for line in lines:
+                    if not line:
+                        continue
+                    stripped_line = line.rstrip('\n')
+                    parts = stripped_line.split(',')
 
-            for peer_nr, filename, dir in self.yield_files('tx_submit_times.txt'):
-                with open(filename) as tx_submit_times_file:
-                    lines = tx_submit_times_file.readlines()
-                    for line in lines:
-                        if not line:
-                            continue
-                        stripped_line = line.rstrip('\n')
-                        parts = stripped_line.split(',')
+                    creation_time = int(parts[0]) - avg_start_time
+                    tx_signature = parts[1]
+                    latency = -1
+                    confirm_time = -1
+                    if tx_signature in signature_map:
+                        confirm_time = signature_map[tx_signature] - avg_start_time
+                        latency = confirm_time - creation_time
 
-                        creation_time = int(parts[0]) - avg_start_time
-                        submit_times.append(creation_time)
-                        tx_signature = parts[1]
-                        latency = -1
-                        confirm_time = -1
-                        if tx_signature in signature_map:
-                            confirm_time = signature_map[tx_signature] - avg_start_time
-                            confirm_times.append(confirm_time)
-                            latency = confirm_time - creation_time
-                            avg_latency += latency
-                            num_confirmed += 1
-
-                        transactions_file.write("%d,%s,%d,%d,%d\n" % (peer_nr, tx_signature, creation_time, confirm_time, latency))
-
-        if num_confirmed > 0:
-            with open("latency.txt", "w") as latency_file:
-                latency_file.write("%f" % (avg_latency / num_confirmed))
-
-        submit_times = sorted(submit_times)
-        confirm_times = sorted(confirm_times)
-
-        # Compute cumulative tx statistics
-        cumulative_window = 100  # milliseconds
-        cur_time = 0
-        submitted_tx_index = 0
-        confirmed_tx_index = 0
-
-        submitted_count = 0
-        confirmed_count = 0
-        results = [(0, 0, 0)]
-
-        while cur_time < max(submit_times[-1], confirm_times[-1]):
-            # Increase counters
-            while submitted_tx_index < len(submit_times) and submit_times[submitted_tx_index] <= cur_time + cumulative_window:
-                submitted_tx_index += 1
-                submitted_count += 1
-
-            while confirmed_tx_index < len(confirm_times) and confirm_times[confirmed_tx_index] <= cur_time + cumulative_window:
-                confirmed_tx_index += 1
-                confirmed_count += 1
-
-            cur_time += cumulative_window
-            results.append((cur_time, submitted_count, confirmed_count))
-
-        with open("tx_cumulative.csv", "w") as out_file:
-            out_file.write("time,submitted,confirmed\n")
-            for result in results:
-                out_file.write("%d,%d,%d\n" % result)
+                    self.transactions.append((peer_nr, tx_signature, creation_time, confirm_time, latency))
 
     def run(self):
         self.aggregate_bandwidth()
-        #self.analyse_blockchain()
-        self.analyse_tx_on_blockchain()
+        self.parse()
+
 
 # cd to the output directory
 os.chdir(os.environ['OUTPUT_DIR'])
