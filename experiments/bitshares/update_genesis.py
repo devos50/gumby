@@ -4,7 +4,8 @@ This script updates the genesis file.
 import json
 import os
 
-NUM_WITNESSES = 4
+NUM_WITNESSES = 2
+NUM_USERS = 100
 
 accounts = []  # List of tuple (brain_priv_key, pub_key, wif_priv_key)
 
@@ -24,7 +25,7 @@ json_content["initial_active_witnesses"] = NUM_WITNESSES
 json_content["immutable_parameters"]["min_witness_count"] = NUM_WITNESSES - 1
 
 # Write the accounts
-for ind in range(NUM_WITNESSES):
+for ind in range(NUM_USERS):
     json_content["initial_accounts"].append({
         "name": "user%d" % ind,
         "owner_key": accounts[ind][1],

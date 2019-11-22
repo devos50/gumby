@@ -69,7 +69,7 @@ class BitsharesModule(ExperimentModule):
             return
 
         # Copy the data directory
-        shutil.copytree(os.path.join(self.devnet_dir, "data-clean"), "data")
+        shutil.copytree(os.path.join(self.devnet_dir, "data-clean-%d" % self.num_validators), "data")
 
         self.load_keys()
 
@@ -140,7 +140,7 @@ class BitsharesModule(ExperimentModule):
         wallet_rpc_port = 13000 + peer_id
         
         # Get the chain ID
-        with open(os.path.join(self.devnet_dir, "chainid"), "r") as chainid_file:
+        with open(os.path.join(self.devnet_dir, "chainid-%d" % self.num_validators), "r") as chainid_file:
             chain_id = chainid_file.read().rstrip('\n')
 
         print("Starting CLI wallet with chain ID: %s" % chain_id)
