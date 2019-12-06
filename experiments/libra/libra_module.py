@@ -308,3 +308,6 @@ class LibraModule(BlockchainModule):
         if self.faucet_process:
             self.faucet_process.kill()
         reactor.stop()
+
+        # Delete the postgres directory
+        shutil.rmtree("libradb", ignore_errors=True)
