@@ -124,7 +124,8 @@ class AlgorandModule(BlockchainModule):
 
         # Copy over the configuration to the local file system
         my_peer_id = self.experiment.scenario_runner._peernumber
-        shutil.copytree(os.path.join(self.root_dir, "Node%d" % my_peer_id), "Node%d" % my_peer_id)
+        config_dir = "/home/pouwelse/algorand_data/data-%d" % self.num_validators
+        shutil.copytree(os.path.join(config_dir, "Node%d" % my_peer_id), "Node%d" % my_peer_id)
 
         self._logger.info("Initializing configuration...")
         data_dir = self.get_data_dir(my_peer_id)
