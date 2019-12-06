@@ -432,7 +432,7 @@ class HyperledgerModule(ExperimentModule):
         Start monitoring the blocks
         """
         self._logger.info("Starting monitor...")
-        cmd = "cd /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/ && /home/pouwelse/go/bin/go run /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/fabric-cli.go event listenblock --cid mychannel --peer localhost:7051 --config /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/config.yaml > %s" % os.path.join(os.getcwd(), "transactions.txt")
+        cmd = "cd /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/ && /home/pouwelse/go/bin/go run /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/fabric-cli.go event listenblock --cid mychannel --peer localhost:7000 --config /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/config.yaml > %s" % os.path.join(os.getcwd(), "transactions.txt")
         my_env = os.environ.copy()
         my_env["GOPATH"] = "/home/pouwelse/gocode"
         self.monitor_process = subprocess.Popen(cmd, env=my_env, shell=True)
