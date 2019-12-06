@@ -453,6 +453,7 @@ class HyperledgerModule(ExperimentModule):
             latest_block = response.height
             if latest_block > self.latest_block_num:
                 self._logger.info("Updating to block nr %d", latest_block)
+                self.latest_block_num = latest_block
                 confirm_time = int(round(time.time() * 1000))
                 for confirmed_block_num in range(self.latest_block_num + 1, latest_block + 1):
                     self.block_confirm_times[confirmed_block_num] = confirm_time
@@ -472,7 +473,7 @@ class HyperledgerModule(ExperimentModule):
                     requestor=org1_admin,
                     channel_name='mychannel',
                     peers=['peer0.org1.example.com'],
-                    block_number='1',
+                    block_number="%d" % block_ind,
                     decode=True
                 ))
                 blockchain_file.write(json.dumps(block))
