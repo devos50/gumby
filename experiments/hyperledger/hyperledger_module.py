@@ -214,6 +214,9 @@ class HyperledgerModule(ExperimentModule):
             "ORDERER_GENERAL_GENESISFILE": os.path.join(self.config_path, "channel-artifacts", "genesis.block"),
             "ORDERER_GENERAL_LOCALMSPDIR": os.path.join(orderer_data_path, "msp"),
 
+            # Operations
+            "ORDERER_OPERATIONS_LISTENADDRESS": "127.0.0.1:%d" % (21000 + my_peer_id),
+
             # TLS
             "ORDERER_GENERAL_TLS_ENABLED": "true",
             "ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY": os.path.join(orderer_tls_dir, "server.key"),
