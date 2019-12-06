@@ -283,6 +283,11 @@ class BitsharesModule(BlockchainModule):
             for order_tup in self.tx_info:
                 created_tx_files.write("%d,%s\n" % (order_tup[0], order_tup[1]))
 
+        my_peer_id = self.experiment.scenario_runner._peernumber
+        if my_peer_id == 1:
+            with open("nathan_balance.txt", "w") as balances_file:
+                balances_file.write(json.dumps(self.wallet_rpc.list_account_balances("nathan")))
+
         with open("balances.txt", "w") as balances_file:
             balances_file.write(json.dumps(self.wallet_rpc.list_account_balances(self.username)))
         with open("global_settings.txt", "w") as settings_file:
