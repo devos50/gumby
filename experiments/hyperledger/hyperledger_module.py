@@ -116,7 +116,7 @@ class HyperledgerModule(ExperimentModule):
                 },
                 "AnchorPeers": [{
                     "Host": organization_host,
-                    "Port": 7050 + organization_index
+                    "Port": 7000 + organization_index
                 }]
             }
 
@@ -131,7 +131,7 @@ class HyperledgerModule(ExperimentModule):
 
         for organization_index in range(1, self.num_validators + 1):
             organization_host, _ = self.experiment.get_peer_ip_port_by_id(organization_index)
-            consenter_port = 7050 + (organization_index - 1) * 1000
+            consenter_port = 7000 + organization_index
             consenter_info = {
                 "Host": organization_host,
                 "Port": consenter_port,
@@ -201,7 +201,7 @@ class HyperledgerModule(ExperimentModule):
 
         orderer_data_path = os.path.join(os.getcwd(), "orderer_data")
         orderer_tls_dir = os.path.join(orderer_data_path, "tls")
-        orderer_port = (7050 + 1000 * (my_peer_id - 1))
+        orderer_port = 7000 + my_peer_id
 
         orderer_env = os.environ.copy()
         orderer_vars = {
@@ -243,7 +243,7 @@ class HyperledgerModule(ExperimentModule):
         peer_data_path = os.path.join(os.getcwd(), "peer_data")
         peer_tls_dir = os.path.join(peer_data_path, "tls")
 
-        peer_port = (7051 + 1000 * (my_peer_id - 1))
+        peer_port = 8000 + my_peer_id
         chaincode_listen_port = 9000 + my_peer_id
 
         peer_env = os.environ.copy()
@@ -310,7 +310,7 @@ class HyperledgerModule(ExperimentModule):
 
         # Fill in 'orderers'
         for orderer_index in range(1, self.num_validators + 1):
-            orderer_port = (7050 + 1000 * (orderer_index - 1))
+            orderer_port = 7000 + orderer_index
             host, _ = self.experiment.get_peer_ip_port_by_id(orderer_index)
             info = {
                 "url": "%s:%d" % (host, orderer_port),
@@ -326,7 +326,7 @@ class HyperledgerModule(ExperimentModule):
 
         # Fill in 'peers'
         for peer_index in range(1, self.num_validators + 1):
-            peer_port = (7051 + 1000 * (peer_index - 1))
+            peer_port = 8000 + peer_index
             host, _ = self.experiment.get_peer_ip_port_by_id(peer_index)
             info = {
                 "url": "%s:%d" % (host, peer_port),
