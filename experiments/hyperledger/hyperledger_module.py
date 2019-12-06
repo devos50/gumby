@@ -263,6 +263,9 @@ class HyperledgerModule(ExperimentModule):
             "CORE_PEER_GOSSIP_ORGLEADER": "false",
             "FABRIC_LOGGING_SPEC": "INFO",
 
+            # Operations
+            "CORE_OPERATIONS_LISTENADDRESS": "127.0.0.1:%d" % (22000 + my_peer_id),
+
             # TLS
             "CORE_PEER_TLS_ENABLED": "true",
             "CORE_PEER_TLS_CERT_FILE": os.path.join(peer_tls_dir, "server.crt"),
