@@ -466,7 +466,7 @@ class HyperledgerModule(ExperimentModule):
         self._logger.info("Writing blockchain...")
         org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
         loop = asyncio.get_event_loop()
-        with open("blockchain.txt", "w") as blockchain_file:
+        with open("blockchain.txt", "wb") as blockchain_file:
             for block_ind in range(1, self.latest_block_num + 1):
                 self._logger.info("Getting block %d...", block_ind)
                 block = loop.run_until_complete(self.fabric_client.query_block(
@@ -476,7 +476,7 @@ class HyperledgerModule(ExperimentModule):
                     block_number="%d" % block_ind,
                     decode=True
                 ))
-                blockchain_file.write(json.dumps(block))
+                blockchain_file.write(block)
 
     @experiment_callback
     def print_block(self):
