@@ -8,8 +8,7 @@
 @0:15 start_orderers
 @0:15 start_peers
 @0:25 deploy_chaincode {1}
-@0:55 start_monitor {1}
-@0:60 start_creating_transactions 20
-@0:90 stop_monitor {1}
-@0:91 write_blockchain {1}
-@0:100 stop
+@0:75 start_monitor {1}
+@0:80 start_creating_transactions 20
+@0:110 stop_monitor {1}
+@0:120 stop
