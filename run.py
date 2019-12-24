@@ -38,6 +38,8 @@
 # Code:
 
 from __future__ import print_function
+
+import asyncio
 import logging
 import sys
 from os import environ, getpgid, getpid, kill, setpgrp
@@ -53,8 +55,6 @@ try:
     from psutil import get_pid_list as pids
 except ImportError:
     from psutil import pids
-
-from twisted.internet import reactor
 
 from gumby.runner import ExperimentRunner
 
@@ -81,7 +81,37 @@ def _killGroup(signal=SIGTERM):
             pass
     return pids_found
 
+
 _terminating = False
+
+
+async def run_experiment():
+    # Create a process group so we can clean up after ourselves when
+    setpgrp()  # create new process group and become its leader
+    # Catch SIGTERM to attempt to clean after ourselves
+    signal(SIGTERM, _termTrap)
+
+    exp_runner = ExperimentRunner(conf_path)
+    exit_code = await exp_runner.run()
+
+    # Kill all the subprocesses before exiting
+    logger = logging.getLogger()
+    logger.info("Killing leftover local sub processes...")
+    pids_found = _killGroup()
+    wait_start_time = time()
+    while pids_found > 1 and (time() - wait_start_time) < 30:
+        pids_found = _killGroup()
+        if pids_found > 1:
+            logger.info("Waiting for %d subprocess(es) to die...", pids_found)
+        sleep(5)
+
+    if (time() - wait_start_time) >= 30:
+        logger.info("Time out waiting, sending SIGKILL to remaining processes.")
+        _killGroup(SIGKILL)
+
+    logger.info("Done.")
+    exit(exit_code)
+
 
 if __name__ == '__main__':
     sys.path.append(dirname(__file__))
@@ -91,35 +121,9 @@ if __name__ == '__main__':
             print("Error: The specified configuration file doesn't exist.")
             exit(1)
 
-        # Create a process group so we can clean up after ourselves when
-        setpgrp()  # create new process group and become its leader
-        # Catch SIGTERM to attempt to clean after ourselves
-        signal(SIGTERM, _termTrap)
+        asyncio.run(run_experiment())
 
-        exp_runner = ExperimentRunner(conf_path)
-        exp_runner.run()
-
-        reactor.exitCode = 0
-        reactor.run()
-
-        # Kill all the subprocesses before exiting
-        logger = logging.getLogger()
-        logger.info("Killing leftover local sub processes...")
-        pids_found = _killGroup()
-        wait_start_time = time()
-        while pids_found > 1 and (time() - wait_start_time) < 30:
-            pids_found = _killGroup()
-            if pids_found > 1:
-                logger.info("Waiting for %d subprocess(es) to die...", pids_found)
-            sleep(5)
-
-        if (time() - wait_start_time) >= 30:
-            logger.info("Time out waiting, sending SIGKILL to remaining processes.")
-            _killGroup(SIGKILL)
-
-        logger.info("Done.")
-
-        exit(reactor.exitCode)
+        exit(0)
     else:
         print("Usage:\n%s EXPERIMENT_CONFIG" % sys.argv[0])
 

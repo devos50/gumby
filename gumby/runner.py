@@ -37,19 +37,19 @@
 
 # Code:
 
+from asyncio import create_subprocess_shell, gather, subprocess
 from os import path, chdir, environ, makedirs, listdir, remove
 from shutil import rmtree
 import logging
 import sys
 
+import asyncssh
 from twisted.internet import reactor
-from twisted.internet.defer import Deferred, setDebugging, gatherResults, succeed
+from twisted.internet.defer import Deferred, gatherResults, succeed
 from twisted.internet.protocol import ProcessProtocol
 
 
 from .settings import configToEnv, loadConfig
-from .sshclient import runRemoteCMD
-setDebugging(True)
 
 
 class ExperimentRunner():
@@ -61,7 +61,6 @@ class ExperimentRunner():
         self._cfg_path = conf_path
         self._cfg = config
         self._remote_workspace_dir = path.join(config['remote_workspace_dir'], "Experiment_" + path.basename(config['experiment_name']))
-        # TODO: check if the experiment dir actually exists
         self._workspace_dir = path.abspath(config['workspace_dir'])
         self._output_dir = path.join(self._workspace_dir, 'output')
         self._env_runner = "scripts/run_in_env.py"
@@ -69,38 +68,37 @@ class ExperimentRunner():
     def logPrefix(self):
         return "ExperimentRunner"
 
-    def copyWorkspaceToHeadNodes(self):
+    async def run_ssh_command(self, host, cmd):
+        async with asyncssh.connect(host) as conn:
+            return await conn.run(cmd, check=True)
+
+    async def run_command(self, cmd):
+        proc = await create_subprocess_shell(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        await proc.communicate()
+
+    async def copy_workspace_to_head_nodes(self):
         self._logger.info("Syncing workspaces on remote head nodes...")
 
-        def onCopySuccess(ignored):
-            self._logger.info("Great copying success!")
-
-        def onCopyFailure(failure):
-            self._logger.error("Meh, copy fail.")
-            return failure
-
-        def onSingleCopyFailure(failure, host):
-            self._logger.error("Failed to synchronize the workspace to the remote host: %s.", host)
-            return failure
-
-        copy_list = []
+        processes = []
 
         # First, we need to copy the stuff to the das4 clusters we want to use to run the experiment
         for host in self._cfg['head_nodes']:
-            pp = OneShotProcessProtocol("Rsync to remote %s" % host)
             workspace_dir = self._cfg['workspace_dir']
             args = ("/usr/bin/rsync", "-az", "--recursive", "--exclude=.git*",
                     "--exclude=.svn", "--exclude=local", "--exclude=output", "--delete-excluded", "--delete-during",
-                    workspace_dir + '/', ":".join((host, self._remote_workspace_dir + '/')
-                                                  ))
-            self._logger.info("Running: %s ", ' '.join(args))
-            reactor.spawnProcess(pp, args[0], args)
+                    workspace_dir + '/', ":".join((host, self._remote_workspace_dir + '/')))
+            cmd = ' '.join(args)
+            self._logger.info("Running: %s ", cmd)
 
-            copy_list.append(pp.getDeferred().addErrback(onSingleCopyFailure, host))
+            processes.append(self.run_command(cmd))
 
-        d = gatherResults(copy_list, consumeErrors=True)
-        d.addCallbacks(onCopySuccess, onCopyFailure)
-        return d
+        try:
+            await gather(*processes)
+            self._logger.info("Great copying success!")
+            return True
+        except Exception:
+            self._logger.error("Meh, copy fail.")
+            return False
 
     def collectOutputFromHeadNodes(self):
         self._logger.info("Syncing output data back from head nodes...")
@@ -158,7 +156,7 @@ class ExperimentRunner():
                 self._logger.info("Spawning remote tracker on head node with: %s", cmd)
                 final_cmd = path.join(self._remote_workspace_dir, cmd)
                 host = self._cfg['head_nodes'][0]
-                d = runRemoteCMD(host, final_cmd)
+                d = self.run_ssh_command(host, final_cmd)
 
             d.addErrback(onTrackerFailure)
 
@@ -178,7 +176,7 @@ class ExperimentRunner():
             self._logger.info("Spawning config server on head node with: %s", cmd)
             final_cmd = path.join(self._remote_workspace_dir, cmd)
             host = self._cfg['head_nodes'][0]
-            d = runRemoteCMD(host, final_cmd)
+            d = self.run_ssh_command(host, final_cmd)
 
         d.addErrback(onConfServerFailure)
 
@@ -197,27 +195,26 @@ class ExperimentRunner():
         else:
             return succeed(None)
 
-    def runRemoteSetup(self):
-        def onSetupSuccess(ignored):
-            self._logger.info("Remote setup successful!")
-
-        def onSetupFailure(failure):
-            return failure
+    async def run_remote_setup(self):
         if self._cfg['remote_setup_cmd']:
-            d = self.runCommandOnAllRemotes(self._cfg['remote_setup_cmd'])
-            d.addCallbacks(onSetupSuccess, onSetupFailure)
-            return d
+            try:
+                await self.run_command_on_all_remotes(self._cfg['remote_setup_cmd'])
+                self._logger.info("Remote setup successful!")
+                return True
+            except Exception:
+                self._logger.error("Remote setup failed!")
+                return False
         else:
-            return succeed(None)
+            return True
 
-    def runSetupScripts(self):
+    def run_setup_scripts(self):
         self._logger.info("Running local and remote setup scripts")
-        return gatherResults((self.runRemoteSetup(), self.runLocalSetup()), consumeErrors=True)
+        return gatherResults((self.run_remote_setup(), self.runLocalSetup()), consumeErrors=True)
 
     def runCommand(self, command, remote=False):
         if remote:
             self._logger.info("Remotely running command %s", command)
-            return self.runCommandOnAllRemotes(command)
+            return self.run_command_on_all_remotes(command)
         else:
             self._logger.info("Locally running command %s", command)
             return self.runLocalCommand(command)
@@ -230,8 +227,8 @@ class ExperimentRunner():
         reactor.spawnProcess(pp, env_runner, args, env=self.local_env)  # Inherit env from parent + conf vars
         return pp.getDeferred()
 
-    def runCommandOnAllRemotes(self, command):
-        remote_instance_list = []
+    async def run_command_on_all_remotes(self, command):
+        tasks = []
         # TODO: Allow for other venv dirs to be used by setting the path in the config file.
         # use remote _env_runner
         if self._cfg["use_remote_venv"]:
@@ -241,8 +238,10 @@ class ExperimentRunner():
         args = " ".join((python, path.join(self._remote_workspace_dir, 'gumby', self._env_runner), " ", self._cfg_path, " ", command))
         for host in self._cfg['head_nodes']:
             self._logger.info("Executing command in %s: %s", host, args)
-            remote_instance_list.append(runRemoteCMD(host, args))
-        return gatherResults(remote_instance_list, consumeErrors=True)
+
+            tasks.append(self.run_ssh_command(host, args))
+
+        return gather(*tasks)
 
     def startTracker(self):
         def onTrackerFailure(failure):
@@ -286,7 +285,7 @@ class ExperimentRunner():
             return self.collectOutputFromHeadNodes().addCallback(lambda _: failure)
 
         if self._cfg['remote_instance_cmd']:
-            dr = self._instances_d = self.runCommandOnAllRemotes(self._cfg['remote_instance_cmd'])
+            dr = self._instances_d = self.run_command_on_all_remotes(self._cfg['remote_instance_cmd'])
         else:
             dr = succeed(None)
         if self._cfg['local_instance_cmd']:
@@ -300,12 +299,12 @@ class ExperimentRunner():
             self._logger.info("Post processing collected data")
             return self.runCommand(self._cfg['post_process_cmd'])
 
-    def run(self):
+    async def run(self):
         def onExperimentSucceeded(_):
             self._logger.info("experiment suceeded")
             reactor.stop()
 
-        def onExperimentFailed(failure):
+        def on_experiment_failed(failure):
             self._logger.error("Experiment execution failed, exiting with error.")
             self._logger.error(repr(failure))
 
@@ -333,40 +332,44 @@ class ExperimentRunner():
 
         # Step 3:
         # Sync the working dir with the head nodes
-        d = Deferred()
-        d.addCallback(lambda _: self.copyWorkspaceToHeadNodes())
+        res = await self.copy_workspace_to_head_nodes()
+        if not res:
+            return 1
 
         # Step 4:
         # Run the set up script, both locally and in the head nodes
-        d.addCallback(lambda _: self.runSetupScripts())
+        res = await self.run_setup_scripts()
+        if not res:
+            return 1
 
         # Step 5:
         # Start the tracker, either locally or on the first head node of the list.
-        d.addCallback(lambda _: self.startTracker())
+        #d.addCallback(lambda _: self.startTracker())
 
         # Step 6:
         # Start the config server, always locally if running instances locally as the head nodes are firewalled and
         # can only be reached from the outside trough SSH.
-        d.addCallback(lambda _: self.startExperimentServer())
+        #d.addCallback(lambda _: self.startExperimentServer())
 
         # Step 7:
         # Spawn both local and remote instance runner scripts, which will connect to the config server and wait for all
         # of them to be ready before starting the experiment.
-        d.addCallback(lambda _: self.startInstances())
+        #d.addCallback(lambda _: self.startInstances())
 
         # Step 8:
         # Collect all the data from the remote head nodes.
-        d.addCallback(lambda _: self.collectOutputFromHeadNodes())
+        #d.addCallback(lambda _: self.collectOutputFromHeadNodes())
 
         # Step 9:
         # Extract the data and graph stuff
-        d.addCallback(lambda _: self.runPostProcess())
+        #d.addCallback(lambda _: self.runPostProcess())
 
         # TODO: From here onwards
-        reactor.callLater(0, d.callback, None)
+        #reactor.callLater(0, d.callback, None)
         # reactor.callLater(60, reactor.stop)
 
-        return d.addCallbacks(onExperimentSucceeded, onExperimentFailed)
+        #return d.addCallbacks(onExperimentSucceeded, onExperimentFailed)
+        return 0
 
 
 class OneShotProcessProtocol(ProcessProtocol):
