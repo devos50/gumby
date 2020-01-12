@@ -1,10 +1,8 @@
-import os
 from base64 import b64encode, b64decode
 from os import environ
-from random import Random, random
+from random import random
 from socket import gethostbyname
 
-import networkx as nx
 from twisted.internet import reactor
 
 from gumby.experiment import experiment_callback
@@ -110,93 +108,6 @@ class IPv8OverlayExperimentModule(ExperimentModule):
         """
         for peer in self.all_vars.keys():
             self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer))
-
-    @experiment_callback
-    def introduce_community_topology(self):
-        """
-        Build a community around a one peer
-        """
-        num_minters = 1
-        if os.getenv('NUM_MINTERS'):
-            num_minters = int(os.getenv('NUM_MINTERS'))
-
-        num_nodes = len(self.all_vars.keys())
-        num_minters = min(num_nodes, num_minters)
-
-        # Work a graph where all peers are connected to minters
-        topology = nx.Graph()
-        for m in range(1, num_minters + 1):
-            topology.add_node(int(m), minter=True)
-            for k in self.all_vars.keys():
-                if k != m:
-                    topology.add_edge(int(m), int(k))
-        self.build_network(topology)
-
-    @experiment_callback
-    def introduce_to_bootstrap_peers(self):
-        """
-        Introduce to the bootstrap peers
-        """
-        # Choose bootstrap peers
-        num_nodes = len(self.all_vars.keys())
-        if os.getenv('AVG_DEG'):
-            avg_degree = int(os.getenv('AVG_DEG'))
-        else:
-            avg_degree = 20
-
-        self._logger.info("Average degree is %s and number of nodes is %s", avg_degree, num_nodes)
-
-        topology = nx.random_graphs.gnm_random_graph(num_nodes,
-                                                     num_nodes * avg_degree / 2, seed=42)
-        nx.relabel_nodes(topology, {k: k + 1 for k in range(num_nodes)}, copy=False)
-        # Everyone can mint
-        bb = {k: True for k in topology.nodes()}
-        nx.set_node_attributes(topology, bb, 'minter')
-        # 1. Everybody knows everyone
-        # self.overlay.bootstrap_master = [self.experiment.get_peer_ip_port_by_id(k) for k in self.all_vars.keys()]
-        # Assume perfect knowledge of the world
-        self.build_network(topology)
-
-    def build_network(self, topology):
-        '''
-        Given a topology build a network
-        :return:
-        '''
-        self.overlay.bootstrap_master = []
-        # We create a perfect knowledge of 2-hop peers
-        for peer in topology.neighbors(int(self.my_id)):
-            self.overlay.bootstrap_master.extend(
-                (self.experiment.get_peer_ip_port_by_id(k) for k in topology[peer]))
-            val = self.experiment.get_peer_ip_port_by_id(peer)
-            self._logger.info("Peer %s with value %s", peer, val)
-
-        known_minters = set(nx.get_node_attributes(topology, 'minter').keys())
-        if self.my_id in known_minters:
-            self._logger.info("Building own minter community ")
-            self.overlay.init_minter_community()
-
-        delta = 2 * random()
-        label_map = {int(k): b64decode(v['public_key']) for k, v in self.all_vars.items()}
-        self.inverted_map = {v: k for k, v in label_map.items()}
-        self.overlay.known_graph = nx.relabel_nodes(topology, label_map)
-        # Register the introduction walk tasks with waves by 100
-        self.overlay.register_anonymous_task("intro_delay", reactor.callLater(delta * (self.my_id // 100),
-                                                                              self.recheck_connections))
-
-    @experiment_callback
-    def recheck_connections(self):
-        """
-        Recheck if all peer in known graph are connected/ reconnect otherwise
-        """
-        if self.overlay.known_graph:
-            my_key = self.overlay.my_peer.public_key.key_to_bin()
-            for p in self.overlay.known_graph.neighbors(my_key):
-                peer = self.overlay.get_peer_by_pub_key(p)
-                if not peer and self.inverted_map:
-                    peer_id = self.inverted_map[p]
-                    peer_val = self.experiment.get_peer_ip_port_by_id(str(peer_id))
-                    self._logger.info("Peer %s not connected/Reconnecting with value %s", peer_id, peer_val)
-                    self.overlay.walk_to(peer_val)
 
     @experiment_callback
     def introduce_peers(self, max_peers=None, excluded_peers=None):
