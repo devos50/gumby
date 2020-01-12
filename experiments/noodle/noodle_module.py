@@ -105,9 +105,15 @@ class NoodleModule(IPv8OverlayExperimentModule):
         self.overlay.settings.max_peers_subtrust = -1
 
         # Add the minter
-        minter_pk = self.get_peer("1").public_key.key_to_bin()
-        self.overlay.settings.minters = [hexlify(minter_pk)]
-        self.overlay.known_graph.add_node(minter_pk, minter=True)
+        num_minters = 1
+        if os.getenv('NUM_MINTERS'):
+            num_minters = int(os.getenv('NUM_MINTERS'))
+
+        self.overlay.settings.minters = []
+        for minter_id in range(1, num_minters + 1):
+            minter_pk = self.get_peer(str(minter_id)).public_key.key_to_bin()
+            self.overlay.settings.minters.append(hexlify(minter_pk))
+            self.overlay.known_graph.add_node(minter_pk, minter=True)
 
         if self.is_minter():
             self.overlay.init_minter_community()
