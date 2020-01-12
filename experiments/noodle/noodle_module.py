@@ -58,7 +58,6 @@ class NoodleModule(IPv8OverlayExperimentModule):
     def __init__(self, experiment):
         super(NoodleModule, self).__init__(experiment, NoodleCommunity)
         self.request_signatures_lc = None
-        self.num_blocks_in_db_lc = None
         self.block_stat_file = None
         self.request_ds_lc = None
         self.did_write_start_time = False
@@ -372,15 +371,6 @@ class NoodleModule(IPv8OverlayExperimentModule):
         self.request_ds_lc.stop()
 
     @experiment_callback
-    def start_monitor_num_blocks_in_db(self):
-        self.num_blocks_in_db_lc = LoopingCall(self.check_num_blocks_in_db)
-        self.num_blocks_in_db_lc.start(1)
-
-    @experiment_callback
-    def stop_monitor_num_blocks_in_db(self):
-        self.num_blocks_in_db_lc.stop()
-
-    @experiment_callback
     def request_signature(self, peer_id, up, down):
         self.request_signature_from_peer(self.get_peer(peer_id), up, down)
 
@@ -490,15 +480,6 @@ class NoodleModule(IPv8OverlayExperimentModule):
         peer = self.get_peer(peer_id)
         self.overlay.transfer(peer, value)
 
-    def check_num_blocks_in_db(self):
-        """
-        Check the total number of blocks we have in the database and write it to a file.
-        """
-        num_blocks = len(self.overlay.persistence.get_all_blocks())
-        with open('num_trustchain_blocks.txt', 'a') as output_file:
-            elapsed_time = time.time() - self.experiment.scenario_runner.exp_start_time
-            output_file.write("%f,%d\n" % (elapsed_time, num_blocks))
-
     @experiment_callback
     def introduce_to_bootstrap_peers(self):
         """
@@ -511,10 +492,9 @@ class NoodleModule(IPv8OverlayExperimentModule):
         else:
             avg_degree = 20
 
-        self._logger.info("Average degree is %s and number of nodes is %s", avg_degree, num_nodes)
+        self._logger.info("The average degree is %d and the total number of nodes is %d", avg_degree, num_nodes)
 
-        topology = nx.random_graphs.gnm_random_graph(num_nodes,
-                                                     num_nodes * avg_degree / 2, seed=42)
+        topology = nx.random_graphs.gnm_random_graph(num_nodes, num_nodes * avg_degree / 2, seed=42)
         nx.relabel_nodes(topology, {k: k + 1 for k in range(num_nodes)}, copy=False)
         # Everyone can mint
         bb = {k: True for k in topology.nodes()}
@@ -529,30 +509,25 @@ class NoodleModule(IPv8OverlayExperimentModule):
         Given a network topology, build the network.
         """
         self.overlay.bootstrap_master = []
-        # We create a perfect knowledge of 2-hop peers
-        for peer in topology.neighbors(int(self.my_id)):
+        for neighbour_peer_id in topology.neighbors(int(self.my_id)):
             self.overlay.bootstrap_master.extend(
-                (self.experiment.get_peer_ip_port_by_id(k) for k in topology[peer]))
-            val = self.experiment.get_peer_ip_port_by_id(peer)
-            self._logger.info("Peer %s with value %s", peer, val)
+                (self.experiment.get_peer_ip_port_by_id(k) for k in topology[neighbour_peer_id]))
+            neighbour_peer_address = self.experiment.get_peer_ip_port_by_id(neighbour_peer_id)
+            self._logger.info("This peer will connect to peer %d", neighbour_peer_id)
+            reactor.callLater(4 * random(), self.overlay.walk_to, neighbour_peer_address)
 
-        known_minters = set(nx.get_node_attributes(topology, 'minter').keys())
-        if self.my_id in known_minters:
-            self._logger.info("Building own minter community ")
-            self.overlay.init_minter_community()
-
-        delta = 5 * random()
+        # Build the known graph and set the right labels
         label_map = {int(k): b64decode(v['public_key']) for k, v in self.all_vars.items()}
         self.inverted_map = {v: k for k, v in label_map.items()}
         self.overlay.known_graph = nx.relabel_nodes(topology, label_map)
-        # Register the introduction walk tasks with waves by 100
-        self.overlay.register_anonymous_task("intro_delay", reactor.callLater(delta, self.recheck_connections))
+        self.overlay.register_anonymous_task("intro_delay", reactor.callLater(5, self.recheck_connections))
 
     @experiment_callback
     def recheck_connections(self):
         """
-        Recheck if all peer in known graph are connected/ reconnect otherwise
+        Recheck if all peer in known graph are connected. Reconnect otherwise
         """
+        self._logger.info("Rechecking connections...")
         if self.overlay.known_graph:
             my_key = self.overlay.my_peer.public_key.key_to_bin()
             for p in self.overlay.known_graph.neighbors(my_key):
@@ -582,10 +557,3 @@ class NoodleModule(IPv8OverlayExperimentModule):
         print("Items in transfer queue: %d" % len(self.overlay.transfer_queue.queue))
         print("Items in incoming block queue: %d" % len(self.overlay.incoming_block_queue.queue))
         print("Items in audit response queue: %d" % len(self.overlay.audit_response_queue.queue))
-
-    @experiment_callback
-    def write_trustchain_statistics(self):
-        from anydex.wallet.tc_wallet import TrustchainWallet
-        with open('trustchain.txt', 'w') as trustchain_file:
-            wallet = TrustchainWallet(self.overlay)
-            trustchain_file.write(json.dumps(wallet.get_statistics()))
