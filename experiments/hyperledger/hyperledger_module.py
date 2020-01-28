@@ -36,10 +36,6 @@ class HyperledgerModule(BlockchainModule):
         self.tx_info = []
         self.monitor_process = None
 
-    def on_all_vars_received(self):
-        super(HyperledgerModule, self).on_all_vars_received()
-        self.transactions_manager.transfer = self.transfer
-
     @experiment_callback
     def generate_config(self):
         """
@@ -396,8 +392,8 @@ class HyperledgerModule(BlockchainModule):
             responses = await self.fabric_client.chaincode_install(
                 requestor=admin,
                 peers=['peer0.org%d.example.com' % peer_index],
-                cc_path='github.com/chaincode/sacc',
-                cc_name='sacc',
+                cc_path='github.com/chaincode/energytrading',
+                cc_name='energytrading',
                 cc_version=chaincode_version,
             )
             self._logger.info("Result of chaincode install for peer %d: %s", peer_index, responses)
@@ -408,7 +404,7 @@ class HyperledgerModule(BlockchainModule):
             channel_name='mychannel',
             peers=['peer0.org1.example.com'],
             args={"Args": ["john", "0"]},
-            cc_name='sacc',
+            cc_name='energytrading',
             cc_version=chaincode_version,
             wait_for_event=True  # optional, for being sure chaincode is instantiated
         )
@@ -503,29 +499,6 @@ class HyperledgerModule(BlockchainModule):
 
         self.fabric_client = Client(net_profile="network.json")
         self.fabric_client.new_channel('mychannel')
-
-    @experiment_callback
-    async def transfer(self):
-        self._logger.info("Initiating transaction...")
-        validator_peer_id = ((self.experiment.my_id - 1) % self.num_validators) + 1
-        start_time = time.time()
-        submit_time = int(round(start_time * 1000))
-
-        def on_tx_done(task, stime):
-            if len(task.result()) == 64:
-                self.tx_info.append((task.result(), stime))
-
-        # Make a transaction
-        args = ["blah", "20"]
-        admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
-        ensure_future(self.fabric_client.chaincode_invoke(
-            requestor=admin,
-            channel_name='mychannel',
-            peers=['peer0.org%d.example.com' % validator_peer_id],
-            args=args,
-            cc_name='sacc',
-            fcn='set'
-        )).add_done_callback(lambda task, stime=submit_time: on_tx_done(task, stime))
 
     @experiment_callback
     def write_stats(self):
