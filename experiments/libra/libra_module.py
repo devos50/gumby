@@ -1,56 +1,30 @@
+import decimal
 import os
+import re
 import shutil
 import subprocess
 import sys
 import time
 
+import aiohttp
 import pexpect as pexpect
-import six
 import toml
 
 import libra
+from asyncio import sleep, get_event_loop
+
+from aiohttp import web
 from libra import Client, RawTransaction, SignedTransaction, TransactionError
 from libra.proto.admission_control_pb2 import SubmitTransactionRequest
 from libra.transaction import Script, TransactionPayload
 
-from twisted.internet import reactor
-from twisted.internet.defer import fail
-from twisted.internet.task import deferLater, LoopingCall
-from twisted.web import server, http
-from twisted.web.client import readBody, WebClientContextFactory, Agent
-from twisted.web.http_headers import Headers
-
-from experiments.libra.faucet_endpoint import FaucetEndpoint
 from gumby.experiment import experiment_callback
 from gumby.modules.blockchain_module import BlockchainModule
 from gumby.modules.experiment_module import static_module
+from gumby.util import run_task
 
 
-def http_request(uri, method):
-    """
-    Performs a HTTP request
-    :param uri: The URL to perform a HTTP request to
-    :return: A deferred firing the body of the response.
-    :raises HttpError: When the HTTP response code is not OK (i.e. not the HTTP Code 200)
-    """
-    def _on_response(response):
-        if response.code == http.OK:
-            return readBody(response)
-        raise Exception(response)
-
-    try:
-        uri = six.ensure_binary(uri)
-    except AttributeError:
-        pass
-    try:
-        contextFactory = WebClientContextFactory()
-        agent = Agent(reactor, contextFactory)
-        headers = Headers({'User-Agent': ['Tribler 1.2.3']})
-        deferred = agent.request(method, uri, headers, None)
-        deferred.addCallback(_on_response)
-        return deferred
-    except:
-        return fail()
+MAX_MINT = 10 ** 19  # 10 trillion libras
 
 
 @static_module
@@ -71,6 +45,7 @@ class LibraModule(BlockchainModule):
         self.wallet = None
         self.tx_info = {}
         self.last_tx_confirmed = -1
+        self.site = None
 
         self.monitor_lc = None
         self.current_seq_num = 0
@@ -166,8 +141,31 @@ class LibraModule(BlockchainModule):
                                                          ('/home/pouwelse/libra/das_config/%d/node.config.toml' % (my_peer_id - 1),
                                                           os.path.join(os.getcwd(), 'libra_output.log'))], shell=True)
 
+    async def on_mint_request(self, request):
+        address = request.rel_url.query['address']
+        self._logger.info("Received mint request for address %s", address)
+        if re.match('^[a-f0-9]{64}$', address) is None:
+            return web.Response(text="Malformed address", status=400)
+
+        try:
+            amount = decimal.Decimal(request.rel_url.query['amount'])
+        except decimal.InvalidOperation:
+            return web.Response(text="Bad amount", status=400)
+
+        if amount > MAX_MINT:
+            return web.Response(text="Exceeded max amount of {}".format(MAX_MINT / (10 ** 6)), status=400)
+
+        try:
+            self.faucet_client.sendline("a m {} {}".format(address, amount / (10 ** 6)))
+            self.faucet_client.expect("Mint request submitted", timeout=2)
+        except pexpect.exceptions.ExceptionPexpect:
+            #self.faucet_client.terminate(True)
+            raise
+
+        return web.Response(text="done")
+
     @experiment_callback
-    def start_libra_client(self):
+    async def start_libra_client(self):
         my_peer_id = self.experiment.scenario_runner._peernumber
         validator_peer_id = (my_peer_id - 1) % self.num_validators
 
@@ -190,14 +188,20 @@ class LibraModule(BlockchainModule):
                   "-m /home/pouwelse/libra/terraform/validator-sets/dev/mint.key" % (host, port, validator_peer_id)
 
             self.faucet_client = pexpect.spawn(cmd)
+            self.faucet_client.delaybeforesend = 0.1
             self.faucet_client.logfile = sys.stdout.buffer
             self.faucet_client.expect("Please, input commands", timeout=3)
 
             # Also start the HTTP API for the faucet service
             self._logger.info("Starting faucet HTTP API...")
-            faucet_endpoint = FaucetEndpoint(self.faucet_client)
-            site = server.Site(resource=faucet_endpoint)
-            self.faucet_service = reactor.listenTCP(8000, site, interface="0.0.0.0")
+            app = web.Application()
+            app.add_routes([web.get('/', self.on_mint_request)])
+
+            runner = web.AppRunner(app, access_log=None)
+            await runner.setup()
+            # If localhost is used as hostname, it will randomly either use 127.0.0.1 or ::1
+            self.site = web.TCPSite(runner, port=8000)
+            await self.site.start()
 
         if self.is_client():
             self._logger.info("Spawning client that connects to validator %s (host: %s, port %s)", validator_peer_id, host, port)
@@ -215,7 +219,7 @@ class LibraModule(BlockchainModule):
         self.wallet.new_account()
 
     @experiment_callback
-    def mint(self):
+    async def mint(self):
         if not self.is_client():
             return
 
@@ -223,13 +227,16 @@ class LibraModule(BlockchainModule):
         client_id = my_peer_id - self.num_validators
         random_wait = 10 / self.num_clients * client_id
 
-        def perform_mint_request():
-            faucet_host, _ = self.experiment.get_peer_ip_port_by_id(1)
-            address = self.wallet.accounts[0].address.hex()
-            deferred = http_request("http://" + faucet_host + ":8000/?amount=%d&address=%s" % (1000000, address), b'POST')
-            print("Mint request performed!")
+        await sleep(random_wait)
 
-        deferLater(reactor, random_wait, perform_mint_request)
+        faucet_host, _ = self.experiment.get_peer_ip_port_by_id(1)
+        address = self.wallet.accounts[0].address.hex()
+
+        async with aiohttp.ClientSession() as session:
+            url = "http://" + faucet_host + ":8000/?amount=%d&address=%s" % (1000000, address)
+            await session.get(url)
+
+        print("Mint request performed!")
 
     @experiment_callback
     def print_balance(self, account_nr):
@@ -265,8 +272,7 @@ class LibraModule(BlockchainModule):
         if not self.is_client():
             return
 
-        self.monitor_lc = LoopingCall(self.monitor)
-        self.monitor_lc.start(0.1)
+        self.monitor_lc = run_task(self.monitor, interval=0.1)
 
     def monitor(self):
         """
@@ -291,7 +297,7 @@ class LibraModule(BlockchainModule):
         if not self.is_client():
             return
 
-        self.monitor_lc.stop()
+        self.monitor_lc.cancel()
 
     @experiment_callback
     def write_tx_stats(self):
@@ -301,13 +307,17 @@ class LibraModule(BlockchainModule):
                 tx_file.write("%d,%d,%d\n" % (tx_num, tx_info[0], tx_info[1]))
 
     @experiment_callback
-    def stop(self):
+    async def stop(self):
         print("Stopping Libra...")
         if self.libra_validator_process:
             self.libra_validator_process.kill()
         if self.faucet_process:
             self.faucet_process.kill()
-        reactor.stop()
+        if self.site:
+            await self.site.stop()
+
+        loop = get_event_loop()
+        loop.stop()
 
         # Delete the postgres directory
         shutil.rmtree("libradb", ignore_errors=True)
