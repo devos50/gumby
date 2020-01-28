@@ -11,12 +11,11 @@ from datetime import datetime
 import requests
 
 import treq
+from asyncio import get_event_loop
 
 from stellar_base import Keypair, Horizon
 from stellar_base.builder import Builder
 from stellar_base.transaction_envelope import TransactionEnvelope
-
-from twisted.internet import reactor
 
 from gumby.experiment import experiment_callback
 from gumby.modules.blockchain_module import BlockchainModule
@@ -444,4 +443,6 @@ ADDRESS="%s:%d"
         if self.horizon_process:
             self._logger.info("Killing horizon")
             self.horizon_process.kill()
-        reactor.stop()
+
+        loop = get_event_loop()
+        loop.stop()
