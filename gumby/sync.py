@@ -320,7 +320,7 @@ class ExperimentServiceFactory:
         if to_id not in self.id_to_connection:
             self._logger.error("Error while forwarding message: peer with id %d not found!", to_id)
 
-        self.id_to_connection[to_id].sendLine(b"msg:%d:%s:%s" % (from_id, msg_type, msg))
+        self.id_to_connection[to_id].send_line(b"msg:%d:%s:%s" % (from_id, msg_type, msg))
 
         self._logger.info("Done, disconnecting all clients.")
         try:
