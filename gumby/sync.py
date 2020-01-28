@@ -212,7 +212,7 @@ class ExperimentServiceFactory:
             # Assign IDs to the connected subscribers, based on their address
             host_dict = {}
             for connection in self.connections_made:
-                connection_host = connection.transport.getPeer().host
+                connection_host = connection.transport.get_extra_info('peername')[0]
                 if connection_host not in host_dict:
                     host_dict[connection_host] = []
                 host_dict[connection_host].append(connection)
