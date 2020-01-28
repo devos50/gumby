@@ -13,9 +13,7 @@ from algosdk.algod import AlgodClient
 from algosdk.error import KMDHTTPError, AlgodHTTPError
 from algosdk.kmd import KMDClient
 from algosdk.wallet import Wallet
-
-from twisted.internet import reactor
-from twisted.internet.task import deferLater
+from asyncio import get_event_loop, sleep
 
 from gumby.experiment import experiment_callback
 from gumby.modules.blockchain_module import BlockchainModule
@@ -162,7 +160,7 @@ class AlgorandModule(BlockchainModule):
             kmd_token_file.write(rest_token)
 
     @experiment_callback
-    def start_algorand_node(self):
+    async def start_algorand_node(self):
         """
         Start an algorand node.
         """
@@ -170,13 +168,6 @@ class AlgorandModule(BlockchainModule):
             return
 
         my_peer_id = self.experiment.scenario_runner._peernumber
-
-        def start_node(node_cmd):
-            self._logger.info("Starting Algorand node...")
-            self.node_process = subprocess.Popen([node_cmd], shell=True)
-
-            kmd_cmd = "/home/pouwelse/gocode/bin/goal kmd start -d %s" % self.get_data_dir(my_peer_id)
-            self.kmd_process = subprocess.Popen([kmd_cmd], shell=True)
 
         self._logger.info("Starting Algorand node...")
         if my_peer_id == 1:
@@ -187,7 +178,13 @@ class AlgorandModule(BlockchainModule):
             cmd = "/home/pouwelse/gocode/bin/goal node start -d %s -p %s" % (self.get_data_dir(my_peer_id), peer_str)
 
         # Wait a bit, depending on the node number
-        deferLater(reactor, (my_peer_id - 1) * 0.5, start_node, cmd)
+        await sleep((my_peer_id - 1) * 0.5)
+
+        self._logger.info("Starting Algorand node...")
+        self.node_process = subprocess.Popen([cmd], shell=True)
+
+        kmd_cmd = "/home/pouwelse/gocode/bin/goal kmd start -d %s" % self.get_data_dir(my_peer_id)
+        self.kmd_process = subprocess.Popen([kmd_cmd], shell=True)
 
     @experiment_callback
     def start_client(self):
@@ -316,4 +313,5 @@ class AlgorandModule(BlockchainModule):
 
     @experiment_callback
     def stop(self):
-        reactor.stop()
+        loop = get_event_loop()
+        loop.stop()
