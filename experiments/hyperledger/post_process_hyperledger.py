@@ -36,7 +36,7 @@ class HyperledgerStatisticsParser(BlockchainTransactionsParser):
                         continue
 
                     block_nr = int(parts[0])
-                    if block_nr == 1 or block_nr == 2: # The first block contains chaincode instantiation
+                    if block_nr == 1:  # The first block contains chaincode instantiation
                         continue
 
                     confirm_time = int(parts[1]) - self.avg_start_time

@@ -9,6 +9,6 @@
 @0:15 start_peers
 @0:25 deploy_chaincode {1}
 @0:75 start_monitor {1}
-@0:80 start_creating_transactions 120
+@0:80 start_creating_transactions
 @0:220 stop_monitor {1}
 @0:230 stop

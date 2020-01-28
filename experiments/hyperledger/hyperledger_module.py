@@ -1,23 +1,24 @@
-import asyncio
 import json
 import os
 import shutil
 import subprocess
 import time
 
+from asyncio import sleep, get_event_loop, ensure_future
 from ruamel.yaml import YAML, RoundTripDumper, round_trip_dump
 from ruamel.yaml.comments import CommentedMap
-from twisted.internet import reactor
-from twisted.internet.task import LoopingCall
 
 from gumby.experiment import experiment_callback
-from gumby.modules.experiment_module import static_module, ExperimentModule
+from gumby.modules.blockchain_module import BlockchainModule
+from gumby.modules.experiment_module import static_module
 
 from hfc.fabric import Client
 
+from gumby.util import run_task
+
 
 @static_module
-class HyperledgerModule(ExperimentModule):
+class HyperledgerModule(BlockchainModule):
     """
     Note: for Hyperledger, we are doing some special stuff with initiating transactions.
     Therefore, this class does not extend from BlockchainModule.
@@ -26,22 +27,18 @@ class HyperledgerModule(ExperimentModule):
     def __init__(self, experiment):
         super(HyperledgerModule, self).__init__(experiment)
         self.config_path = "/home/pouwelse/hyperledger-network-template"
-        self.monitor_process = None
         self.fabric_client = None
-        self.num_validators = int(os.environ["NUM_VALIDATORS"])
-        self.num_clients = int(os.environ["NUM_CLIENTS"])
-        self.tx_rate = int(os.environ["TX_RATE"])
-        self.did_write_start_time = False
         self.peer_process = None
         self.orderer_process = None
-        self.spawner = None
         self.monitor_lc = None
         self.latest_block_num = 0
         self.block_confirm_times = {}
+        self.tx_info = []
+        self.monitor_process = None
 
-    def is_client(self):
-        my_peer_id = self.experiment.scenario_runner._peernumber
-        return my_peer_id > self.num_validators
+    def on_all_vars_received(self):
+        super(HyperledgerModule, self).on_all_vars_received()
+        self.transactions_manager.transfer = self.transfer
 
     @experiment_callback
     def generate_config(self):
@@ -358,7 +355,7 @@ class HyperledgerModule(ExperimentModule):
         os.system("/home/pouwelse/hyperledger-network-template/start_containers.sh %d" % my_peer_id)
 
     @experiment_callback
-    def deploy_chaincode(self):
+    async def deploy_chaincode(self):
         """
         Create the channel, add peers and instantiate chaincode.
         """
@@ -366,48 +363,47 @@ class HyperledgerModule(ExperimentModule):
         network_file_path = os.path.join(os.getcwd(), "network.json")
         channel_config_path = os.path.join(self.config_path, "channel-artifacts", "channel.tx")
 
-        loop = asyncio.get_event_loop()
         self.fabric_client = Client(net_profile=network_file_path)
 
         org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
         chaincode_version = 'v6'
 
         # Create a New Channel, the response should be true if succeed
-        response = loop.run_until_complete(self.fabric_client.channel_create(
+        response = await self.fabric_client.channel_create(
             orderer='orderer1.example.com',
             channel_name='mychannel',
             requestor=org1_admin,
             config_tx=channel_config_path
-        ))
+        )
         self._logger.info("Result of channel creation: %s", response)
 
-        time.sleep(3)
+        await sleep(3)
 
         # Join Peers into Channel
         for peer_index in range(1, len(self.fabric_client.peers) + 1):
             admin = self.fabric_client.get_user(org_name='org%d.example.com' % peer_index, name='Admin')
-            responses = loop.run_until_complete(self.fabric_client.channel_join(
+            responses = await self.fabric_client.channel_join(
                 requestor=admin,
                 channel_name='mychannel',
                 peers=['peer0.org%d.example.com' % peer_index],
                 orderer='orderer%d.example.com' % peer_index,
-            ))
+            )
             self._logger.info("Results of channel join for peer %d: %s", peer_index, responses)
 
         # Install chaincode
         for peer_index in range(1, len(self.fabric_client.peers) + 1):
             admin = self.fabric_client.get_user(org_name='org%d.example.com' % peer_index, name='Admin')
-            responses = loop.run_until_complete(self.fabric_client.chaincode_install(
+            responses = await self.fabric_client.chaincode_install(
                 requestor=admin,
                 peers=['peer0.org%d.example.com' % peer_index],
                 cc_path='github.com/chaincode/sacc',
                 cc_name='sacc',
                 cc_version=chaincode_version,
-            ))
+            )
             self._logger.info("Result of chaincode install for peer %d: %s", peer_index, responses)
 
         # Instantiate chaincode
-        response = loop.run_until_complete(self.fabric_client.chaincode_instantiate(
+        response = await self.fabric_client.chaincode_instantiate(
             requestor=org1_admin,
             channel_name='mychannel',
             peers=['peer0.org1.example.com'],
@@ -415,7 +411,7 @@ class HyperledgerModule(ExperimentModule):
             cc_name='sacc',
             cc_version=chaincode_version,
             wait_for_event=True  # optional, for being sure chaincode is instantiated
-        ))
+        )
         self._logger.info("Result of chaincode instantiation: %s", response)
 
     @experiment_callback
@@ -427,84 +423,66 @@ class HyperledgerModule(ExperimentModule):
         os.system("/home/pouwelse/hyperledger-network-template/stop_all.sh")
 
     @experiment_callback
-    def start_monitor(self):
+    async def start_monitor(self):
         """
         Start monitoring the blocks
         """
         self._logger.info("Starting monitor...")
-        cmd = "cd /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/ && /home/pouwelse/go/bin/go run /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/fabric-cli.go event listenblock --cid mychannel --peer localhost:8001 --config /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/config.yaml > %s" % os.path.join(os.getcwd(), "transactions.txt")
+        org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
+
+        self._logger.info("Starting monitor...")
+        cmd = "cd /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/ && /home/pouwelse/go/bin/go run /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/fabric-cli.go event listenblock --cid mychannel --peer localhost:8001 --config /home/pouwelse/fabric-examples/fabric-cli/cmd/fabric-cli/config.yaml > %s" % os.path.join(
+            os.getcwd(), "transactions.txt")
         my_env = os.environ.copy()
         my_env["GOPATH"] = "/home/pouwelse/gocode"
         self.monitor_process = subprocess.Popen(cmd, env=my_env, shell=True)
 
-        org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
-        loop = asyncio.get_event_loop()
-
-        def get_latest_block_num():
+        async def get_latest_block_num():
             self._logger.info("Getting latest block nr...")
-            response = loop.run_until_complete(self.fabric_client.query_info(
+            response = await self.fabric_client.query_info(
                 requestor=org1_admin,
                 channel_name='mychannel',
                 peers=['peer0.org1.example.com'],
                 decode=True
-            ))
+            )
             print(response)
 
             latest_block = response.height
             if latest_block > self.latest_block_num:
                 self._logger.info("Updating to block nr %d", latest_block)
+                old_latest_block_num = self.latest_block_num
                 self.latest_block_num = latest_block
                 confirm_time = int(round(time.time() * 1000))
-                for confirmed_block_num in range(self.latest_block_num + 1, latest_block + 1):
+                for confirmed_block_num in range(old_latest_block_num + 1, latest_block + 1):
                     self.block_confirm_times[confirmed_block_num] = confirm_time
 
-        self.monitor_lc = LoopingCall(get_latest_block_num)
-        self.monitor_lc.start(0.1)
+        self.monitor_lc = run_task(get_latest_block_num, interval=0.1)
 
     @experiment_callback
-    def write_blockchain(self):
-        self._logger.info("Writing blockchain...")
-        org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
-        loop = asyncio.get_event_loop()
-        with open("blockchain.txt", "wb") as blockchain_file:
-            for block_ind in range(1, self.latest_block_num + 1):
-                self._logger.info("Getting block %d...", block_ind)
-                block = loop.run_until_complete(self.fabric_client.query_block(
-                    requestor=org1_admin,
-                    channel_name='mychannel',
-                    peers=['peer0.org1.example.com'],
-                    block_number="%d" % block_ind,
-                    decode=True
-                ))
-                blockchain_file.write(block)
-
-    @experiment_callback
-    def print_block(self):
-        loop = asyncio.get_event_loop()
+    async def print_block(self, block_nr):
         org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
 
         # Query Block by block number
-        response = loop.run_until_complete(self.fabric_client.query_block(
+        response = await self.fabric_client.query_block(
             requestor=org1_admin,
             channel_name='mychannel',
             peers=['peer0.org1.example.com'],
-            block_number='1',
+            block_number=block_nr,
             decode=True
-        ))
+        )
         print(response)
 
     @experiment_callback
-    def print_chain_info(self):
-        loop = asyncio.get_event_loop()
+    async def print_chain_info(self):
         org1_admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
 
         # Query Block by block number
-        response = loop.run_until_complete(self.fabric_client.query_info(
+        response = await self.fabric_client.query_info(
             requestor=org1_admin,
             channel_name='mychannel',
             peers=['peer0.org1.example.com'],
             decode=True
-        ))
+        )
         print(response)
 
     @experiment_callback
@@ -514,7 +492,7 @@ class HyperledgerModule(ExperimentModule):
         """
         self._logger.info("Stopping monitor...")
         if self.monitor_lc:
-            self.monitor_lc.stop()
+            self.monitor_lc.cancel()
         if self.monitor_process:
             self.monitor_process.kill()
 
@@ -524,42 +502,48 @@ class HyperledgerModule(ExperimentModule):
             return
 
         self.fabric_client = Client(net_profile="network.json")
+        self.fabric_client.new_channel('mychannel')
 
     @experiment_callback
-    def start_creating_transactions(self, duration):
-        self.start_creating_transactions_with_rate(self.tx_rate, float(duration))
+    async def transfer(self):
+        self._logger.info("Initiating transaction...")
+        validator_peer_id = ((self.experiment.my_id - 1) % self.num_validators) + 1
+        start_time = time.time()
+        submit_time = int(round(start_time * 1000))
+
+        def on_tx_done(task, stime):
+            if len(task.result()) == 64:
+                self.tx_info.append((task.result(), stime))
+
+        # Make a transaction
+        args = ["blah", "20"]
+        admin = self.fabric_client.get_user(org_name='org1.example.com', name='Admin')
+        ensure_future(self.fabric_client.chaincode_invoke(
+            requestor=admin,
+            channel_name='mychannel',
+            peers=['peer0.org%d.example.com' % validator_peer_id],
+            args=args,
+            cc_name='sacc',
+            fcn='set'
+        )).add_done_callback(lambda task, stime=submit_time: on_tx_done(task, stime))
 
     @experiment_callback
-    def start_creating_transactions_with_rate(self, tx_rate, duration):
-        """
-        Start with submitting transactions.
-        """
+    def write_stats(self):
         if not self.is_client():
             return
 
-        duration = float(duration)
-
-        if not self.did_write_start_time:
-            # Write the start time to a file
-            submit_tx_start_time = int(round(time.time() * 1000))
-            with open("submit_tx_start_time.txt", "w") as out_file:
-                out_file.write("%d" % submit_tx_start_time)
-            self.did_write_start_time = True
-
-        individual_tx_rate = int(tx_rate) / self.num_clients
-        my_peer_id = self.experiment.scenario_runner._peernumber
-
-        # Spawn the process
-        script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "tx_spawner.py")
-        cmd = "python %s network.json %f %d %d %d %f > spawner.out 2>&1" % (script_path, individual_tx_rate, self.num_clients, self.num_validators, my_peer_id, duration)
-        self.spawner = subprocess.Popen(cmd, shell=True)
+        # Write the transaction info away
+        with open("tx_submit_times.txt", "w") as tx_times_file:
+            for tx_id, submit_time in self.tx_info:
+                tx_times_file.write("%s,%d\n" % (tx_id, submit_time))
 
     @experiment_callback
     def stop(self):
-        print("Stopping Hyperledger...")
+        print("Stopping Hyperledger Fabric...")
         if self.orderer_process:
             self.orderer_process.kill()
         if self.peer_process:
             self.peer_process.kill()
 
-        reactor.stop()
+        loop = get_event_loop()
+        loop.stop()
