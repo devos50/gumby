@@ -3,18 +3,17 @@ import os
 import random
 import shutil
 import subprocess
+from asyncio import get_event_loop
 
 import time
 from threading import Thread
 
 from grapheneapi.grapheneapi import GrapheneAPI
 
-from twisted.internet import reactor
-from twisted.internet.task import LoopingCall
-
 from gumby.experiment import experiment_callback
 from gumby.modules.blockchain_module import BlockchainModule
 from gumby.modules.experiment_module import static_module
+from gumby.util import run_task
 
 
 @static_module
@@ -28,7 +27,7 @@ class BitsharesModule(BlockchainModule):
         self.brain_priv_key = None
         self.wif_priv_key = None
         self.pub_key = None
-        self.trade_lc = LoopingCall(self.create_random_order)
+        self.trade_lc = None
         self.username = None
         self.bs_process = None
         self.bs_process_lc = None
@@ -66,8 +65,7 @@ class BitsharesModule(BlockchainModule):
     @experiment_callback
     def start_dumping_blockchain(self):
         if not self.dump_blockchain_lc:
-            self.dump_blockchain_lc = LoopingCall(self.dump_blockchain)
-            self.dump_blockchain_lc.start(10)
+            self.dump_blockchain_lc = run_task(self.dump_blockchain, interval=10)
 
     @experiment_callback
     def start_bitshares(self):
@@ -101,13 +99,12 @@ class BitsharesModule(BlockchainModule):
             conf_file.write(template_content)
 
         # Now we start the witness node
-        if self.experiment.scenario_runner._peernumber == 1:
+        if self.experiment.my_id == 1:
             self.start_bitshares_process()
         else:
-            reactor.callLater(random.random() * 10, self.start_bitshares_process)
+            run_task(self.start_bitshares_process, delay=random.random() * 10)
 
-        self.bs_process_lc = LoopingCall(self.check_bs_process)
-        self.bs_process_lc.start(12, now=False)
+        self.bs_process_lc = run_task(self.check_bs_process, interval=12, delay=12)
 
     def on_id_received(self):
         super(BitsharesModule, self).on_id_received()
@@ -145,7 +142,7 @@ class BitsharesModule(BlockchainModule):
         cli_wallet_exec = os.path.join(self.devnet_dir, "cli_wallet")
         cmd = '%s --wallet-file=my-wallet.json --chain-id %s --server-rpc-endpoint=ws://127.0.0.1:%d --server-rpc-user=%s --server-rpc-password=%s --rpc-endpoint=0.0.0.0:%d --daemon > %s 2>&1' % (cli_wallet_exec, chain_id, server_rpc_port, self.wallet_rpc_user, self.wallet_rpc_password, wallet_rpc_port, 'bitshares_wallet_output.log')
         subprocess.Popen([cmd], shell=True)
-        self.bs_process_lc.stop()
+        self.bs_process_lc.cancel()
 
     @experiment_callback
     def unlock_cli_wallet(self):
@@ -236,7 +233,7 @@ class BitsharesModule(BlockchainModule):
 
     @experiment_callback
     def stop_creating_orders(self):
-        self.trade_lc.stop()
+        self.trade_lc.cancel()
 
     @experiment_callback
     def transfer(self):
@@ -325,5 +322,8 @@ class BitsharesModule(BlockchainModule):
         if self.bs_process:
             self.bs_process.kill()
         if self.dump_blockchain_lc:
-            self.dump_blockchain_lc.stop()
-        reactor.stop()
+            self.dump_blockchain_lc.cancel()
+
+        loop = get_event_loop()
+        loop.stop()
+        exit(0)
