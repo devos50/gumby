@@ -1,11 +1,9 @@
 import os
 import time
 
-from twisted.internet import reactor
-from twisted.internet.task import LoopingCall, deferLater
-
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module, ExperimentModule
+from gumby.util import run_task
 
 
 @static_module
@@ -31,8 +29,7 @@ class TransactionsModule(ExperimentModule):
             self.stop()
 
     def is_client(self):
-        my_peer_id = self.experiment.scenario_runner._peernumber
-        return my_peer_id > self.num_validators
+        return self.experiment.my_id > self.num_validators
 
     @experiment_callback
     def start_creating_transactions(self):
@@ -58,7 +55,6 @@ class TransactionsModule(ExperimentModule):
             self.did_write_start_time = True
 
         self._logger.info("Starting transactions...")
-        self.tx_lc = LoopingCall(self.transfer)
 
         # Depending on the tx rate and number of clients, wait a bit
         individual_tx_rate = int(tx_rate) / self.num_clients
@@ -66,11 +62,10 @@ class TransactionsModule(ExperimentModule):
 
         def start_lc():
             self._logger.info("Starting tx lc...")
-            self.tx_lc.start(1.0 / individual_tx_rate)
+            self.tx_lc = run_task(self.transfer, interval=(1.0 / individual_tx_rate))
 
-        my_peer_id = self.experiment.scenario_runner._peernumber
-        my_client_id = my_peer_id - self.num_validators
-        deferLater(reactor, (1.0 / self.num_clients) * (my_client_id - 1), start_lc)
+        my_client_id = self.experiment.my_id - self.num_validators
+        run_task(start_lc, delay=(1.0 / self.num_clients) * (my_client_id - 1))
 
     @experiment_callback
     def stop_creating_transactions(self):
@@ -81,5 +76,5 @@ class TransactionsModule(ExperimentModule):
             return
 
         self._logger.info("Stopping transactions...")
-        self.tx_lc.stop()
+        self.tx_lc.cancel()
         self.tx_lc = None
