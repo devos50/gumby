@@ -33,24 +33,31 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Disable threadpool messages
         self.overlay._use_main_thread = True
 
-    @experiment_callback
-    def init_wallets(self):
-        dummy1_wallet = DummyWallet1()
-        dummy2_wallet = DummyWallet2()
-        self.overlay.use_local_address = True
-        self.overlay.wallets = {
-            dummy1_wallet.get_identifier(): dummy1_wallet,
-            dummy2_wallet.get_identifier(): dummy2_wallet
-        }
-
-        dummy1_wallet.balance = 1000000000
-        dummy2_wallet.balance = 1000000000
-        dummy1_wallet.MONITOR_DELAY = 0
-        dummy2_wallet.MONITOR_DELAY = 0
-
-        tc_wallet = TrustchainWallet(self.session.trustchain_community)
-        tc_wallet.check_negative_balance = False
-        self.overlay.wallets[tc_wallet.get_identifier()] = tc_wallet
+        # Init settings according to the env variables
+        if 'FANOUT' in os.environ:
+            self._logger.info("Setting fanout to %d", int(os.environ['FANOUT']))
+            self.overlay.settings.fanout = int(os.environ['FANOUT'])
+        if 'MATCH_WINDOW' in os.environ:
+            self.overlay.settings.match_window = float(os.environ['MATCH_WINDOW'])
+            self._logger.info("Setting match window to %f", float(os.environ['MATCH_WINDOW']))
+        if 'MATCH_SEND_INTERVAL' in os.environ:
+            self.overlay.settings.match_send_interval = float(os.environ['MATCH_SEND_INTERVAL'])
+            self._logger.info("Setting match send interval to %f", float(os.environ['MATCH_SEND_INTERVAL']))
+        if 'SYNC_POLICY' in os.environ:
+            self.overlay.set_sync_policy(int(os.environ['SYNC_POLICY']))
+            self._logger.info("Setting sync policy to %d", int(os.environ['SYNC_POLICY']))
+        if 'DISSEMINATION_POLICY' in os.environ:
+            self.overlay.settings.dissemination_policy = int(os.environ['DISSEMINATION_POLICY'])
+            self._logger.info("Setting dissemination policy to %d", int(os.environ['DISSEMINATION_POLICY']))
+        if 'NUM_ORDER_SYNC' in os.environ:
+            self.overlay.settings.num_order_sync = int(os.environ['NUM_ORDER_SYNC'])
+            self._logger.info("Setting num order sync to %d", int(os.environ['NUM_ORDER_SYNC']))
+        if 'SEND_FAIL_RATE' in os.environ:
+            self.overlay.settings.send_fail_rate = float(os.environ['SEND_FAIL_RATE'])
+            self._logger.info("Setting send fail rate to %f", float(os.environ['SEND_FAIL_RATE']))
+        if 'MATCHMAKER_MALICIOUS_RATE' in os.environ:
+            self.overlay.settings.matchmaker_malicious_rate = float(os.environ['MATCHMAKER_MALICIOUS_RATE'])
+            self._logger.info("Setting matchmaker malicious rate to %f", float(os.environ['MATCHMAKER_MALICIOUS_RATE']))
 
     @experiment_callback
     def init_matchmakers(self):
@@ -61,6 +68,23 @@ class MarketModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def disable_max_peers(self):
         self.overlay.max_peers = -1
+
+    @experiment_callback
+    def set_fanout(self, fanout):
+        self.overlay.settings.fanout = int(fanout)
+
+    @experiment_callback
+    def set_match_window(self, window_size):
+        self.overlay.settings.match_window = int(window_size)
+
+    @experiment_callback
+    def fix_broadcast_set(self):
+        rand_peers = random.sample(self.overlay.matchmakers,
+                                   min(len(self.overlay.matchmakers), self.overlay.settings.fanout))
+        self.overlay.fixed_broadcast_set = rand_peers
+        self._logger.info("Fixed broadcast set to %d peers:", len(rand_peers))
+        for peer in rand_peers:
+            self._logger.info("Will broadcast to peer: %s", str(peer))
 
     @experiment_callback
     def connect_matchmakers(self, num_to_connect):
@@ -121,32 +145,33 @@ class MarketModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def write_stats(self):
         scenario_runner = self.experiment.scenario_runner
-        transactions = []
+        trades = []
 
-        # Parse transactions
-        for transaction in self.overlay.transaction_manager.find_all():
-            partner_peer_id = self.overlay.lookup_ip(transaction.partner_order_id.trader_id)[1] - 12000
+        # Parse trades
+        for trade in self.overlay.trading_engine.completed_trades:
+            partner_peer_id = self.overlay.lookup_ip(trade.order_id.trader_id)[1] - 12000
             if partner_peer_id < scenario_runner._peernumber:  # Only one peer writes the transaction
-                transactions.append((int(transaction.timestamp) / 1000.0 - scenario_runner.exp_start_time,
-                                     transaction.transferred_assets.first.amount,
-                                     transaction.transferred_assets.second.amount,
-                                     len(transaction.payments), scenario_runner._peernumber, partner_peer_id))
+                trades.append((int(trade.timestamp) - int(scenario_runner.exp_start_time * 1000),
+                               trade.assets.first.amount,
+                               trade.assets.second.amount,
+                               scenario_runner._peernumber, partner_peer_id))
 
-        # Write transactions
-        with open('transactions.log', 'w') as transactions_file:
-            for transaction in transactions:
-                transactions_file.write("%s,%s,%s,%s,%s,%s\n" % transaction)
+        # Write trades
+        with open('trades.log', 'w') as trades_file:
+            for trade in trades:
+                trades_file.write("%s,%s,%s,%s,%s\n" % trade)
 
         # Write orders
         with open('orders.log', 'w') as orders_file:
             for order in self.overlay.order_manager.order_repository.find_all():
-                order_data = (int(order.timestamp) / 1000.0, order.order_id, scenario_runner._peernumber,
+                order_data = (int(order.timestamp), order.order_id, scenario_runner._peernumber,
                               'ask' if order.is_ask() else 'bid',
-                              'complete' if order.is_complete() else 'incomplete',
-                              order.assets.first.amount, order.assets.second.amount, order.reserved_quantity,
+                              order.status,
+                              order.assets.first.amount, order.assets.first.asset_id, order.assets.second.amount,
+                              order.assets.second.asset_id, order.reserved_quantity,
                               order.traded_quantity,
-                              (int(order.completed_timestamp) / 1000.0) if order.is_complete() else '-1')
-                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
+                              int(order.completed_timestamp) if order.is_complete() else '-1')
+                orders_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % order_data)
 
         # Write ticks in order book
         with open('orderbook.txt', 'w') as orderbook_file:
@@ -156,6 +181,23 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('matchmakers.txt', 'w') as matchmakers_file:
             for matchmaker in self.overlay.matchmakers:
                 matchmakers_file.write("%s,%d\n" % (matchmaker.address[0], matchmaker.address[1]))
+
+        # Write items in the matching queue
+        with open('match_queue.txt', 'w') as queue_file:
+            for match_cache in self.overlay.get_match_caches():
+                for retries, price, other_order_id in match_cache.queue.queue:
+                    queue_file.write("%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
+
+        # Write away the different messages
+        with open('messages.txt', 'w') as messages_file:
+            messages_file.write("cancel_orders,%d\n" % self.overlay.num_received_cancel_orders)
+            messages_file.write("orders,%d\n" % self.overlay.num_received_orders)
+            messages_file.write("match,%d\n" % self.overlay.num_received_match)
+            messages_file.write("match_decline,%d\n" % self.overlay.num_received_match_decline)
+            messages_file.write("propose_trade,%d\n" % self.overlay.num_received_proposed_trade)
+            messages_file.write("decline_trade,%d\n" % self.overlay.num_received_declined_trade)
+            messages_file.write("counter_trade,%d\n" % self.overlay.num_received_counter_trade)
+            messages_file.write("complete_trade,%d\n" % self.overlay.num_received_complete_trade)
 
         # Get statistics about the amount of fulfilled orders (asks/bids)
         fulfilled_asks = 0
@@ -177,9 +219,7 @@ class MarketModule(IPv8OverlayExperimentModule):
             for trader_id, host in self.overlay.mid_register.items():
                 mid_file.write("%s,%s\n" % (trader_id.as_hex(), "%s:%d" % host))
 
-        # Write items in the matching queue
-        with open('match_queue.txt', 'w') as queue_file:
-            for match_cache in self.overlay.get_match_caches():
-                for retries, price, other_order_id in match_cache.queue.queue:
-                    queue_file.write(
-                        "%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
+        # Write bandwidth statistics
+        with open('bandwidth.txt', 'w') as bandwidth_file:
+            bandwidth_file.write("%d,%d" % (self.overlay.endpoint.bytes_up,
+                                            self.overlay.endpoint.bytes_down))

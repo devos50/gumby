@@ -1,3 +1,4 @@
+import hashlib
 from abc import ABCMeta, abstractmethod
 
 from ipv8.dht.provider import DHTCommunityProvider
@@ -215,7 +216,21 @@ class MarketCommunityLauncher(IPv8CommunityLauncher):
         return Peer(session.trustchain_keypair)
 
     def get_kwargs(self, session):
-        return {'trustchain': session.trustchain_community, 'dht': session.dht_community, 'use_database': False}
+        from anydex.core.tradingengine import TradingEngine
+
+        class MockTradingEngine(TradingEngine):
+            """
+            Trading engine that immediately completes a trade.
+            """
+
+            def trade(self, trade):
+                self.completed_trades.append(trade)
+
+                # The trade ID must be the same on the two nodes
+                trade_id = hashlib.sha1(str(trade.proposal_id).encode()).digest()
+                self.matching_community.on_trade_completed(trade, trade_id)
+
+        return {'dht': session.dht_community, 'use_database': False, 'trading_engine': MockTradingEngine()}
 
 
 class GigaChannelCommunityLauncher(IPv8CommunityLauncher):
