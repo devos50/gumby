@@ -76,7 +76,7 @@ class AnyDexModule(ExperimentModule):
         return loader
 
     @experiment_callback
-    def start_session(self):
+    async def start_session(self):
         from ipv8.configuration import get_default_configuration
 
         ipv8_config = get_default_configuration()
@@ -84,6 +84,8 @@ class AnyDexModule(ExperimentModule):
         ipv8_config['overlays'] = []
         ipv8_config['keys'] = []  # We load the keys ourselves
         self.ipv8 = IPv8(ipv8_config, enable_statistics=self.tribler_config.get_ipv8_statistics())
+
+        await self.ipv8.start()
 
         self.session = GumbyMinimalSession(self.tribler_config)
         self.session.trustchain_keypair = read_keypair_trustchain(self.tribler_config.get_trustchain_keypair_filename())
@@ -110,8 +112,8 @@ class AnyDexModule(ExperimentModule):
         self.custom_ipv8_community_loader.isolate(name)
 
     @experiment_callback
-    def stop_session(self):
-        self.ipv8.stop()
+    async def stop_session(self):
+        await self.ipv8.stop()
 
     def setup_config(self):
         if self.ipv8_port is None:
