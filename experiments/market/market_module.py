@@ -143,6 +143,18 @@ class MarketModule(IPv8OverlayExperimentModule):
         self.overlay.cancel_order(self.order_id_map[order_id])
 
     @experiment_callback
+    def initialize_latencies(self):
+        """
+        Initialize all latencies in IPv8.
+        """
+        self._logger.info("Initializing latencies...")
+        latencies_file_path = "/home/pouwelse/latencies.txt"
+        with open(latencies_file_path) as latencies_file:
+            for latency_str in latencies_file.readlines():
+                if latency_str:
+                    self.overlay.endpoint.latencies.append(float(latency_str))
+
+    @experiment_callback
     def write_stats(self):
         scenario_runner = self.experiment.scenario_runner
         trades = []

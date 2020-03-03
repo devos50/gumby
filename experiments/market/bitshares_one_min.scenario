@@ -8,6 +8,7 @@
 @0:1 annotate start-experiment
 @0:5 init_matchmakers
 @0:6 init_trader_lookup_table
+@0:7 initialize_latencies
 @0:9 disable_max_peers
 @0:10 connect_matchmakers 10
 @0:29 fix_broadcast_set
