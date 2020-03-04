@@ -131,6 +131,13 @@ class MarketStatisticsParser(StatisticsParser):
         with open('avg_latency.txt', 'w') as latency_file:
             latency_file.write("%f" % self.avg_order_latency)
 
+    def aggregate_negotiation_stats(self):
+        with open("negotiation_stats.txt", 'w') as aggregated_negotiations_file:
+            aggregated_negotiations_file.write("order_id,started\n")
+            for peer_nr, filename, dir in self.yield_files('negotiation_stats.txt'):
+                with open(filename) as negotiation_stats_file:
+                    aggregated_negotiations_file.write(negotiation_stats_file.read())
+
     def check_missed_matches(self):
         orders = []
 
@@ -222,6 +229,7 @@ class MarketStatisticsParser(StatisticsParser):
         self.aggregate_trade_data()
         self.aggregate_order_data()
         self.aggregate_general_stats()
+        self.aggregate_negotiation_stats()
         self.aggregate_bandwidth()
         self.parse_messages()
         self.check_missed_matches()

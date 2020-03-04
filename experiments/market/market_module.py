@@ -235,3 +235,8 @@ class MarketModule(IPv8OverlayExperimentModule):
         with open('bandwidth.txt', 'w') as bandwidth_file:
             bandwidth_file.write("%d,%d" % (self.overlay.endpoint.bytes_up,
                                             self.overlay.endpoint.bytes_down))
+
+        # Write negotiation statistics
+        with open('negotiation_stats.txt', 'w') as negotiation_file:
+            for order_id, negotiation_info in self.overlay.negotiation_stats.items():
+                negotiation_file.write("%s,%d\n" % (str(order_id), negotiation_info["started"]))
