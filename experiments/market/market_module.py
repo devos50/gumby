@@ -197,8 +197,8 @@ class MarketModule(IPv8OverlayExperimentModule):
         # Write items in the matching queue
         with open('match_queue.txt', 'w') as queue_file:
             for match_cache in self.overlay.get_match_caches():
-                for retries, price, other_order_id in match_cache.queue.queue:
-                    queue_file.write("%s,%d,%s,%s\n" % (match_cache.order.order_id, retries, price, other_order_id))
+                for retries, price, other_order_id, other_quantity in match_cache.queue.queue:
+                    queue_file.write("%s,%d,%s,%s,%d\n" % (match_cache.order.order_id, retries, price, other_order_id, other_quantity))
 
         # Write away the different messages
         with open('messages.txt', 'w') as messages_file:
