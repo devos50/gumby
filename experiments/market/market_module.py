@@ -53,7 +53,7 @@ class MarketModule(IPv8OverlayExperimentModule):
             self.overlay.settings.num_order_sync = int(os.environ['NUM_ORDER_SYNC'])
             self._logger.info("Setting num order sync to %d", int(os.environ['NUM_ORDER_SYNC']))
         if 'SEND_FAIL_RATE' in os.environ:
-            self.overlay.settings.send_fail_rate = float(os.environ['SEND_FAIL_RATE'])
+            self.overlay.endpoint.send_fail_rate = float(os.environ['SEND_FAIL_RATE'])
             self._logger.info("Setting send fail rate to %f", float(os.environ['SEND_FAIL_RATE']))
         if 'MATCHMAKER_MALICIOUS_RATE' in os.environ:
             self.overlay.settings.matchmaker_malicious_rate = float(os.environ['MATCHMAKER_MALICIOUS_RATE'])
