@@ -1,17 +1,17 @@
 import sys
 
 
-def compute_probability(n, r):
+def compute_probability(m, f, r):
     res = 1
-    for i in range(r):
-        res = res * ((n - r - i) / float(n))
+    for i in range(f):
+        res = res * ((m - int((1 - r) * f) - i) / m)
 
     return res
 
 
-def determine_combination(network_size, error_prob):
+def determine_combination(network_size, error_prob, adversarial_rate):
     for fanout in range(1, 200):
-        prob = compute_probability(network_size, fanout)
+        prob = compute_probability(network_size, fanout, adversarial_rate)
         if prob <= error_prob:
             return fanout
 
@@ -19,4 +19,4 @@ def determine_combination(network_size, error_prob):
     return -1
 
 
-print(determine_combination(int(sys.argv[1]), 0.1))
+print(determine_combination(int(sys.argv[1]), 0.05, float(sys.argv[2])))
