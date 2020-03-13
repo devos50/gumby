@@ -58,6 +58,11 @@ class MarketModule(IPv8OverlayExperimentModule):
         if 'MATCHMAKER_MALICIOUS_RATE' in os.environ:
             self.overlay.settings.matchmaker_malicious_rate = float(os.environ['MATCHMAKER_MALICIOUS_RATE'])
             self._logger.info("Setting matchmaker malicious rate to %f", float(os.environ['MATCHMAKER_MALICIOUS_RATE']))
+        if 'FRACTION_SELFISH_MATCHING' in os.environ:
+            selfish_nodes = int(int(os.environ['NUM_MATCHMAKERS']) * float(os.environ['FRACTION_SELFISH_MATCHING']))
+            if self.experiment.scenario_runner._peernumber <= selfish_nodes:
+                self._logger.info("Enabling selfish matching")
+                self.overlay.settings.selfish_matching = True
 
     @experiment_callback
     def init_matchmakers(self):
