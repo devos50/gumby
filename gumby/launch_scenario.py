@@ -98,7 +98,7 @@ def main(self_service=False):
 
     debug("Connecting to: %s:%s", environ['SYNC_HOST'], int(environ['SYNC_PORT']))
     run_task(loop.create_connection, ExperimentClientFactory(), environ['SYNC_HOST'],
-             int(environ['SYNC_PORT']), delay=random.randint(1, 5))
+             int(environ['SYNC_PORT']), delay=random.randint(1, 10))
     loop.run_forever()
     loop.close()
     exit(loop.exit_code)
