@@ -1,0 +1,28 @@
+&module gumby.modules.experiment_module.ExperimentModule
+&module experiments.burrow.burrow_module.BurrowModule
+
+@0:1 generate_config {1}
+@0:5 start_burrow
+@0:10 deploy_contract {1}
+@0:20 register_households_and_mint {1}
+@0:30 set_role seller {2}
+@0:30 set_role seller {3}
+@0:30 set_role seller {4}
+@0:30 set_role buyer {5}
+@0:30 set_role buyer {6}
+@0:30 set_role buyer {7}
+@0:40 post_clearing_results
+@0:50 received_energy {5}
+@0:51 received_energy {6}
+@0:52 received_energy {7}
+@0:60 received_energy {5}
+@0:61 received_energy {6}
+@0:62 received_energy {7}
+@0:70 received_energy {5}
+@0:71 received_energy {6}
+@0:72 received_energy {7}
+@0:80 received_energy {5}
+@0:81 received_energy {6}
+@0:82 received_energy {7}
+@0:90 print_euro_token_balance {2-7}
+@0:95 stop_burrow
