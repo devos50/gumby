@@ -2,14 +2,12 @@ import csv
 import json
 import os
 import time
+from asyncio import sleep, get_event_loop, ensure_future
 from base64 import b64decode
 from binascii import hexlify
 from random import randint, random, choice
 
 import networkx as nx
-
-from twisted.internet import reactor
-from twisted.internet.task import LoopingCall, deferLater
 
 from gumby.experiment import experiment_callback
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
@@ -20,6 +18,8 @@ from gumby.modules.tribler_module import TriblerModule
 from ipv8.attestation.noodle.community import NoodleCommunity
 from ipv8.attestation.noodle.listener import BlockListener
 from ipv8.attestation.noodle.settings import SecurityMode
+
+from gumby.util import run_task
 
 
 class FakeBlockListener(BlockListener):
@@ -180,34 +180,12 @@ class NoodleModule(IPv8OverlayExperimentModule):
         self.overlay.settings.validation_range = int(value)
 
     @experiment_callback
-    def start_requesting_signatures(self):
-
-        if os.getenv('TX_SEC'):
-            value = float(os.getenv('TX_SEC'))
-        else:
-            value = 0.001
-        self._logger.info("Setting transaction rate to %s", 1 / value)
-
-        self.request_signatures_lc = LoopingCall(self.request_random_signature)
-        self.request_signatures_lc.start(value)
-
-    @experiment_callback
     def start_periodic_mem_flush(self):
         value = 1
         if os.getenv('FLUSH_TIME'):
             value = float(os.getenv('FLUSH_TIME'))
 
         self.overlay.init_mem_db_flush(value)
-
-    @experiment_callback
-    def start_multihop_noodle_transactions(self):
-        if os.getenv('TX_SEC'):
-            value = float(os.getenv('TX_SEC'))
-        else:
-            value = 0.001
-
-        self.request_signatures_lc = LoopingCall(self.request_noodle_all_random_signature)
-        self.request_signatures_lc.start(value)
 
     def is_minter(self):
         """
@@ -247,7 +225,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
         peers = self.overlay.get_all_communities_peers()
         for peer in peers:
             delay = (1.0 / len(peers)) * int(self.experiment.get_peer_id(peer.address[0], peer.address[1]))
-            deferLater(reactor, delay, self.overlay.transfer, peer, 100000000000000)
+            run_task(self.overlay.transfer, peer, 100000000000000, delay=delay)
 
     @experiment_callback
     def write_submit_tx_start_time(self):
@@ -259,28 +237,26 @@ class NoodleModule(IPv8OverlayExperimentModule):
             self.did_write_start_time = True
 
     @experiment_callback
-    def start_creating_transactions(self):
+    async def start_creating_transactions(self):
         self.write_submit_tx_start_time()
 
         self._logger.info("Starting transactions...")
         total_peers = len(self.all_vars.keys())
 
-        target_function = self.request_noodle_fixed_community_signature
-        if os.getenv("RANDOM_INTERACTIONS"):
-            target_function = self.request_noodle_random_community_signature
-
-        self.tx_lc = LoopingCall(target_function)
-
         # Depending on the tx rate and number of clients, wait a bit
         individual_tx_rate = int(self.tx_rate) / total_peers
         self._logger.info("Individual tx rate: %f" % individual_tx_rate)
 
-        def start_lc():
-            self._logger.info("Starting tx lc...")
-            self.tx_lc.start(1.0 / individual_tx_rate)
-
         my_peer_id = self.experiment.scenario_runner._peernumber
-        deferLater(reactor, (1.0 / total_peers) * (my_peer_id - 1), start_lc)
+        delay = (1.0 / total_peers) * (my_peer_id - 1)
+        await sleep(delay)
+
+        target_function = self.request_noodle_fixed_community_signature
+        if os.getenv("RANDOM_INTERACTIONS"):
+            target_function = self.request_noodle_random_community_signature
+
+        self._logger.info("Starting tx lc...")
+        self.tx_lc = run_task(target_function, interval=1.0 / individual_tx_rate)
 
     @experiment_callback
     def start_creating_transactions_full(self):
@@ -293,20 +269,20 @@ class NoodleModule(IPv8OverlayExperimentModule):
             return
 
         tx_spawn_duration = int(os.environ["TX_SPAWN_DURATION"])
-        self.start_creating_transactions()
-        deferLater(reactor, tx_spawn_duration, self.stop_creating_transactions)
-        deferLater(reactor, 1, self.start_periodic_mem_flush)
+        ensure_future(self.start_creating_transactions())
+        run_task(self.stop_creating_transactions, delay=tx_spawn_duration)
+        run_task(self.start_periodic_mem_flush, delay=1)
 
         # Schedule post-processing tasks
-        deferLater(reactor, tx_spawn_duration + 5, self.commit_block_times)
-        deferLater(reactor, tx_spawn_duration + 5, self.write_overlay_statistics)
-        deferLater(reactor, tx_spawn_duration + 5, self.write_noodle_stats)
-        deferLater(reactor, tx_spawn_duration + 10, self.stop_tribler_session)
-        deferLater(reactor, tx_spawn_duration + 15, self.stop)
+        run_task(self.commit_block_times, delay=tx_spawn_duration + 5)
+        run_task(self.write_overlay_statistics, delay=tx_spawn_duration + 5)
+        run_task(self.write_noodle_stats, delay=tx_spawn_duration + 5)
+        run_task(self.stop_tribler_session, delay=tx_spawn_duration + 10)
+        run_task(self.stop, delay=tx_spawn_duration + 15)
 
         profile_module = self.get_profile_module()
         if profile_module:
-            deferLater(reactor, tx_spawn_duration + 12, profile_module.stop_yappi)
+            run_task(profile_module.stop_yappi, delay=tx_spawn_duration + 12)
 
     def get_profile_module(self):
         for module in self.experiment.experiment_modules:
@@ -325,46 +301,14 @@ class NoodleModule(IPv8OverlayExperimentModule):
         self.get_tribler_module().stop_session()
 
     def stop(self):
-        reactor.stop()
+        loop = get_event_loop()
+        loop.stop()
 
     @experiment_callback
     def stop_creating_transactions(self):
         self._logger.info("Stopping transactions...")
         self.tx_lc.stop()
         self.tx_lc = None
-
-    @experiment_callback
-    def start_direct_noodle_transactions(self):
-        if os.getenv('TX_SEC'):
-            value = float(os.getenv('TX_SEC'))
-        else:
-            value = 0.001
-
-        self.request_signatures_lc = LoopingCall(self.request_noodle_1hop_random_signature)
-        self.request_signatures_lc.start(value)
-
-        # def start_sig_req():
-
-        # sleep_offset = (self.my_id-1)/len(self.all_vars)
-        # self.overlay.register_anonymous_task("init_delay", reactor.callLater(sleep_offset, start_sig_req))
-
-    @experiment_callback
-    def stop_requesting_signatures(self):
-        self.request_signatures_lc.stop()
-        self.overlay.all_sync_stop()
-
-    @experiment_callback
-    def start_req_sign_with_random_double_spends(self, batch=1, chance=0.1):
-
-        if os.getenv('DS_BATCH'):
-            batch = int(os.getenv('DS_BATCH'))
-        if os.getenv('DS_CHANCE'):
-            chance = float(os.getenv('DS_CHANCE'))
-
-        self._logger.info("Double spend batch is %s", batch)
-        self._logger.info("Double spend chance is %s", chance)
-        self.request_ds_lc = LoopingCall(self.make_double_spend, batch, chance)
-        self.request_ds_lc.start(1)
 
     @experiment_callback
     def stop_req_sign_with_random_double_spends(self):
@@ -403,7 +347,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
         """
         target_peer_id = self.my_id % len(self.all_vars.keys()) + 1
         target_peer = self.get_peer(str(target_peer_id))
-        self.overlay.transfer(target_peer, 1)
+        ensure_future(self.overlay.transfer(target_peer, 1))
 
     @experiment_callback
     def request_noodle_all_random_signature(self):
@@ -453,19 +397,6 @@ class NoodleModule(IPv8OverlayExperimentModule):
             rand_down = randint(1, 1000)
             self.request_signature_from_peer(leader_peer, rand_up, rand_down)
 
-    @experiment_callback
-    def start_spamming_leader_peer(self, block_num=100):
-        """
-        Send block_num of blocks per second to leader peer per second.
-        NUM_TX environment variable will be used instead of block_num if defined
-        :param block_num: number of blocks per sec to send to leader peer
-        """
-        if os.getenv('NUM_TX'):
-            block_num = int(os.getenv('NUM_TX'))
-
-        self.request_signatures_lc = LoopingCall(self.send_to_leader_peer, int(block_num))
-        self.request_signatures_lc.start(1)
-
     def request_signature_from_peer(self, peer, up, down, attached_block=None):
         peer_id = self.experiment.get_peer_id(peer.address[0], peer.address[1])
         self._logger.info("%s: Requesting signature from peer: %s", self.my_id, peer_id)
@@ -514,13 +445,13 @@ class NoodleModule(IPv8OverlayExperimentModule):
                 (self.experiment.get_peer_ip_port_by_id(k) for k in topology[neighbour_peer_id]))
             neighbour_peer_address = self.experiment.get_peer_ip_port_by_id(neighbour_peer_id)
             self._logger.info("This peer will connect to peer %d", neighbour_peer_id)
-            reactor.callLater(4 * random(), self.overlay.walk_to, neighbour_peer_address)
+            run_task(self.overlay.walk_to, neighbour_peer_address, delay=4 * random())
 
         # Build the known graph and set the right labels
         label_map = {int(k): b64decode(v['public_key']) for k, v in self.all_vars.items()}
         self.inverted_map = {v: k for k, v in label_map.items()}
         self.overlay.known_graph = nx.relabel_nodes(topology, label_map)
-        self.overlay.register_anonymous_task("intro_delay", reactor.callLater(5, self.recheck_connections))
+        run_task(self.recheck_connections, delay=5)
 
     @experiment_callback
     def recheck_connections(self):

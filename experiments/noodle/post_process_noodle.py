@@ -6,10 +6,9 @@ import json
 import os
 import statistics as np
 import sys
+from binascii import hexlify
 
 from gumby.post_process_blockchain import BlockchainTransactionsParser
-
-from Tribler.Core.Utilities.unicode import hexlify
 
 from scripts.trustchain_database_reader import GumbyDatabaseAggregator
 

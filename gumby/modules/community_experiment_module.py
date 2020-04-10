@@ -3,11 +3,9 @@ from os import environ
 from random import random
 from socket import gethostbyname
 
-from twisted.internet import reactor
-
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import ExperimentModule
-from gumby.util import generate_keypair_trustchain, save_keypair_trustchain, save_pub_key_trustchain
+from gumby.util import generate_keypair_trustchain, save_keypair_trustchain, save_pub_key_trustchain, run_task
 from ipv8.peer import Peer
 from ipv8.peerdiscovery.churn import RandomChurn
 from ipv8.peerdiscovery.discovery import EdgeWalk, RandomWalk
@@ -129,15 +127,15 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             for peer_id in self.all_vars.keys():
                 if int(peer_id) != self.my_id and int(peer_id) not in excluded_peers_list:
                     delta = 5 * random()
-                    reactor.callLater(delta, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_id))
+                    run_task(self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_id), delay=delta)
         else:
             # Walk to a number of peers
             eligible_peers = [peer_id for peer_id in self.all_vars.keys()
                               if int(peer_id) not in excluded_peers_list and int(peer_id) != self.my_id]
-            rand_peer_ids = sample(eligible_peers, int(max_peers))
+            rand_peer_ids = random.sample(eligible_peers, int(max_peers))
             for rand_peer_id in rand_peer_ids:
                 delta = 5 * random()
-                reactor.callLater(delta, self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(rand_peer_id))
+                run_task(self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(rand_peer_id), delay=delta)
 
     @experiment_callback
     def add_walking_strategy(self, name, max_peers, **kwargs):
