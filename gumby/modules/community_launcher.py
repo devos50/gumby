@@ -216,7 +216,6 @@ class NoodleCommunityLauncher(IPv8CommunityLauncher):
 
     def finalize(self, ipv8, session, community):
         super(NoodleCommunityLauncher, self).finalize(ipv8, session, community)
-        session.lm.noodle_community = community
         community.ipv8 = ipv8
 
 

@@ -248,6 +248,7 @@ class TriblerModule(BaseIPv8Module):
         """
         Write information about the IPv8 overlay networks to a file.
         """
+        self._logger.info("Writing overlay statistics")
         with open('overlays.txt', 'w') as overlays_file:
             overlays_file.write("name,pub_key,peers\n")
             for overlay in self.session.ipv8.overlays:
