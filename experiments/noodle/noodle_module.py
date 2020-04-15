@@ -307,12 +307,12 @@ class NoodleModule(IPv8OverlayExperimentModule):
     @experiment_callback
     def stop_creating_transactions(self):
         self._logger.info("Stopping transactions...")
-        self.tx_lc.stop()
+        self.tx_lc.cancel()
         self.tx_lc = None
 
     @experiment_callback
     def stop_req_sign_with_random_double_spends(self):
-        self.request_ds_lc.stop()
+        self.request_ds_lc.cancel()
 
     @experiment_callback
     def request_signature(self, peer_id, up, down):
