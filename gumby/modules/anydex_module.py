@@ -131,7 +131,7 @@ class AnyDexModule(ExperimentModule):
                 f.write("\n".join(["%s %d" % (environ['HEAD_HOST'], port) for port in port_range]))
             bootstrap_file = path.join(my_state_path, 'bootstraptribler.txt')
 
-        # We manually update the IPv8 bootstrap servers since IPv8 does not use the bootstraptribler.txt file.
+        # We manually update the IPv8 bootstrap aws_servers since IPv8 does not use the bootstraptribler.txt file.
         from ipv8 import community
         community._DEFAULT_ADDRESSES = []
         community._DNS_ADDRESSES = []

@@ -118,6 +118,8 @@ class ExperimentRunner():
             cmd = self._cfg['local_setup_cmd']
             await self.runLocalCommand(cmd)
             self._logger.info("Local setup script finished.")
+        else:
+            self._logger.info("Skipping local setup.")
 
     async def runRemoteSetup(self):
         if self._cfg['remote_setup_cmd']:
@@ -170,6 +172,7 @@ class ExperimentRunner():
 
     async def startExperimentServer(self):
         if self._cfg['experiment_server_cmd']:
+            self._logger.info("Starting experiment server")
             # TODO: This is not very flexible, refactor it to have a background_commands
             # list instead of experiment_server_cmd, tracker_cmd, etc...
             try:
