@@ -86,7 +86,7 @@ class BaseIPv8Module(ExperimentModule):
             self.ipv8_port = 12000 + self.experiment.my_id
         self._logger.info("IPv8 port set to %d", self.ipv8_port)
 
-        # We manually update the IPv8 bootstrap servers since IPv8 does not use the bootstraptribler.txt file.
+        # We manually update the IPv8 bootstrap aws_servers since IPv8 does not use the bootstraptribler.txt file.
         from ipv8 import community
         community._DEFAULT_ADDRESSES = []
         community._DNS_ADDRESSES = []
