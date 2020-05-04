@@ -7,5 +7,5 @@ do
   rsync -r gumby ec2-user@$SERVER:/home/ec2-user -e "ssh -i ~/Amazon.pem"
 
   echo "Building virtualenv on $SERVER..."
-  ssh ec2-user@$SERVER -i ~/Amazon.pem gumby/scripts/build_virtualenv_aws.sh
+  ssh -n ec2-user@$SERVER -i ~/Amazon.pem gumby/scripts/build_virtualenv_aws.sh
 done < "$AWS_SERVERS_FILE"
