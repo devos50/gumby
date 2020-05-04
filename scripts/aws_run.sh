@@ -1,7 +1,5 @@
 #!/bin/bash
 
-env
-
 source $VENV/bin/activate
 
 let "PROCESSES_PER_NODE=$AWS_INSTANCES_TO_RUN/$AWS_NODE_AMOUNT"
