@@ -17,5 +17,6 @@ OUTPUT_DIR=/tmp/Experiment_${EXPERIMENT_NAME}_output
 while read -r SERVER
 do
   echo "RSynching back from $SERVER"
-  rsync -r ec2-user@$SERVER:$OUTPUT_DIR/ output/$SERVER -e "ssh -i ~/Amazon.pem"
+  mkdir -p output/localhost
+  rsync -r ec2-user@$SERVER:$OUTPUT_DIR/ output/localhost/$SERVER -e "ssh -i ~/Amazon.pem"
 done < "$AWS_SERVERS_FILE"
