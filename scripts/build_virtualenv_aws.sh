@@ -19,7 +19,6 @@ else
     VENV=$HOME/venv3
 fi
 
-echo "Building venv"
 sudo yum install python3 python3-devel gcc -y
 
 if [ ! -e $VENV/bin/python ]; then
@@ -32,5 +31,3 @@ mkdir -p $VENV/src
 source $VENV/bin/activate
 
 python -m pip install psutil
-
-echo "Building venv done"
