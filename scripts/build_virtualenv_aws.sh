@@ -30,4 +30,4 @@ mkdir -p $VENV/src
 
 source $VENV/bin/activate
 
-python -m pip install psutil
+python -m pip install configobj cryptography netifaces networkx pony psutil pyyaml

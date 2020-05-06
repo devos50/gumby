@@ -54,7 +54,7 @@ def main(self_service=False):
     if "TRIBLER_DIR" not in environ:
         environ["TRIBLER_DIR"] = path.abspath(path.join(environ["PROJECT_DIR"], "tribler"))
     if "IPV8_DIR" not in environ:
-        environ["IPV8_DIR"] = path.abspath(path.join(environ["PROJECT_DIR"], "tribler", "src", "pyipv8"))
+        environ["IPV8_DIR"] = path.abspath(path.join(environ["TRIBLER_DIR"], "src", "pyipv8"))
     if "SYNC_HOST" not in environ:
         # If we deploy using an SSH connection, use the IP of the host
         if "SSH_CONNECTION" in environ:
