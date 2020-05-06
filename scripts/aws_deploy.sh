@@ -2,8 +2,8 @@
 
 while read -r SERVER
 do
-  cmd="AWS_INSTANCES_TO_RUN=$AWS_INSTANCES_TO_RUN AWS_NODE_AMOUNT=$AWS_NODE_AMOUNT EXPERIMENT_NAME=$EXPERIMENT_NAME AWS_INSTANCE_COMMAND=$DAS4_NODE_COMMAND AWS_NODE_TIMEOUT=$AWS_NODE_TIMEOUT SYNC_PORT=$SYNC_PORT SCENARIO_FILE=$SCENARIO_FILE TRIBLER_DIR=/home/ec2-user/tribler EXPERIMENT_DIR=/home/ec2-user/gumby/experiments/noodle VENV=/home/ec2-user/venv3 gumby/scripts/aws_run.sh"
-  ssh -n ec2-user@$SERVER -i ~/Amazon.pem $cmd &
+  cmd="AWS_INSTANCES_TO_RUN=$AWS_INSTANCES_TO_RUN AWS_NODE_AMOUNT=$AWS_NODE_AMOUNT EXPERIMENT_NAME=$EXPERIMENT_NAME AWS_INSTANCE_COMMAND=$DAS4_NODE_COMMAND AWS_NODE_TIMEOUT=$AWS_NODE_TIMEOUT SYNC_PORT=$SYNC_PORT SCENARIO_FILE=$SCENARIO_FILE TRACKER_PORT=$TRACKER_PORT TRIBLER_DIR=/home/ubuntu/tribler EXPERIMENT_DIR=/home/ubuntu/gumby/experiments/noodle VENV=/home/ubuntu/venv3 TX_RATE=$GUMBY_TX_RATE TX_SPAWN_DURATION=$GUMBY_TX_SPAWN_DURATION TX_GRACE_PERIOD=$GUMBY_TX_GRACE_PERIOD RISK=$GUMBY_RISK SYNC_TIME=$GUMBY_SYNC_TIME NUM_WIT=$GUMBY_NUM_WIT AUDIT_ON=$GUMBY_AUDIT_ON gumby/scripts/aws_run.sh"
+  ssh -n ubuntu@$SERVER -i ~/Amazon.pem $cmd &
   pids[${i}]=$!
 done < "$AWS_SERVERS_FILE"
 
@@ -18,5 +18,5 @@ while read -r SERVER
 do
   echo "RSynching back from $SERVER"
   mkdir -p output/localhost
-  rsync -r ec2-user@$SERVER:$OUTPUT_DIR/ output/localhost/$SERVER -e "ssh -i ~/Amazon.pem"
+  rsync -r ubuntu@$SERVER:$OUTPUT_DIR/ output/localhost/$SERVER -e "ssh -i ~/Amazon.pem"
 done < "$AWS_SERVERS_FILE"

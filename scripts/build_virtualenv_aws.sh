@@ -19,7 +19,8 @@ else
     VENV=$HOME/venv3
 fi
 
-sudo yum install python3 python3-devel gcc -y
+sudo apt-get update
+sudo apt-get install python3 python3-dev python3-venv gcc -y
 
 if [ ! -e $VENV/bin/python ]; then
   python3 -m venv --system-site-packages --clear $VENV
@@ -30,4 +31,6 @@ mkdir -p $VENV/src
 
 source $VENV/bin/activate
 
-python -m pip install configobj cryptography netifaces networkx pony psutil pyyaml
+sudo apt-get install libsodium23 python3-libtorrent -y
+python -m pip install wheel
+python -m pip install aiohttp aiohttp_apispec configobj cryptography libnacl lz4 netifaces networkx pony psutil pyyaml yappi

@@ -27,8 +27,8 @@ for INSTANCE in $(seq 1 1 $PROCESSES_IN_THIS_NODE); do
 done
 
 # Make sure gumby can be found
-export PYTHONPATH=/home/ec2-user/gumby
-export PATH=/home/ec2-user/gumby/gumby:$PATH
+export PYTHONPATH=/home/ubuntu/gumby
+export PATH=/home/ubuntu/gumby/gumby:$PATH
 
 # @CONF_OPTION DAS4_NODE_TIMEOUT: Time in seconds to wait for the sub-processes to run before killing them. (required)
 (process_guard.py -f $CMDFILE -t $AWS_NODE_TIMEOUT -o $OUTPUT_DIR -m $OUTPUT_DIR  -i 5 2>&1 | tee process_guard.log) ||:
