@@ -1,0 +1,16 @@
+&module gumby.modules.tribler_module.TriblerModule
+&module experiments.plexus.plexus_module.PlexusModule
+
+@0:0 isolate_ipv8_overlay NoodleCommunity
+@0:0 enable_trustchain_memory_db
+@0:2 start_session
+@0:5 init_block_writer
+@0:6 init_noodle_settings
+@0:9 disable_max_peers
+@0:10 introduce_peers
+@0:30 stop_creating_transactions
+@0:35 commit_block_times
+@0:35 write_overlay_statistics
+@0:35 write_noodle_stats
+@0:40 stop_session
+@0:50 stop

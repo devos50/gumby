@@ -54,6 +54,7 @@ class BaseIPv8Module(ExperimentModule):
         loader = IsolatedIPv8CommunityLoader(self.session_id)
         loader.set_launcher(IPv8DiscoveryCommunityLauncher())
         loader.set_launcher(TrustChainCommunityLauncher())
+        loader.set_launcher(NoodleCommunityLauncher())
         loader.set_launcher(TriblerTunnelCommunityLauncher())
         loader.set_launcher(PopularityCommunityLauncher())
         loader.set_launcher(DHTCommunityLauncher())
