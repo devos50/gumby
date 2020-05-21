@@ -5,6 +5,8 @@ from logging import debug, warning
 from os import environ, path
 from sys import argv, path as python_path
 
+import uvloop
+
 from gumby.instrumentation import init_instrumentation
 from gumby.log import setupLogging
 from gumby.sync import ExperimentClientFactory, ExperimentServiceFactory
@@ -105,4 +107,5 @@ def main(self_service=False):
 
 
 if __name__ == '__main__':
+    uvloop.install()
     main()
