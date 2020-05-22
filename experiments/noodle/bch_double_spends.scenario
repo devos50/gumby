@@ -5,8 +5,8 @@
 @0:2 start_session
 @0:5 init_block_writer
 @0:6 init_noodle_settings
-@0:9 disable_max_peers
-@0:10 introduce_peers
+@0:8 disable_max_peers
+@0:9 introduce_peers
 @0:18 mint
 @0:20 minter_send_to_all
 @0:30 write_submit_tx_start_time
