@@ -62,6 +62,8 @@ class NoodleModule(IPv8OverlayExperimentModule):
         self.request_ds_lc = None
         self.did_write_start_time = False
         self.tx_lc = None
+        self.initiated_transfers = 0
+        self.completed_transfers = 0
 
         if os.getenv('TX_RATE'):
             self.tx_rate = int(os.getenv('TX_RATE'))
@@ -409,7 +411,12 @@ class NoodleModule(IPv8OverlayExperimentModule):
     def transfer(self, peer_id, value):
         value = int(value)
         peer = self.get_peer(peer_id)
-        self.overlay.transfer(peer, value)
+        self.initiated_transfers += 1
+
+        def log_transfer(_):
+            self.completed_transfers += 1
+
+        self.overlay.transfer(peer, value).add_done_callback(log_transfer)
 
     @experiment_callback
     def introduce_to_bootstrap_peers(self):
@@ -485,6 +492,9 @@ class NoodleModule(IPv8OverlayExperimentModule):
         with open("outstanding_proof_requests.txt", "w") as proof_requests_file:
             proof_requests_file.write(json.dumps(self.overlay.proof_requests))
 
-        print("Items in transfer queue: %d" % len(self.overlay.transfer_queue.queue))
-        print("Items in incoming block queue: %d" % len(self.overlay.incoming_block_queue.queue))
-        print("Items in audit response queue: %d" % len(self.overlay.audit_response_queue.queue))
+        #print("Items in transfer queue: %d" % len(self.overlay.transfer_queue.queue))
+        #print("Items in incoming block queue: %d" % len(self.overlay.incoming_block_queue.queue))
+        #print("Items in audit response queue: %d" % len(self.overlay.audit_response_queue.queue))
+
+        with open("transfers.txt", "w") as transfers_file:
+            transfers_file.write("%d,%d" % (self.initiated_transfers, self.completed_transfers))

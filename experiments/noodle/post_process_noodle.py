@@ -261,11 +261,25 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
             w_file.write("Spend transactions not seen by counterparty: %d\n" % num_spend_send_fail)
             w_file.write("Claim transactions not seen by counterparty: %d\n" % num_claim_send_fail)
 
+    def aggregate_transfer_stats(self):
+        print("Aggregating transfer starts...")
+        total_transfers = 0
+        completed_transfers = 0
+        for peer_nr, filename, dir in self.yield_files('transfers.txt'):
+            with open(filename) as transfers_file:
+                parts = transfers_file.read().split(",")
+                total_transfers += int(parts[0])
+                completed_transfers += int(parts[1])
+
+        with open("transfers.txt", "w") as transfers_file:
+            transfers_file.write("%d,%d" % (total_transfers, completed_transfers))
+
     def run(self):
         self.parse()
         self.write_perf_results()
         self.aggregate_databases()
         self.write_blocks_to_file()
+        self.aggregate_transfer_stats()
 
 
 if __name__ == "__main__":
