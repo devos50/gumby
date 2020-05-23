@@ -159,6 +159,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
 
     @experiment_callback
     def init_block_writer(self):
+        self._logger.info("Initializing block writer...")
         # Open projects output directory and save blocks arrival time
         self.block_stat_file = 'blocks.csv'
         with open(self.block_stat_file, "w") as t_file:
