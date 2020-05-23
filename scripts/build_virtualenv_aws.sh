@@ -33,4 +33,5 @@ source $VENV/bin/activate
 
 sudo apt-get install libsodium23 python3-libtorrent -y
 python -m pip install wheel
-python -m pip install aiohttp aiohttp_apispec configobj cryptography libnacl lz4 netifaces networkx orjson pony psutil pyyaml uvloop yappi
+python -m pip install aiohttp aiohttp_apispec configobj cryptography libnacl lz4 netifaces networkx orjson pony psutil pyyaml yappi
+pip install uvloop
