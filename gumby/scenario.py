@@ -395,7 +395,7 @@ class ScenarioRunner(ScenarioParser):
                 self._logger.error("Error running scenario %s:%d, undefined callback %s.", filename, line_number, clb)
                 continue
             if tstmp >= 0:
-                tstmp = tstmp + self.exp_start_time
+                tstmp = tstmp + self.exp_start_time + 10
                 delay = tstmp - time()
                 self._logger.info("Register call %s %s:%d %s %s %s", tstmp, filename, line_number, clb,
                                   repr(args), repr(kwargs))
