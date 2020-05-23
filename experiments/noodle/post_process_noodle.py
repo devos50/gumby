@@ -114,8 +114,7 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                 if tx_id not in self.tx_propagation_info:
                                     self.tx_propagation_info[tx_id] = [False, False]
 
-                                if peer_nr == to_peer_id:
-                                    self.tx_propagation_info[tx_id][1] = True
+                                self.tx_propagation_info[tx_id][1] = True
 
                                 # Update the confirm time
                                 tx_info[tx_id][1] = block_time - self.avg_start_time

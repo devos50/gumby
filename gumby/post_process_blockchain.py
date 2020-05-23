@@ -17,22 +17,22 @@ class BlockchainTransactionsParser(StatisticsParser):
         """
         Parse all blockchain statistics.
         """
-        self.compute_avg_start_time()
+        self.compute_min_start_time()
         self.parse_transactions()
         self.compute_avg_latency()
         self.compute_tx_cumulative_stats()
         self.write_all()
 
-    def compute_avg_start_time(self):
-        avg_start_time = 0
-        num_files = 0
+    def compute_min_start_time(self):
+        min_start_time = 10E20
         for peer_nr, filename, dir in self.yield_files('submit_tx_start_time.txt'):
             with open(filename) as submit_tx_start_time_file:
                 start_time = int(submit_tx_start_time_file.read())
-                avg_start_time += start_time
-                num_files += 1
+                if start_time < min_start_time:
+                    min_start_time = start_time
 
-        self.avg_start_time = int(avg_start_time / num_files)
+        print("Min tx start time: %d" % min_start_time)
+        self.avg_start_time = min_start_time
 
     def parse_transactions(self):
         """
