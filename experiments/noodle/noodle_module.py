@@ -409,7 +409,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
                                 double_spend_block=attached_block)
 
     @experiment_callback
-    def transfer(self, peer_id, value, double_spend=None):
+    def transfer(self, peer_id, value, double_spend_peer_id=None):
         value = int(value)
         peer = self.get_peer(peer_id)
         self.initiated_transfers += 1
@@ -418,9 +418,8 @@ class NoodleModule(IPv8OverlayExperimentModule):
             self.completed_transfers += 1
 
         double_spend_peer = None
-        if double_spend:
-            parts = double_spend.split(",")
-            double_spend_peer_id = int(parts[0])
+        if double_spend_peer_id:
+            double_spend_peer_id = int(double_spend_peer_id)
             double_spend_peer = self.get_peer(double_spend_peer_id)
 
         self.overlay.transfer(peer, value, double_spend_peer=double_spend_peer).add_done_callback(log_transfer)
