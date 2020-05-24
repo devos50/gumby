@@ -409,7 +409,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
                                 double_spend_block=attached_block)
 
     @experiment_callback
-    def transfer(self, peer_id, value):
+    def transfer(self, peer_id, value, double_spend=None):
         value = int(value)
         peer = self.get_peer(peer_id)
         self.initiated_transfers += 1
@@ -417,7 +417,7 @@ class NoodleModule(IPv8OverlayExperimentModule):
         def log_transfer(_):
             self.completed_transfers += 1
 
-        self.overlay.transfer(peer, value).add_done_callback(log_transfer)
+        self.overlay.transfer(peer, value, double_spend=double_spend).add_done_callback(log_transfer)
 
     @experiment_callback
     def introduce_to_bootstrap_peers(self):
