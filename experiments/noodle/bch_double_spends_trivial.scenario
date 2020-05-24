@@ -10,11 +10,11 @@
 @0:18 mint
 @0:20 minter_send_to_all
 @0:30 write_submit_tx_start_time
-@0:31 transfer 1 500 double_spend_id=6 {5}
-@0:32 transfer 2 500 double_spend_id=7 {4}
-@0:33 transfer 3 500 double_spend_id=8 {3}
-@0:34 transfer 4 500 double_spend_id=9 {2}
-@0:35 transfer 5 500 double_spend_id=10 {1}
+@0:31 transfer 1 500 double_spend_peer_id=6 {5}
+@0:32 transfer 2 500 double_spend_peer_id=7 {4}
+@0:33 transfer 3 500 double_spend_peer_id=8 {3}
+@0:34 transfer 4 500 double_spend_peer_id=9 {2}
+@0:35 transfer 5 500 double_spend_peer_id=10 {1}
 @0:50 commit_block_times
 @0:60 write_overlay_statistics
 @0:60 write_noodle_stats

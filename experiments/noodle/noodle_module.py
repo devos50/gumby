@@ -419,7 +419,6 @@ class NoodleModule(IPv8OverlayExperimentModule):
 
         double_spend_peer = None
         if double_spend_peer_id:
-            double_spend_peer_id = int(double_spend_peer_id)
             double_spend_peer = self.get_peer(double_spend_peer_id)
 
         self.overlay.transfer(peer, value, double_spend_peer=double_spend_peer).add_done_callback(log_transfer)
