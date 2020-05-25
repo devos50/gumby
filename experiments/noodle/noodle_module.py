@@ -99,6 +99,12 @@ class NoodleModule(IPv8OverlayExperimentModule):
             self.overlay.settings.block_queue_interval = int(os.getenv('BLOCK_QUEUE_INTERVAL'))
         if os.getenv('AUDIT_RESPONSE_QUEUE_INTERVAL'):
             self.overlay.settings.audit_response_queue_interval = int(os.getenv('AUDIT_RESPONSE_QUEUE_INTERVAL'))
+        if os.getenv('FRAC_MALICIOUS_WITNESSES'):
+            num_nodes = len(self.all_vars.keys())
+            num_malicious = int(num_nodes * float(os.environ['FRAC_MALICIOUS_WITNESSES']))
+            if self.my_id <= num_malicious:
+                self._logger.info("I am a malicious witness!")
+                self.overlay.settings.is_malicious_witness = True
 
         self.overlay.persistence.do_commit = False
 
