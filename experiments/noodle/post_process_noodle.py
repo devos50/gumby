@@ -53,6 +53,7 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
         peer_map["30303030"] = 0
 
         tx_info = {}  # Keep track of the submit time and confirmation times for each transaction we see.
+        claimed_per_peer = {}  # Used while detecting if a peer signed a double spend
 
         with open("blocks.csv", "w") as blocks_file:
             writer = csv.DictWriter(blocks_file, ['time', 'type', 'from_seq_num', 'to_seq_num', 'from_peer_id', 'to_peer_id', 'seen_by', 'transaction'])
@@ -100,6 +101,10 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                 tx_id = "%d.%d.%d" % (from_peer_id, to_peer_id, from_seq_num)
                                 if tx_id not in tx_info:
                                     tx_info[tx_id] = [-1, -1]
+                                else:
+                                    print("Double spend with tx id %s!" % tx_id)
+                                    latest_spend = max(block_time - self.avg_start_time, tx_info[tx_id][0])
+                                    # TODO finish
 
                                 if tx_id not in self.tx_propagation_info:
                                     self.tx_propagation_info[tx_id] = [False, False]
@@ -113,6 +118,15 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                 tx_id = "%d.%d.%d" % (to_peer_id, from_peer_id, to_seq_num)
                                 if tx_id not in tx_info:
                                     tx_info[tx_id] = [-1, -1]
+
+                                if peer_nr == from_peer_id:  # If this claim is targeted to this peer...
+                                    if from_peer_id not in claimed_per_peer:
+                                        claimed_per_peer[from_peer_id] = set()
+
+                                    if tx_id in claimed_per_peer[from_peer_id]:
+                                        print("Double spend %s got through!" % tx_id)
+                                    else:
+                                        claimed_per_peer[from_peer_id].add(tx_id)
 
                                 if tx_id not in self.tx_propagation_info:
                                     self.tx_propagation_info[tx_id] = [False, False]
