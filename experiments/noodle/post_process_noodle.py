@@ -53,7 +53,9 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
         peer_map["30303030"] = 0
 
         tx_info = {}  # Keep track of the submit time and confirmation times for each transaction we see.
+        tx_info_ds = {}
         claimed_per_peer = {}  # Used while detecting if a peer signed a double spend
+        stopped_interactions_times = {}
 
         with open("blocks.csv", "w") as blocks_file:
             writer = csv.DictWriter(blocks_file, ['time', 'type', 'from_seq_num', 'to_seq_num', 'from_peer_id', 'to_peer_id', 'seen_by', 'transaction'])
@@ -101,9 +103,13 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                 tx_id = "%d.%d.%d" % (from_peer_id, to_peer_id, from_seq_num)
                                 if tx_id not in tx_info:
                                     tx_info[tx_id] = [-1, -1]
-                                else:
+
+                                # Check if this peer is making multiple spends with the same sequence number
+                                if from_peer_id == peer_nr and tx_id not in tx_info_ds:
+                                    tx_info_ds[tx_id] = block_time - self.avg_start_time
+                                elif from_peer_id == peer_nr:
                                     print("Double spend with tx id %s!" % tx_id)
-                                    latest_spend = max(block_time - self.avg_start_time, tx_info[tx_id][0])
+                                    latest_spend = max(block_time - self.avg_start_time, tx_info_ds[tx_id])
                                     # TODO finish
 
                                 if tx_id not in self.tx_propagation_info:
@@ -135,6 +141,12 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
 
                                 # Update the confirm time
                                 tx_info[tx_id][1] = block_time - self.avg_start_time
+                            elif block_type == "reject_interactions":
+                                if peer_nr not in stopped_interactions_times:
+                                    stopped_interactions_times[peer_nr] = {}
+
+                                malicious_peer_id = transaction.strip().split(":")[1][2:-2]
+                                stopped_interactions_times[peer_nr][malicious_peer_id] = block_time - self.avg_start_time
 
             for tx_id, individual_tx_info in tx_info.items():
                 tx_latency = -1
@@ -143,6 +155,8 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
 
                 if individual_tx_info[0] >= 0:  # Do not include mint transactions or transactions created before the experiment starts
                     self.transactions.append((1, tx_id, individual_tx_info[0], individual_tx_info[1], tx_latency))
+
+        print("Stopped interactions: %s" % stopped_interactions_times)
 
     def write_blocks_to_file(self):
         # First, determine the experiment start time
