@@ -54,7 +54,7 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
 
         tx_info = {}  # Keep track of the submit time and confirmation times for each transaction we see.
         tx_info_ds = {}
-        claimed_per_peer = {}  # Used while detecting if a peer signed a double spend
+        ds_got_through = {}  # Used while detecting if a peer signed a double spend
         stopped_interactions_times = {}
 
         with open("blocks.csv", "w") as blocks_file:
@@ -126,13 +126,11 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                     tx_info[tx_id] = [-1, -1]
 
                                 if peer_nr == from_peer_id:  # If this claim is targeted to this peer...
-                                    if from_peer_id not in claimed_per_peer:
-                                        claimed_per_peer[from_peer_id] = set()
-
-                                    if tx_id in claimed_per_peer[from_peer_id]:
-                                        print("Double spend %s got through!" % tx_id)
+                                    spend_tx_id = (from_peer_id, to_seq_num)
+                                    if spend_tx_id not in ds_got_through:
+                                        ds_got_through[spend_tx_id] = True
                                     else:
-                                        claimed_per_peer[from_peer_id].add(tx_id)
+                                        print("Double spend %s got through!" % tx_id)
 
                                 if tx_id not in self.tx_propagation_info:
                                     self.tx_propagation_info[tx_id] = [False, False]
