@@ -50,7 +50,7 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                         break
 
         # Assign the empty key to peer 0
-        peer_id["30303030"] = 0
+        peer_map["30303030"] = 0
 
         tx_info = {}  # Keep track of the submit time and confirmation times for each transaction we see.
 
