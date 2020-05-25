@@ -105,12 +105,12 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                     tx_info[tx_id] = [-1, -1]
 
                                 # Check if this peer is making multiple spends with the same sequence number
-                                if from_peer_id == peer_nr and (from_peer_id, from_seq_num) not in tx_info_ds:
-                                    tx_info_ds[(from_peer_id, from_seq_num)] = block_time - self.avg_start_time
+                                spend_tx_id = (from_peer_id, from_seq_num)
+                                if from_peer_id == peer_nr and spend_tx_id not in tx_info_ds:
+                                    tx_info_ds[spend_tx_id] = [(block_time - self.avg_start_time, to_peer_id)]
                                 elif from_peer_id == peer_nr:
-                                    print("Double spend with tx id %d - %d!" % (from_peer_id, from_seq_num))
-                                    latest_spend = max(block_time - self.avg_start_time, tx_info_ds[(from_peer_id, from_seq_num)])
-                                    # TODO finish
+                                    print("Double spend with tx id %d - %d!" % spend_tx_id)
+                                    tx_info_ds[spend_tx_id].append((block_time - self.avg_start_time, to_peer_id))
 
                                 if tx_id not in self.tx_propagation_info:
                                     self.tx_propagation_info[tx_id] = [False, False]
@@ -144,6 +144,7 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                     stopped_interactions_times[peer_nr] = {}
 
                                 malicious_peer_id = transaction.strip().split(":")[1][2:-2]
+                                malicious_peer_id = peer_map[malicious_peer_id]
                                 stopped_interactions_times[peer_nr][malicious_peer_id] = block_time - self.avg_start_time
 
             for tx_id, individual_tx_info in tx_info.items():
@@ -155,6 +156,22 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                     self.transactions.append((1, tx_id, individual_tx_info[0], individual_tx_info[1], tx_latency))
 
         print("Stopped interactions: %s" % stopped_interactions_times)
+
+        # Go through the double spends and see the time until detection
+        detect_times = []
+        for spend_tx_id, ds_list in tx_info_ds.items():
+            malicious_peer = spend_tx_id[0]
+            for ds_time, to_peer in ds_list:
+                # Did this peer stop interactions withe malicious peer?
+                if to_peer in stopped_interactions_times and malicious_peer in stopped_interactions_times[to_peer]:
+                    detect_time = stopped_interactions_times[to_peer][malicious_peer] - ds_time
+                    detect_times.append(detect_time)
+
+        # Write detect times
+        with open("ds_detect_times.csv", "w") as detect_file:
+            detect_file.write("time\n")
+            for detect_time in detect_times:
+                detect_file.write("%d\n" % detect_time)
 
     def write_blocks_to_file(self):
         # First, determine the experiment start time
