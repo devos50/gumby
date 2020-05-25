@@ -105,11 +105,11 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
                                     tx_info[tx_id] = [-1, -1]
 
                                 # Check if this peer is making multiple spends with the same sequence number
-                                if from_peer_id == peer_nr and tx_id not in tx_info_ds:
-                                    tx_info_ds[tx_id] = block_time - self.avg_start_time
+                                if from_peer_id == peer_nr and (from_peer_id, from_seq_num) not in tx_info_ds:
+                                    tx_info_ds[(from_peer_id, from_seq_num)] = block_time - self.avg_start_time
                                 elif from_peer_id == peer_nr:
-                                    print("Double spend with tx id %s!" % tx_id)
-                                    latest_spend = max(block_time - self.avg_start_time, tx_info_ds[tx_id])
+                                    print("Double spend with tx id %d - %d!" % (from_peer_id, from_seq_num))
+                                    latest_spend = max(block_time - self.avg_start_time, tx_info_ds[(from_peer_id, from_seq_num)])
                                     # TODO finish
 
                                 if tx_id not in self.tx_propagation_info:
