@@ -52,6 +52,11 @@ class NoodleStatisticsParser(BlockchainTransactionsParser):
         # Assign the empty key to peer 0
         peer_map["30303030"] = 0
 
+        # Write the peer map away
+        with open("peer_map.txt", "w") as peer_map_file:
+            for peer_id, peer_nr in peer_map.items():
+                peer_map_file.write("%s,%d\n" % (peer_id, peer_nr))
+
         tx_info = {}  # Keep track of the submit time and confirmation times for each transaction we see.
         tx_info_ds = {}
         ds_got_through = {}  # Used while detecting if a peer signed a double spend
