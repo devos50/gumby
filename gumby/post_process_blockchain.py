@@ -65,6 +65,10 @@ class BlockchainTransactionsParser(StatisticsParser):
             if transaction[3] != -1:
                 confirm_times.append(transaction[3])
 
+        self.cumulative_stats = [(0, 0, 0)]
+        if len(submit_times) == 0:
+            return
+
         submit_times = sorted(submit_times)
         confirm_times = sorted(confirm_times)
 
@@ -75,7 +79,6 @@ class BlockchainTransactionsParser(StatisticsParser):
 
         submitted_count = 0
         confirmed_count = 0
-        self.cumulative_stats = [(0, 0, 0)]
 
         while cur_time < max(submit_times[-1], confirm_times[-1]):
             # Increase counters
