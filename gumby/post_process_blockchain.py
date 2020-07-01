@@ -95,6 +95,16 @@ class BlockchainTransactionsParser(StatisticsParser):
             cur_time += cumulative_window
             self.cumulative_stats.append((cur_time, submitted_count, confirmed_count))
 
+    def get_latencies(self):
+        """
+        Return a list with latencies of all transactions.
+        """
+        latencies = []
+        for transaction in self.transactions:
+            if transaction[4] != -1:
+                latencies.append(transaction[4])
+        return latencies
+
     def write_all(self):
         """
         Write all information to disk.
