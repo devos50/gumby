@@ -126,8 +126,8 @@ An example of the scenario file used during the basic TrustChain experiment is g
 @0:5 init_trustchain
 @0:10 introduce_peers max_peers=10
 @0:30 annotate start-creating-blocks
-@0:30 start_requesting_signatures
-@0:90 stop_requesting_signatures
+@0:30 start_creating_blocks
+@0:90 stop_creating_blocks
 @0:95 write_overlay_statistics
 @0:95 write_trustchain_statistics
 @0:95 commit_blocks_to_db

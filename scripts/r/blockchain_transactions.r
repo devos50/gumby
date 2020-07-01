@@ -14,7 +14,6 @@ if(file.exists("tx_cumulative.csv")){
 	print(df)
 
 	p <- ggplot(df, aes(x=time, y=value, group=variable, colour=variable)) + theme_bw()
-	p <- add_annotations(p, df, df2)
 	p <- p + geom_line()
 	p <- p + theme(legend.position="bottom", legend.direction="horizontal")
 	p <- p + xlab("Time into the experiment (sec)")

@@ -1,16 +1,14 @@
-import json
 import os
-from random import randint, choice
+from random import choice
 import csv
-from time import time
 
 from ipv8.attestation.trustchain.community import TrustChainCommunity
 from ipv8.attestation.trustchain.listener import BlockListener
 
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module
+from gumby.modules.transactions_module import TransactionsModule
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
-from gumby.util import run_task
 
 
 class FakeBlockListener(BlockListener):
@@ -25,63 +23,41 @@ class FakeBlockListener(BlockListener):
         pass
 
 
-class GeneratedBlockListener(BlockListener):
-    """
-    This block listener to measure throughput.
-    This peer will not sign blocks
-    """
-
-    def __init__(self, mes_file):
-        # File to safe measurements
-        self.file_name = mes_file
-        self.start_time = None
-
-    def should_sign(self, _):
-        return False
-
-    def received_block(self, block):
-        # Add block to stat file
-        if not self.start_time:
-            # First block received
-            self.start_time = time()
-        with open(self.file_name, "a") as t_file:
-            writer = csv.DictWriter(t_file, ['time', 'transaction'])
-            writer.writerow({"time": time() - self.start_time, 'transaction': str(block.transaction)})
-
-
 @static_module
 class TrustchainModule(IPv8OverlayExperimentModule):
+
     def __init__(self, experiment):
         super(TrustchainModule, self).__init__(experiment, TrustChainCommunity)
-        self.request_signatures_lc = None
         self.num_blocks_in_db_task = None
         self.block_stat_file = None
-        self.request_signatures_task = None
+        self.tx_rate = int(os.environ["TX_RATE"])
+        self.transactions_manager = None
+        self.block_stat_file = None
 
-    def on_ipv8_available(self, _):
-        # Disable threadpool messages
-        self.overlay._use_main_thread = True
+    def on_all_vars_received(self):
+        super(TrustchainModule, self).on_all_vars_received()
+
+        # Find the transactions manager and set it
+        for module in self.experiment.experiment_modules:
+            if isinstance(module, TransactionsModule):
+                self._logger.info("Found transaction manager!")
+                self.transactions_manager = module
+
+        self.transactions_manager.transfer = self.transfer
 
     def get_peer_public_key(self, peer_id):
         # override the default implementation since we use the trustchain key here.
         return self.all_vars[peer_id]['trustchain_public_key']
 
     @experiment_callback
-    def turn_off_broadcast(self):
-        self.overlay.settings.broadcast_blocks = False
-
-    @experiment_callback
-    def init_leader_trustchain(self):
-        # Open projects output directory and save blocks arrival time
-        self.block_stat_file = os.path.join(os.environ['PROJECT_DIR'], 'output', 'leader_blocks_time.csv')
-        with open(self.block_stat_file, "w") as t_file:
-            writer = csv.DictWriter(t_file, ['time', 'transaction'])
-            writer.writeheader()
-        self.overlay.add_listener(GeneratedBlockListener(self.block_stat_file), [b'test'])
-
-    @experiment_callback
     def init_trustchain(self):
-        self.overlay.add_listener(FakeBlockListener(), [b'test'])
+        self.overlay.add_listener(FakeBlockListener(), [b'transfer'])
+        if os.getenv('BROADCAST_FANOUT'):
+            self.overlay.settings.broadcast_fanout = int(os.getenv('BROADCAST_FANOUT'))
+
+    @experiment_callback
+    def disable_broadcast(self):
+        self.overlay.settings.broadcast_fanout = 0
 
     @experiment_callback
     def disable_max_peers(self):
@@ -100,24 +76,13 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.overlay.settings.crawler = True
 
     @experiment_callback
-    def start_requesting_signatures(self):
-        self.request_signatures_task = run_task(self.request_random_signature, interval=1)
-
-    @experiment_callback
-    def stop_requesting_signatures(self):
-        self.request_signatures_task.cancel()
-
-    @experiment_callback
-    def start_monitor_num_blocks_in_db(self):
-        self.num_blocks_in_db_task = run_task(self.check_num_blocks_in_db, interval=1)
-
-    @experiment_callback
-    def stop_monitor_num_blocks_in_db(self):
-        self.num_blocks_in_db_task.cancel()
-
-    @experiment_callback
-    def request_signature(self, peer_id, up, down):
-        self.request_signature_from_peer(self.get_peer(peer_id), up, down)
+    def init_block_writer(self):
+        # Open projects output directory and save blocks arrival time
+        self.block_stat_file = 'blocks.csv'
+        with open(self.block_stat_file, "w") as t_file:
+            writer = csv.DictWriter(t_file, ['time', 'transaction', 'type', "seq_num", "link", 'from_id', 'to_id'])
+            writer.writeheader()
+        self.overlay.persistence.block_file = self.block_stat_file
 
     @experiment_callback
     def request_crawl(self, peer_id, sequence_number):
@@ -126,63 +91,19 @@ class TrustchainModule(IPv8OverlayExperimentModule):
                                         self.get_peer(peer_id).public_key.key_to_bin(),
                                         int(sequence_number))
 
-    @experiment_callback
-    def request_random_signature(self):
-        """
-        Request a random signature from one of your known verified peers
-        """
-        rand_up = randint(1, 1000)
-        rand_down = randint(1, 1000)
-
-        if not self.overlay.network.verified_peers:
-            self._logger.warning("No verified peers to request random signature from!")
-            return
-
+    def transfer(self):
         verified_peers = list(self.overlay.network.verified_peers)
-        self.request_signature_from_peer(choice(verified_peers), rand_up * 1024 * 1024, rand_down * 1024 * 1024)
-
-    def send_to_leader_peer(self, block_num):
-        leader_peer = self.overlay.network.verified_peers[0]
-        for _ in range(block_num):
-            rand_up = randint(1, 1000)
-            rand_down = randint(1, 1000)
-            self.request_signature_from_peer(leader_peer, rand_up, rand_down)
+        rand_peer = choice(verified_peers)
+        peer_id = self.experiment.get_peer_id(rand_peer.address[0], rand_peer.address[1])
+        transaction = {"tokens": 1 * 1024 * 1024, "from_peer": self.my_id, "to_peer": peer_id}
+        self.overlay.sign_block(rand_peer, rand_peer.public_key.key_to_bin(), block_type=b'transfer', transaction=transaction)
 
     @experiment_callback
-    def start_spamming_leader_peer(self, block_num=100):
-        """
-        Send block_num of blocks per second to leader peer per second.
-        NUM_TX environment variable will be used instead of block_num if defined
-        :param block_num: number of blocks per sec to send to leader peer
-        """
-        if os.getenv('NUM_TX'):
-            block_num = int(os.getenv('NUM_TX'))
-
-        self.request_signatures_task = run_task(self.send_to_leader_peer, int(block_num), interval=1)
-
-    def request_signature_from_peer(self, peer, up, down):
-        peer_id = self.experiment.get_peer_id(peer.address[0], peer.address[1])
-        self._logger.info("%s: Requesting signature from peer: %s", self.my_id, peer_id)
-        transaction = {"up": up, "down": down, "from_peer": self.my_id, "to_peer": peer_id}
-        self.overlay.sign_block(peer, peer.public_key.key_to_bin(), block_type=b'test', transaction=transaction)
-
-    def check_num_blocks_in_db(self):
-        """
-        Check the total number of blocks we have in the database and write it to a file.
-        """
-        num_blocks = len(self.overlay.persistence.get_all_blocks())
-        with open('num_trustchain_blocks.txt', 'a') as output_file:
-            elapsed_time = time.time() - self.experiment.scenario_runner.exp_start_time
-            output_file.write("%f,%d\n" % (elapsed_time, num_blocks))
+    def commit_block_times(self):
+        self._logger.error("Commit block times to the file %s", self.overlay.persistence.block_file)
+        self.overlay.persistence.commit_block_times()
 
     @experiment_callback
     def commit_blocks_to_db(self):
         if self.session.config.use_trustchain_memory_db():
             self.overlay.persistence.commit(self.overlay.my_peer.public_key.key_to_bin())
-
-    @experiment_callback
-    def write_trustchain_statistics(self):
-        from anydex.wallet.tc_wallet import TrustchainWallet
-        with open('trustchain.txt', 'w') as trustchain_file:
-            wallet = TrustchainWallet(self.overlay)
-            trustchain_file.write(json.dumps(wallet.get_statistics()))
