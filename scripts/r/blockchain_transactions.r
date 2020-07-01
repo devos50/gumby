@@ -3,6 +3,9 @@ library(reshape)
 library(stringr)
 library(igraph)
 
+minX <- as.integer(commandArgs(TRUE)[1])
+maxX <- as.integer(commandArgs(TRUE)[2])
+
 source(paste(Sys.getenv('R_SCRIPTS_PATH'), 'annotation.r', sep='/'))
 df2 <- load_annotations()
 
