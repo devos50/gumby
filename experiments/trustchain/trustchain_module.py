@@ -53,7 +53,11 @@ class TrustchainModule(IPv8OverlayExperimentModule):
     def init_trustchain(self):
         self.overlay.add_listener(FakeBlockListener(), [b'transfer'])
         if os.getenv('BROADCAST_FANOUT'):
+            self._logger.error("Setting broadcast fanout to %s" % os.getenv('BROADCAST_FANOUT'))
             self.overlay.settings.broadcast_fanout = int(os.getenv('BROADCAST_FANOUT'))
+        if os.getenv('SIGN_ATTEMPT_DELAY'):
+            self._logger.error("Setting sign attempt delay to %s" % os.getenv('SIGN_ATTEMPT_DELAY'))
+            self.overlay.settings.sign_attempt_delay = float(os.getenv('SIGN_ATTEMPT_DELAY'))
 
     @experiment_callback
     def disable_broadcast(self):

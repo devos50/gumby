@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
-
 import csv
 import json
 import os
@@ -48,6 +46,9 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
         """
         Parse all transactions, based on the info in the blocks.
         """
+        should_write = True
+        if 'WRITE_BLOCKS' in os.environ:
+            should_write = bool(int(os.environ["WRITE_BLOCKS"]))
 
         # First get all the peer IDs and build a map
         peer_map = {}  # peer id str -> peer id int
@@ -96,16 +97,17 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
                             from_peer_id = peer_map[from_peer_id]
                             to_peer_id = peer_map[to_peer_id]
 
-                            writer.writerow({
-                                "time": block_time,
-                                'type': block_type,
-                                'from_seq_num': from_seq_num,
-                                'to_seq_num': to_seq_num,
-                                'from_peer_id': from_peer_id,
-                                'to_peer_id': to_peer_id,
-                                'seen_by': peer_nr,
-                                'transaction': transaction
-                            })
+                            if should_write:
+                                writer.writerow({
+                                    "time": block_time,
+                                    'type': block_type,
+                                    'from_seq_num': from_seq_num,
+                                    'to_seq_num': to_seq_num,
+                                    'from_peer_id': from_peer_id,
+                                    'to_peer_id': to_peer_id,
+                                    'seen_by': peer_nr,
+                                    'transaction': transaction
+                                })
 
                             if block_type == "transfer" and to_seq_num == 0:
                                 tx_id = "%d.%d.%d" % (from_peer_id, to_peer_id, from_seq_num)
