@@ -11,8 +11,8 @@
 @0:10 introduce_peers max_peers=10
 @0:20 annotate start-creating-blocks
 @0:20 start_creating_transactions
-@0:30 stop_creating_transactions
-@0:35 write_overlay_statistics
-@0:35 commit_block_times
-@0:45 stop_session
-@0:50 stop
+@0:50 stop_creating_transactions
+@0:60 write_overlay_statistics
+@0:60 commit_block_times
+@0:70 stop_session
+@0:75 stop
