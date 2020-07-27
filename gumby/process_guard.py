@@ -174,7 +174,7 @@ class ResourceMonitor(object):
         print("Starting #%05d: %s" % (self.cmd_counter, cmd), file=stdout)
         if stdout:
             stdout.flush()
-        p = PGPopen(cmd, shell=True, stdout=stdout, stderr=stderr, close_fds=True, env=None, preexec_fn=setsid)
+        p = PGPopen(cmd, shell=True, close_fds=True, env=None, preexec_fn=setsid)
         self.pid_dict[p.pid] = p
         self.pgid_list.append(getpgid(p.pid))
 
