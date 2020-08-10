@@ -62,7 +62,7 @@ class TransactionsModule(ExperimentModule):
 
         def start_lc():
             self._logger.info("Starting tx lc...")
-            self.tx_lc = run_task(self.transfer, interval=(1.0 / individual_tx_rate))
+            run_task(self.transfer, interval=(1.0 / individual_tx_rate))
 
         my_client_id = self.experiment.my_id - self.num_validators
         run_task(start_lc, delay=(1.0 / self.num_clients) * (my_client_id - 1))

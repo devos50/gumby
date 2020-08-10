@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import csv
 import json
 import os
@@ -21,6 +21,24 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
         self.output_dir = os.path.join(os.environ['PROJECT_DIR'], 'output')
         self.all_blocks_db = TrustChainDB(self.output_dir, "trustchain")
         self.tx_propagation_info = {}  # Keep track of whether a transaction has been seen by the counterparty / confirmed by the initiator
+
+    def analyze_fraud(self):
+        lowest_time = 2525451299248
+        for peer_nr, filename, dir in self.yield_files('detection_time.txt'):
+            with open(filename) as detect_time_file:
+                detect_time = int(detect_time_file.read().rstrip('\n'))
+                if detect_time < lowest_time:
+                    lowest_time = detect_time
+
+        fraud_time = -1
+        for peer_nr, filename, dir in self.yield_files('fraud_time.txt'):
+            with open(filename) as detect_time_file:
+                fraud_time = int(detect_time_file.read().rstrip('\n'))
+                break
+
+        if fraud_time != -1:
+            with open("detect_time.txt", "w") as detect_time_file:
+                detect_time_file.write("%d" % (lowest_time - fraud_time))
 
     def aggregate_databases(self):
         aggregation_path = os.path.join(os.environ['PROJECT_DIR'], 'output', 'sqlite')
@@ -216,6 +234,9 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
                 trustchain_interactions_file.write("%d,%d\n" % (peer_a, peer_b))
 
     def write_perf_results(self):
+        if "TX_SPAWN_DURATION" not in os.environ:
+            return
+
         # Compute average throughput
         tx_spawn_duration = int(os.environ["TX_SPAWN_DURATION"])
         grace_period = float(os.environ["TX_GRACE_PERIOD"]) * 1000
@@ -278,6 +299,7 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
             w_file.write("Claim transactions not seen by counterparty: %d\n" % num_claim_send_fail)
 
     def run(self):
+        self.analyze_fraud()
         self.parse()
         self.write_perf_results()
         self.aggregate_databases()

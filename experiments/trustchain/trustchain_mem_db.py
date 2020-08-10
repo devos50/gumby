@@ -20,6 +20,8 @@ class TrustchainMemoryDatabase(object):
         self.original_db = None
         self.block_time = {}
         self.block_file = None
+        self.kill_callback = None
+        self.double_spends = []
 
     def get_block_class(self, block_type):
         """
@@ -42,6 +44,9 @@ class TrustchainMemoryDatabase(object):
         self.block_time[(block.public_key, block.sequence_number)] = int(round(time.time() * 1000))
 
     def remove_block(self, block):
+        if self.latest_blocks[block.public_key] == block:
+            self.latest_blocks[block.public_key] = self.get_block_before(block)
+
         self.block_cache.pop((block.public_key, block.sequence_number), None)
         self.linked_block_cache.pop((block.link_public_key, block.link_sequence_number), None)
 
@@ -165,6 +170,9 @@ class TrustchainMemoryDatabase(object):
             my_blocks = [block for block in self.block_cache.values() if block.public_key == my_pub_key]
             for block in my_blocks:
                 self.original_db.add_block(block)
+
+    def add_double_spend(self, blk1, blk2):
+        self.double_spends.append((blk1, blk2))
 
     def close(self):
         if self.original_db:

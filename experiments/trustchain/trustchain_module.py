@@ -1,5 +1,7 @@
 import os
-from random import choice
+import time
+from asyncio import get_event_loop
+from random import choice, random
 import csv
 
 from ipv8.attestation.trustchain.community import TrustChainCommunity
@@ -9,6 +11,7 @@ from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import static_module
 from gumby.modules.transactions_module import TransactionsModule
 from gumby.modules.community_experiment_module import IPv8OverlayExperimentModule
+from gumby.util import run_task
 
 
 class FakeBlockListener(BlockListener):
@@ -33,6 +36,15 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.tx_rate = int(os.environ["TX_RATE"])
         self.transactions_manager = None
         self.block_stat_file = None
+        self.crawl_lc = None
+        self.peers_to_crawl = []
+        self.did_double_spend = False
+        self.experiment.message_callback = self
+
+    def on_message(self, from_id, msg_type, msg):
+        self._logger.info("Received message with type %s from peer %d", msg_type, from_id)
+        if msg_type == b"kill":
+            self.die()
 
     def on_all_vars_received(self):
         super(TrustchainModule, self).on_all_vars_received()
@@ -47,7 +59,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
 
     def get_peer_public_key(self, peer_id):
         # override the default implementation since we use the trustchain key here.
-        return self.all_vars[peer_id]['trustchain_public_key']
+        return self.all_vars[peer_id]['public_key']
 
     @experiment_callback
     def init_trustchain(self):
@@ -58,6 +70,37 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         if os.getenv('SIGN_ATTEMPT_DELAY'):
             self._logger.error("Setting sign attempt delay to %s" % os.getenv('SIGN_ATTEMPT_DELAY'))
             self.overlay.settings.sign_attempt_delay = float(os.getenv('SIGN_ATTEMPT_DELAY'))
+
+        self.overlay.persistence.kill_callback = self.on_fraud_detected
+
+    def on_fraud_detected(self):
+        self._logger.error("Double spend detected!!")
+
+        for str_client_id in self.all_vars.keys():
+            client_id = int(str_client_id)
+            if client_id == self.my_id:
+                continue
+
+            self.experiment.send_message(client_id, b"kill", b"")
+
+        self.die()
+
+    def die(self):
+        # Write bandwidth statistics
+        with open('bandwidth.txt', 'w') as bandwidth_file:
+            bandwidth_file.write("%d,%d" % (self.session.ipv8.endpoint.bytes_up,
+                                            self.session.ipv8.endpoint.bytes_down))
+
+        # Write verified peers
+        with open('verified_peers.txt', 'w') as peers_file:
+            for peer in self.session.ipv8.network.verified_peers:
+                peers_file.write('%d\n' % (peer.address[1] - 12000))
+
+        # Write num verified peers
+        with open('num_verified_peers.txt', 'w') as num_peers_file:
+            num_peers_file.write('%d\n' % len(self.session.ipv8.network.verified_peers))
+
+        get_event_loop().stop()
 
     @experiment_callback
     def disable_broadcast(self):
@@ -89,6 +132,38 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self.overlay.persistence.block_file = self.block_stat_file
 
     @experiment_callback
+    def start_crawling(self):
+        self._logger.info("Start crawling peers")
+
+        # Reset bandwidth stats
+        self.session.ipv8.endpoint.bytes_up = 0
+        self.session.ipv8.endpoint.bytes_down = 0
+
+        for peer_id in self.all_vars.keys():
+            self.peers_to_crawl.append(peer_id)
+        self.peers_to_crawl.remove("%d" % self.experiment.scenario_runner._peernumber)
+
+        run_task(self.crawl, interval=1)
+
+    def crawl(self):
+        """
+        Forward crawl a random peer
+        """
+        peer_id = choice(self.peers_to_crawl)
+        peer = self.get_peer(peer_id)
+
+        latest_block = self.overlay.persistence.get_latest(peer.public_key.key_to_bin())
+        if latest_block:
+            start_seq = latest_block.sequence_number + 1
+        else:
+            start_seq = 1
+
+        crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
+        end_seq = start_seq + crawl_batch_size
+        self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
+        self._logger.info("Crawling peer %s (%d - %d)", peer_id, start_seq, end_seq)
+
+    @experiment_callback
     def request_crawl(self, peer_id, sequence_number):
         self._logger.info("%s: Requesting block: %s for peer: %s" % (self.my_id, sequence_number, peer_id))
         self.overlay.send_crawl_request(self.get_peer(peer_id),
@@ -96,11 +171,28 @@ class TrustchainModule(IPv8OverlayExperimentModule):
                                         int(sequence_number))
 
     def transfer(self):
+        latest_block = self.overlay.persistence.get_latest(self.overlay.my_peer.public_key.key_to_bin())
+
         verified_peers = list(self.overlay.network.verified_peers)
+        if latest_block:
+            verified_peers = [peer for peer in verified_peers if peer.public_key.key_to_bin() != latest_block.link_public_key]
         rand_peer = choice(verified_peers)
         peer_id = self.experiment.get_peer_id(rand_peer.address[0], rand_peer.address[1])
         transaction = {"tokens": 1 * 1024 * 1024, "from_peer": self.my_id, "to_peer": peer_id}
-        self.overlay.sign_block(rand_peer, rand_peer.public_key.key_to_bin(), block_type=b'transfer', transaction=transaction)
+
+        # Should we double spend?
+        if self.my_id == len(self.all_vars.keys()) and random() < 0.2 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
+            self._logger.info("Double spending!")
+            self.did_double_spend = True
+
+            # Write it away
+            with open("fraud_time.txt", "w") as out:
+                out.write("%d" % int(round(time.time() * 1000)))
+
+            self.overlay.sign_block(rand_peer, rand_peer.public_key.key_to_bin(), block_type=b'transfer',
+                                    transaction=transaction, double_spend=True)
+        else:
+            self.overlay.sign_block(rand_peer, rand_peer.public_key.key_to_bin(), block_type=b'transfer', transaction=transaction)
 
     @experiment_callback
     def commit_block_times(self):
