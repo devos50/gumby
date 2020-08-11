@@ -1,11 +1,11 @@
 from base64 import b64encode, b64decode
 from os import environ
-from random import sample
+from random import sample, random
 from socket import gethostbyname
 
 from gumby.experiment import experiment_callback
 from gumby.modules.experiment_module import ExperimentModule
-from gumby.util import generate_keypair_trustchain, save_keypair_trustchain, save_pub_key_trustchain
+from gumby.util import generate_keypair_trustchain, save_keypair_trustchain, save_pub_key_trustchain, run_task
 
 from ipv8.peer import Peer
 from ipv8.peerdiscovery.churn import RandomChurn
@@ -114,7 +114,8 @@ class IPv8OverlayExperimentModule(ExperimentModule):
             # bootstrap the peer introduction, ensuring everybody knows everybody to start off with.
             for peer_id in self.all_vars.keys():
                 if int(peer_id) != self.my_id and int(peer_id) not in excluded_peers_list:
-                    self.overlay.walk_to(self.experiment.get_peer_ip_port_by_id(peer_id))
+                    rand_delay = random() * 10
+                    run_task(self.overlay.walk_to, self.experiment.get_peer_ip_port_by_id(peer_id), delay=rand_delay)
         else:
             # Walk to a number of peers
             eligible_peers = [peer_id for peer_id in self.all_vars.keys()

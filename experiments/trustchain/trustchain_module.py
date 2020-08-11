@@ -75,6 +75,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
 
     def on_fraud_detected(self):
         self._logger.error("Double spend detected!!")
+        self.experiment.annotate("double-spend-detected")
 
         for str_client_id in self.all_vars.keys():
             client_id = int(str_client_id)
@@ -183,6 +184,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         # Should we double spend?
         if self.my_id == len(self.all_vars.keys()) and random() < 0.2 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
             self._logger.info("Double spending!")
+            self.experiment.annotate("double-spend")
             self.did_double_spend = True
 
             # Write it away
