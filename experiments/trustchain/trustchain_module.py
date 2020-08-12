@@ -144,7 +144,8 @@ class TrustchainModule(IPv8OverlayExperimentModule):
             self.peers_to_crawl.append(peer_id)
         self.peers_to_crawl.remove("%d" % self.experiment.scenario_runner._peernumber)
 
-        run_task(self.crawl, interval=1)
+        rand_delay = random()
+        run_task(self.crawl, delay=rand_delay, interval=1)
 
     def crawl(self):
         """
