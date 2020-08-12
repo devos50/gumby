@@ -150,7 +150,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         else:
             crawl_interval = 1
 
-        rand_delay = random()
+        rand_delay = random() * crawl_interval
         self._logger.info("Starting to crawl with interval %f", crawl_interval)
         run_task(self.crawl, delay=rand_delay, interval=crawl_interval)
 
