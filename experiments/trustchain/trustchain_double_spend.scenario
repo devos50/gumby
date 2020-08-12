@@ -13,6 +13,6 @@
 @0:20 annotate start-creating-blocks
 @0:20 start_creating_transactions
 @0:20 start_crawling
+@0:138 write_overlay_statistics
 @0:140 stop_session
-@0:147 write_overlay_statistics
-@0:150 stop
+@0:145 stop
