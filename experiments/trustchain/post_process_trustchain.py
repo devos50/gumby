@@ -23,8 +23,10 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
         self.tx_propagation_info = {}  # Keep track of whether a transaction has been seen by the counterparty / confirmed by the initiator
 
     def analyze_fraud(self):
-        lowest_time = 2525451299248
+        lowest_time = 100000000000
+        has_detected = False
         for peer_nr, filename, dir in self.yield_files('detection_time.txt'):
+            has_detected = True
             with open(filename) as detect_time_file:
                 detect_time = int(detect_time_file.read().rstrip('\n'))
                 if detect_time < lowest_time:
@@ -36,7 +38,7 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
                 fraud_time = int(detect_time_file.read().rstrip('\n'))
                 break
 
-        if fraud_time != -1:
+        if fraud_time != -1 and has_detected:
             with open("detect_time.txt", "w") as detect_time_file:
                 detect_time_file.write("%d" % (lowest_time - fraud_time))
 
