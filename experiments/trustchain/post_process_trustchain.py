@@ -24,23 +24,44 @@ class TrustChainStatisticsParser(BlockchainTransactionsParser):
 
     def analyze_fraud(self):
         lowest_time = 1000000000000000
-        has_detected = False
+        lowest_times = {}
         for peer_nr, filename, dir in self.yield_files('detection_time.txt'):
-            has_detected = True
             with open(filename) as detect_time_file:
-                detect_time = int(detect_time_file.read().rstrip('\n'))
-                if detect_time < lowest_time:
-                    lowest_time = detect_time
+                for line in detect_time_file.readlines():
+                    parts = line.strip().split(",")
+                    public_key = parts[0]
+                    detect_time = int(parts[1])
 
-        fraud_time = -1
+                    if public_key not in lowest_times:
+                        lowest_times[public_key] = 1000000000000000
+
+                    if detect_time < lowest_times[public_key]:
+                        lowest_times[public_key] = detect_time
+
         for peer_nr, filename, dir in self.yield_files('fraud_time.txt'):
             with open(filename) as detect_time_file:
-                fraud_time = int(detect_time_file.read().rstrip('\n'))
-                break
+                content = detect_time_file.read()
+                parts = content.split(",")
+                public_key = parts[0]
+                fraud_time = int(parts[1])
 
-        if fraud_time != -1 and has_detected:
-            with open("detect_time.txt", "w") as detect_time_file:
-                detect_time_file.write("%d" % (lowest_time - fraud_time))
+                if public_key in lowest_times:
+                    lowest_times[public_key] -= fraud_time
+                else:
+                    print("The fraud of peer %s is not detected!" % public_key)
+
+        with open("detect_times.txt", "w") as out_file:
+            for public_key, detect_time in lowest_times.items():
+                out_file.write("%s,%d\n" % (public_key, detect_time))
+
+        # Compute the average lowest detection time
+        avg_time = 0
+        for detect_time in lowest_times.values():
+            avg_time += detect_time
+        avg_time /= len(list(lowest_times.values()))
+
+        with open("avg_detect_time.txt", "w") as detect_time_file:
+            detect_time_file.write("%d" % avg_time)
 
     def aggregate_databases(self):
         aggregation_path = os.path.join(os.environ['PROJECT_DIR'], 'output', 'sqlite')

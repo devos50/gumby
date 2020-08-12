@@ -1,6 +1,7 @@
 import os
 import time
 from asyncio import get_event_loop
+from binascii import hexlify
 from random import choice, random
 import csv
 
@@ -189,14 +190,15 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         transaction = {"tokens": 1 * 1024 * 1024, "from_peer": self.my_id, "to_peer": peer_id}
 
         # Should we double spend?
-        if self.my_id == len(self.all_vars.keys()) and random() < 0.2 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
+        if random() < 0.05 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
             self._logger.info("Double spending!")
-            self.experiment.annotate("double-spend")
+            #self.experiment.annotate("double-spend")
             self.did_double_spend = True
 
             # Write it away
             with open("fraud_time.txt", "w") as out:
-                out.write("%d" % int(round(time.time() * 1000)))
+                hex_pk = hexlify(self.overlay.my_peer.public_key.key_to_bin()).decode()
+                out.write("%s,%d" % (hex_pk, int(round(time.time() * 1000))))
 
             self.overlay.sign_block(rand_peer, rand_peer.public_key.key_to_bin(), block_type=b'transfer',
                                     transaction=transaction, double_spend=True)
