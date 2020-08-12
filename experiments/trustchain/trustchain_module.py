@@ -190,7 +190,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         transaction = {"tokens": 1 * 1024 * 1024, "from_peer": self.my_id, "to_peer": peer_id}
 
         # Should we double spend?
-        if random() < 0.05 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
+        if random() <= 0.1 and not self.did_double_spend and latest_block and latest_block.sequence_number > 1:
             self._logger.info("Double spending!")
             #self.experiment.annotate("double-spend")
             self.did_double_spend = True
