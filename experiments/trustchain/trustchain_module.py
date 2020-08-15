@@ -74,6 +74,9 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         if os.getenv('SHARE_INCONSISTENCIES'):
             self._logger.error("Setting 'share inconsistencies' to True")
             self.overlay.settings.share_inconsistencies = True
+        if os.getenv('CRAWL_SEND_RANDOM_BLOCKS'):
+            self._logger.error("Sending random blocks during crawl!")
+            self.overlay.settings.crawl_send_random_blocks = True
 
         self.overlay.persistence.kill_callback = self.on_fraud_detected
 
