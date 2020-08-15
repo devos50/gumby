@@ -141,8 +141,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self._logger.info("Start crawling peers")
 
         # Reset bandwidth stats
-        self.session.ipv8.endpoint.bytes_up = 0
-        self.session.ipv8.endpoint.bytes_down = 0
+        self.session.ipv8.endpoint.reset_statistics()
 
         for peer_id in self.all_vars.keys():
             self.peers_to_crawl.append(peer_id)
