@@ -166,12 +166,7 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         peer_id = choice(self.peers_to_crawl)
         peer = self.get_peer(peer_id)
 
-        latest_block = self.overlay.persistence.get_latest(peer.public_key.key_to_bin())
-        if latest_block:
-            start_seq = latest_block.sequence_number + 1
-        else:
-            start_seq = 1
-
+        start_seq = self.overlay.persistence.get_lowest_sequence_number_unknown(peer.public_key.key_to_bin())
         crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
         end_seq = start_seq + crawl_batch_size
         self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
