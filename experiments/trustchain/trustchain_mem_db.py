@@ -45,7 +45,11 @@ class TrustchainMemoryDatabase(object):
 
     def remove_block(self, block):
         if self.latest_blocks[block.public_key] == block:
-            self.latest_blocks[block.public_key] = self.get_block_before(block)
+            prev_block = self.get_block_before(block)
+            if prev_block:
+                self.latest_blocks[block.public_key] = prev_block
+            else:
+                self.latest_blocks.pop(block.public_key)
 
         self.block_cache.pop((block.public_key, block.sequence_number), None)
         self.linked_block_cache.pop((block.link_public_key, block.link_sequence_number), None)
