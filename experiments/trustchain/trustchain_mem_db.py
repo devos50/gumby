@@ -1,4 +1,5 @@
 import csv
+import random
 import time
 from binascii import hexlify
 
@@ -22,6 +23,7 @@ class TrustchainMemoryDatabase(object):
         self.block_file = None
         self.kill_callback = None
         self.double_spends = []
+        self.blocks = []
 
     def get_block_class(self, block_type):
         """
@@ -42,6 +44,12 @@ class TrustchainMemoryDatabase(object):
             self.latest_blocks[block.public_key] = block
 
         self.block_time[(block.public_key, block.sequence_number)] = int(round(time.time() * 1000))
+        self.blocks.append(block)
+
+    def get_random_block(self):
+        if self.blocks:
+            return random.choice(self.blocks)
+        return None
 
     def remove_block(self, block):
         if self.latest_blocks[block.public_key] == block:
