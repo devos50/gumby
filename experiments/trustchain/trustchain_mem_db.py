@@ -46,10 +46,8 @@ class TrustchainMemoryDatabase(object):
         self.block_time[(block.public_key, block.sequence_number)] = int(round(time.time() * 1000))
         self.blocks.append(block)
 
-    def get_random_block(self):
-        if self.blocks:
-            return random.choice(self.blocks)
-        return None
+    def get_random_blocks(self, num_random_blocks):
+        return random.sample(self.blocks, min(len(self.blocks), num_random_blocks))
 
     def remove_block(self, block):
         if self.latest_blocks[block.public_key] == block:
