@@ -129,6 +129,11 @@ class TrustchainMemoryDatabase(object):
             return self.linked_block_cache[(block.public_key, block.sequence_number)]
         return None
 
+    def get_linked_sq_pk(self, public_key, sequence_number):
+        if (public_key, sequence_number) in self.linked_block_cache:
+            return self.linked_block_cache[(public_key, sequence_number)]
+        return None
+
     def crawl(self, public_key, start_seq_num, end_seq_num, limit=100):
         # TODO we assume only ourselves are crawled
         blocks = []
