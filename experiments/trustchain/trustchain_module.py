@@ -71,6 +71,9 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         if os.getenv('SIGN_ATTEMPT_DELAY'):
             self._logger.error("Setting sign attempt delay to %s" % os.getenv('SIGN_ATTEMPT_DELAY'))
             self.overlay.settings.sign_attempt_delay = float(os.getenv('SIGN_ATTEMPT_DELAY'))
+        if os.getenv('SHARE_INCONSISTENCIES'):
+            self._logger.error("Setting 'share inconsistencies' to True")
+            self.overlay.settings.share_inconsistencies = True
 
         self.overlay.persistence.kill_callback = self.on_fraud_detected
 
