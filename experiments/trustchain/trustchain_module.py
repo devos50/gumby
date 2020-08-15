@@ -84,16 +84,16 @@ class TrustchainModule(IPv8OverlayExperimentModule):
             strategy = int(os.getenv('GOSSIP_STRATEGY'))
             if strategy == 0:  # Plain
                 self.overlay.settings.share_inconsistencies = False
-                self.overlay.settings.crawl_send_random_blocks = False
+                self.overlay.settings.crawl_send_random_blocks = 0
             elif strategy == 1:
                 self.overlay.settings.share_inconsistencies = True
-                self.overlay.settings.crawl_send_random_blocks = False
+                self.overlay.settings.crawl_send_random_blocks = 0
             elif strategy == 2:
                 self.overlay.settings.share_inconsistencies = False
-                self.overlay.settings.crawl_send_random_blocks = True
+                self.overlay.settings.crawl_send_random_blocks = 2
             elif strategy == 3:
                 self.overlay.settings.share_inconsistencies = True
-                self.overlay.settings.crawl_send_random_blocks = True
+                self.overlay.settings.crawl_send_random_blocks = 2
 
         self.overlay.persistence.kill_callback = self.on_fraud_detected
 
