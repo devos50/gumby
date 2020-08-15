@@ -75,8 +75,9 @@ class TrustchainModule(IPv8OverlayExperimentModule):
             self._logger.error("Setting 'share inconsistencies' to True")
             self.overlay.settings.share_inconsistencies = True
         if os.getenv('CRAWL_SEND_RANDOM_BLOCKS'):
-            self._logger.error("Sending random blocks during crawl!")
-            self.overlay.settings.crawl_send_random_blocks = True
+            num_rand_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
+            self._logger.error("Sending %d random blocks during crawl!", num_rand_blocks)
+            self.overlay.settings.crawl_send_random_blocks = num_rand_blocks
 
         if os.getenv('GOSSIP_STRATEGY'):
             self._logger.error("TrustChain gossip strategy set - overriding settings!")
