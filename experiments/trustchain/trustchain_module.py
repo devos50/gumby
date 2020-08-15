@@ -90,10 +90,10 @@ class TrustchainModule(IPv8OverlayExperimentModule):
                 self.overlay.settings.crawl_send_random_blocks = 0
             elif strategy == 2:
                 self.overlay.settings.share_inconsistencies = False
-                self.overlay.settings.crawl_send_random_blocks = 2
+                self.overlay.settings.crawl_send_random_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
             elif strategy == 3:
                 self.overlay.settings.share_inconsistencies = True
-                self.overlay.settings.crawl_send_random_blocks = 2
+                self.overlay.settings.crawl_send_random_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
 
         self.overlay.persistence.kill_callback = self.on_fraud_detected
 
