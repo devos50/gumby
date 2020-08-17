@@ -2,7 +2,7 @@ import os
 import time
 from asyncio import get_event_loop
 from binascii import hexlify
-from random import choice, random
+from random import choice, random, randint
 import csv
 
 from ipv8.attestation.trustchain.community import TrustChainCommunity
@@ -176,18 +176,31 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         self._logger.info("Starting to crawl with interval %f", crawl_interval)
         run_task(self.crawl, delay=rand_delay, interval=crawl_interval)
 
-    def crawl(self):
+    async def crawl(self):
         """
         Forward crawl a random peer
         """
         peer_id = choice(self.peers_to_crawl)
         peer = self.get_peer(peer_id)
 
-        start_seq = self.overlay.persistence.get_lowest_sequence_number_unknown(peer.public_key.key_to_bin())
-        crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
-        end_seq = start_seq + crawl_batch_size
-        self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
-        self._logger.info("Crawling peer %s (%d - %d)", peer_id, start_seq, end_seq)
+        # Get the latest block of this peer
+        blocks = await self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), -1, -1)
+        if not blocks:
+            return
+
+        for block in blocks:
+            await self.overlay.process_half_block(block, peer)
+            if block.public_key == peer.public_key.key_to_bin():
+                # Select random numbers
+                if block and block.sequence_number > 1:
+                    start_seq = randint(1, block.sequence_number - 1)
+                else:
+                    start_seq = 1
+
+                crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
+                end_seq = start_seq + crawl_batch_size
+                self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
+                self._logger.info("Crawling peer %s (%d - %d)", peer_id, start_seq, end_seq)
 
     @experiment_callback
     def request_crawl(self, peer_id, sequence_number):
