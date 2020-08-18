@@ -83,17 +83,17 @@ class TrustchainModule(IPv8OverlayExperimentModule):
             self._logger.error("TrustChain gossip strategy set - overriding settings!")
             strategy = int(os.getenv('GOSSIP_STRATEGY'))
             if strategy == 0:  # Plain
-                self.overlay.settings.share_inconsistencies = False
                 self.overlay.settings.crawl_send_random_blocks = 0
-            elif strategy == 1:
-                self.overlay.settings.share_inconsistencies = True
-                self.overlay.settings.crawl_send_random_blocks = 0
+                self.overlay.settings.broadcast_fanout = 0
+            elif strategy == 1:  # crawl + rand block spread
+                self.overlay.settings.crawl_send_random_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
+                self.overlay.settings.broadcast_fanout = 0
             elif strategy == 2:
-                self.overlay.settings.share_inconsistencies = False
-                self.overlay.settings.crawl_send_random_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
+                self.overlay.settings.crawl_send_random_blocks = 0
+                self.overlay.settings.broadcast_fanout = int(os.getenv('BROADCAST_FANOUT'))
             elif strategy == 3:
-                self.overlay.settings.share_inconsistencies = True
                 self.overlay.settings.crawl_send_random_blocks = int(os.getenv('CRAWL_SEND_RANDOM_BLOCKS'))
+                self.overlay.settings.broadcast_fanout = int(os.getenv('BROADCAST_FANOUT'))
 
         self.overlay.persistence.kill_callback = self.on_fraud_detected
 
