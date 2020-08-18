@@ -184,23 +184,26 @@ class TrustchainModule(IPv8OverlayExperimentModule):
         peer = self.get_peer(peer_id)
 
         # Get the latest block of this peer
-        blocks = await self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), -1, -1)
-        if not blocks:
-            return
+        try:
+            blocks = await self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), -1, -1)
+            if not blocks:
+                return
 
-        for block in blocks:
-            await self.overlay.process_half_block(block, peer)
-            if block.public_key == peer.public_key.key_to_bin():
-                # Select random numbers
-                if block and block.sequence_number > 1:
-                    start_seq = randint(1, block.sequence_number - 1)
-                else:
-                    start_seq = 1
+            for block in blocks:
+                await self.overlay.process_half_block(block, peer)
+                if block.public_key == peer.public_key.key_to_bin():
+                    # Select random numbers
+                    if block and block.sequence_number > 1:
+                        start_seq = randint(1, block.sequence_number - 1)
+                    else:
+                        start_seq = 1
 
-                crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
-                end_seq = start_seq + crawl_batch_size
-                self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
-                self._logger.info("Crawling peer %s (%d - %d)", peer_id, start_seq, end_seq)
+                    crawl_batch_size = int(os.environ["CRAWL_BATCH_SIZE"])
+                    end_seq = start_seq + crawl_batch_size
+                    self.overlay.send_crawl_request(peer, peer.public_key.key_to_bin(), start_seq, end_seq)
+                    self._logger.info("Crawling peer %s (%d - %d)", peer_id, start_seq, end_seq)
+        except RuntimeError as e:
+            self._logger.info("Failed to process half block (error %s)", e)
 
     @experiment_callback
     def request_crawl(self, peer_id, sequence_number):
